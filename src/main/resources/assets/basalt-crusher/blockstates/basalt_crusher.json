@@ -1,0 +1,33 @@
+{
+  "variants": {
+    "crushing_state=empty,facing=north": { "model": "basalt-crusher:block/basalt_crusher_empty" },
+    "crushing_state=empty,facing=east":  { "model": "basalt-crusher:block/basalt_crusher_empty", "y":  90 },
+    "crushing_state=empty,facing=south": { "model": "basalt-crusher:block/basalt_crusher_empty", "y":  180 },
+    "crushing_state=empty,facing=west":  { "model": "basalt-crusher:block/basalt_crusher_empty", "y":  270 },
+
+    "crushing_state=idle,facing=north": { "model": "basalt-crusher:block/basalt_crusher_idle" },
+    "crushing_state=idle,facing=east":  { "model": "basalt-crusher:block/basalt_crusher_idle", "y":  90 },
+    "crushing_state=idle,facing=south": { "model": "basalt-crusher:block/basalt_crusher_idle", "y":  180 },
+    "crushing_state=idle,facing=west":  { "model": "basalt-crusher:block/basalt_crusher_idle", "y":  270 },
+
+    "crushing_state=open,facing=north": { "model": "basalt-crusher:block/basalt_crusher_open" },
+    "crushing_state=open,facing=east":  { "model": "basalt-crusher:block/basalt_crusher_open", "y":  90 },
+    "crushing_state=open,facing=south": { "model": "basalt-crusher:block/basalt_crusher_open", "y":  180 },
+    "crushing_state=open,facing=west":  { "model": "basalt-crusher:block/basalt_crusher_open", "y":  270 },
+
+    "crushing_state=openish,facing=north": { "model": "basalt-crusher:block/basalt_crusher_openish" },
+    "crushing_state=openish,facing=east":  { "model": "basalt-crusher:block/basalt_crusher_openish", "y":  90 },
+    "crushing_state=openish,facing=south": { "model": "basalt-crusher:block/basalt_crusher_openish", "y":  180 },
+    "crushing_state=openish,facing=west":  { "model": "basalt-crusher:block/basalt_crusher_openish", "y":  270 },
+
+    "crushing_state=closedish,facing=north": { "model": "basalt-crusher:block/basalt_crusher_closedish" },
+    "crushing_state=closedish,facing=east":  { "model": "basalt-crusher:block/basalt_crusher_closedish", "y":  90 },
+    "crushing_state=closedish,facing=south": { "model": "basalt-crusher:block/basalt_crusher_closedish", "y":  180 },
+    "crushing_state=closedish,facing=west":  { "model": "basalt-crusher:block/basalt_crusher_closedish", "y":  270 },
+
+    "crushing_state=closed,facing=north": { "model": "basalt-crusher:block/basalt_crusher_closed" },
+    "crushing_state=closed,facing=east":  { "model": "basalt-crusher:block/basalt_crusher_closed", "y":  90 },
+    "crushing_state=closed,facing=south": { "model": "basalt-crusher:block/basalt_crusher_closed", "y":  180 },
+    "crushing_state=closed,facing=west":  { "model": "basalt-crusher:block/basalt_crusher_closed", "y":  270 }
+  }
+}

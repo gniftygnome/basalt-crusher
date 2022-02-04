@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "basalt-crusher",
+  "version": "${version}",
+  "name": "Basalt Crusher",
+  "description": "Making basalt useful since 2021!",
+  "authors": [
+    "GniftyGnome"
+  ],
+  "contact": {
+    "website": "http://www.gnomecraft.net/",
+    "repo": "https://github.com/gniftygnome/BasaltCrusher"
+  },
+  "license": "MIT",
+  "icon": "assets/basalt-crusher/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "net.gnomecraft.basaltcrusher.BasaltCrusherClient"
+    ],
+    "main": [
+      "net.gnomecraft.basaltcrusher.BasaltCrusher"
+    ]
+  },
+  "mixins": [
+    "basalt-crusher.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.12.12",
+    "fabric": "*",
+    "minecraft": "1.18.x",
+    "java": ">=17"
+  }
+}

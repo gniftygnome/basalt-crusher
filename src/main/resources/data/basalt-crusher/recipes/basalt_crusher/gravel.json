@@ -1,0 +1,11 @@
+{
+  "type": "basalt-crusher:basalt_crusher_recipe",
+  "inputA" : {
+    "tag": "c:basalt"
+  },
+  "inputB": {
+    "item": "basalt-crusher:jaw_liners"
+  },
+  "outputItem": "minecraft:gravel",
+  "outputAmount": 1
+}

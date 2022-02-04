@@ -1,0 +1,136 @@
+package net.gnomecraft.basaltcrusher;
+
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
+
+public class BasaltCrusherScreenHandler extends ScreenHandler {
+    private final Inventory inventory;
+
+    public BasaltCrusherScreenHandler(int syncId, PlayerInventory playerInventory) {
+        this(syncId, playerInventory, new SimpleInventory(4));
+    }
+
+    public BasaltCrusherScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
+        super(BasaltCrusher.BASALT_CRUSHER_SCREEN_HANDLER, syncId);
+
+        checkSize(inventory, 4);
+        this.inventory = inventory;
+
+        inventory.onOpen(playerInventory.player);
+
+        // BasaltCrusher inventory slots
+        this.addSlot(new Slot(inventory, 0, 84,  35));  // input
+        this.addSlot(new Slot(inventory, 1, 17,  35));  // jaw liners
+        this.addSlot(new Slot(inventory, 2, 136, 35));  // output
+        this.addSlot(new Slot(inventory, 3, 45,  35));  // active jaw liner
+
+        // Player inventory slots
+        for (int m = 0; m < 3; ++m) {
+            for (int l = 0; l < 9; ++l) {
+                this.addSlot(new Slot(playerInventory, l + m * 9 + 9, 8 + l * 18, 84 + m * 18));
+            }
+        }
+
+        // Player hotbar slots
+        for (int m = 0; m < 9; ++m) {
+            this.addSlot(new Slot(playerInventory, m, 8 + m * 18, 142));
+        }
+    }
+
+    @Override
+    public boolean canUse(PlayerEntity player) {
+        return this.inventory.canPlayerUse(player);
+    }
+
+    @Override
+    public void onSlotClick(int slotNumber, int button, SlotActionType action, PlayerEntity player) {
+        ItemStack newStack = this.getCursorStack();
+
+        // Filter swaps on the Crusher inventory for acceptable items in.
+        if ((action == SlotActionType.PICKUP || action == SlotActionType.PICKUP_ALL || action == SlotActionType.QUICK_CRAFT) && !newStack.isEmpty() && slotNumber >= 0 && slotNumber < this.slots.size()) {
+            switch (slotNumber) {
+                case 0:
+                    // input slot
+                    if (newStack.isIn(BasaltCrusher.BASALTS)) {
+                        super.onSlotClick(slotNumber, button, action, player);
+                    }
+                    break;
+                case 1:
+                    // jaw liner slot
+                    if (newStack.isIn(BasaltCrusher.JAW_LINERS)) {
+                        super.onSlotClick(slotNumber, button, action, player);
+                    }
+                    break;
+                case 2:
+                    // output slot
+                    // (nothing is acceptable)
+                    break;
+                case 3:
+                    // crushing slot
+                    if (newStack.isIn(BasaltCrusher.JAW_LINERS) && newStack.getCount() == 1 && !newStack.isItemEqual(this.inventory.getStack(3))) {
+                        super.onSlotClick(slotNumber, button, action, player);
+                    }
+                    break;
+                default:
+                    super.onSlotClick(slotNumber, button, action, player);
+                    break;
+            }
+        } else {
+            super.onSlotClick(slotNumber, button, action, player);
+        }
+    }
+
+    @Override
+    public ItemStack transferSlot(PlayerEntity player, int invSlot) {
+        ItemStack newStack = ItemStack.EMPTY;
+        Slot slot = this.slots.get(invSlot);
+
+        // Reimplement to filter transfers to the Crusher inventory for acceptable items in.
+        if (slot.hasStack()) {
+            ItemStack originalStack = slot.getStack();
+            newStack = originalStack.copy();
+
+            if (invSlot < this.inventory.size()) {
+                // From the Crusher inventory to the Player.
+                if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
+                    return ItemStack.EMPTY;
+                }
+            } else {
+                // From the Player inventory to the Crusher.
+                if (originalStack.isIn(BasaltCrusher.JAW_LINERS)) {
+                    // First try to place one jaw liner in the crushing slot.
+                    if (this.inventory.getStack(3).isEmpty()) {
+                        this.inventory.setStack(3, originalStack.split(1));
+                    }
+
+                    // Then try to place up to a stack of jaw liners into the jaw liner slot.
+                    if (!this.insertItem(originalStack, 1, 2, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                } else if (originalStack.isIn(BasaltCrusher.BASALTS)) {
+                    // Then try to place anything basalt into the input slot.
+                    if (!this.insertItem(originalStack, 0, 1, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                } else {
+                    // If we don't even try to do anything, we have to return EMPTY or the game locks up...
+                    return ItemStack.EMPTY;
+                }
+            }
+
+            if (originalStack.isEmpty()) {
+                slot.setStack(ItemStack.EMPTY);
+            } else {
+                slot.markDirty();
+            }
+        }
+
+        return newStack;
+    }
+}

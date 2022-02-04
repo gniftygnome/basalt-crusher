@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smithing",
+  "base": {
+    "item": "basalt-crusher:diamond_jaw_liner"
+  },
+  "addition": {
+    "item": "minecraft:netherite_ingot"
+  },
+  "result": {
+    "item": "basalt-crusher:netherite_jaw_liner"
+  }
+}

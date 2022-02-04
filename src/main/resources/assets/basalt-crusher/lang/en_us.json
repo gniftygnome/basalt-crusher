@@ -1,0 +1,8 @@
+{
+  "block.basalt-crusher.basalt_crusher":      "Basalt Crusher",
+
+  "item.basalt-crusher.basalt_crusher":       "Basalt Crusher",
+  "item.basalt-crusher.iron_jaw_liner":       "Iron Jaw Liner",
+  "item.basalt-crusher.diamond_jaw_liner":    "Diamond Jaw Liner",
+  "item.basalt-crusher.netherite_jaw_liner":  "Netherite Jaw Liner"
+}
