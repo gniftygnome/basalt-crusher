@@ -13,6 +13,8 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BasaltCrusher implements ModInitializer {
     public static Block BASALT_CRUSHER_BLOCK;
@@ -23,9 +25,11 @@ public class BasaltCrusher implements ModInitializer {
     public static ToolItem DIAMOND_JAW_LINER_ITEM;
     public static ToolItem NETHERITE_JAW_LINER_ITEM;
 
+    public static final String modId = "basalt-crusher";
+    public static final Logger LOGGER = LoggerFactory.getLogger(modId);
+
     public static final ScreenHandlerType<BasaltCrusherScreenHandler> BASALT_CRUSHER_SCREEN_HANDLER;
 
-    public static final String modId = "basalt-crusher";
     public static final Identifier BasaltCrusherBlockId = new Identifier(modId, "basalt_crusher");
     public static final Identifier IronJawLinerId = new Identifier(modId, "iron_jaw_liner");
     public static final Identifier DiamondJawLinerId = new Identifier(modId, "diamond_jaw_liner");
@@ -36,6 +40,8 @@ public class BasaltCrusher implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        LOGGER.info("Basalt Crusher block is hungry...");
+
         // Basalt Crusher block
         BASALT_CRUSHER_BLOCK = Registry.register(Registry.BLOCK, BasaltCrusherBlockId, new BasaltCrusherBlock(FabricBlockSettings.of(Material.METAL).hardness(4.0f)));
         BASALT_CRUSHER_ITEM = Registry.register(Registry.ITEM, BasaltCrusherBlockId, new BlockItem(BASALT_CRUSHER_BLOCK, new Item.Settings().group(ItemGroup.DECORATIONS)));
