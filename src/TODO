@@ -1,0 +1,10 @@
+Some Things
+
+* Add support for supplying a redstone signal to "power up" the crushing and get sand?
+  * Doubles the crushing time.
+  * Add a sand recipe.
+  * Logic in the successful crushing section.
+
+* Add support for Efficiency enchantment to speed up crushing time?
+
+* Add an advancement?  Crushing Success!?

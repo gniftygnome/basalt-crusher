@@ -3,13 +3,13 @@
   "id": "basalt-crusher",
   "version": "${version}",
   "name": "Basalt Crusher",
-  "description": "Making basalt useful since 2021!",
+  "description": "Making basalt useful since 2022!",
   "authors": [
     "GniftyGnome"
   ],
   "contact": {
     "website": "http://www.gnomecraft.net/",
-    "repo": "https://github.com/gniftygnome/BasaltCrusher"
+    "repo": "https://github.com/gniftygnome/basalt-crusher"
   },
   "license": "MIT",
   "icon": "assets/basalt-crusher/icon.png",
