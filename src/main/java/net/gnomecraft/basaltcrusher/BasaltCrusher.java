@@ -4,13 +4,12 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
-import net.fabricmc.fabric.api.tag.TagFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.*;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.slf4j.Logger;
@@ -35,8 +34,8 @@ public class BasaltCrusher implements ModInitializer {
     public static final Identifier DiamondJawLinerId = new Identifier(modId, "diamond_jaw_liner");
     public static final Identifier NetheriteJawLinerId = new Identifier(modId, "netherite_jaw_liner");
 
-    public static final Tag<Item> BASALTS = TagFactory.ITEM.create(new Identifier("c", "basalt"));
-    public static final Tag<Item> JAW_LINERS = TagFactory.ITEM.create(new Identifier("basalt-crusher", "jaw_liners"));
+    public static final TagKey<Item> BASALTS = TagKey.of(Registry.ITEM_KEY, new Identifier("c", "basalt"));
+    public static final TagKey<Item> JAW_LINERS = TagKey.of(Registry.ITEM_KEY, new Identifier("basalt-crusher", "jaw_liners"));
 
     @Override
     public void onInitialize() {
