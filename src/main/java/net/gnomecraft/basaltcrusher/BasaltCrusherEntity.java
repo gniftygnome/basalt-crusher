@@ -10,9 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SidedInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.*;
 import net.minecraft.screen.ScreenHandler;
@@ -212,12 +210,12 @@ public class BasaltCrusherEntity extends LockableContainerBlockEntity implements
     }
 
     @Override
-    public boolean canInsert(int index, ItemStack stack, Direction direction) {
-        return this.isValid(index, stack);
+    public boolean canInsert(int slot, ItemStack stack, Direction direction) {
+        return this.isValid(slot, stack);
     }
 
     @Override
-    public boolean canExtract(int index, ItemStack stack, Direction direction) {
+    public boolean canExtract(int slot, ItemStack stack, Direction direction) {
         // Allow extracting anything from any slot that matches the direction.
         return true;
     }
@@ -244,8 +242,8 @@ public class BasaltCrusherEntity extends LockableContainerBlockEntity implements
     }
 
     @Override
-    public ItemStack getStack(int index) {
-        return this.inventory.get(index);
+    public ItemStack getStack(int slot) {
+        return this.inventory.get(slot);
     }
 
     @Override
@@ -259,16 +257,16 @@ public class BasaltCrusherEntity extends LockableContainerBlockEntity implements
     }
 
     @Override
-    public void setStack(int index, ItemStack stack) {
-        ItemStack target = this.inventory.get(index);
+    public void setStack(int slot, ItemStack stack) {
+        ItemStack target = this.inventory.get(slot);
         boolean sameItem = !stack.isEmpty() && stack.isItemEqualIgnoreDamage(target) && ItemStack.areNbtEqual(stack, target);
 
-        this.inventory.set(index, stack);
+        this.inventory.set(slot, stack);
         if (stack.getCount() > this.getMaxCountPerStack()) {
             stack.setCount(this.getMaxCountPerStack());
         }
 
-        if (index == 0 && !sameItem) {
+        if (slot == 0 && !sameItem) {
             this.crushTime = 0;
             this.markDirty();
         }
@@ -276,7 +274,7 @@ public class BasaltCrusherEntity extends LockableContainerBlockEntity implements
 
     @Override
     public boolean canPlayerUse(PlayerEntity player) {
-        if (this.world.getBlockEntity(this.pos) != this) {
+        if (this.world == null || this.world.getBlockEntity(this.pos) != this) {
             return false;
         } else {
             return player.squaredDistanceTo((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D, (double) this.pos.getZ() + 0.5D) <= 64.0D;
@@ -284,11 +282,11 @@ public class BasaltCrusherEntity extends LockableContainerBlockEntity implements
     }
 
     @Override
-    public boolean isValid(int index, ItemStack stack) {
-        Item newItem = stack.isEmpty() ? Items.AIR : stack.getItem();
+    public boolean isValid(int slot, ItemStack stack) {
+        //Item newItem = stack.isEmpty() ? Items.AIR : stack.getItem();
         boolean retVal = false;
 
-        switch (index) {
+        switch (slot) {
             case 0:
                 // input slot
                 // TODO: use the recipe
