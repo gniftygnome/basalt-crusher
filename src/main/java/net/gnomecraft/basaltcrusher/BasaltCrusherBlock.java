@@ -145,5 +145,4 @@ public class BasaltCrusherBlock extends BlockWithEntity {
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(FACING, CRUSHING_STATE);
     }
-
 }

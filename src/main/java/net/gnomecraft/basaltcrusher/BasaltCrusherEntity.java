@@ -2,6 +2,7 @@ package net.gnomecraft.basaltcrusher;
 
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.base.SingleStackStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -44,10 +45,12 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
     public BasaltCrusherEntity(BlockPos pos, BlockState state) {
         super(BasaltCrusher.BASALT_CRUSHER_ENTITY, pos, state);
 
+        // Initialize cached crushing state.
+        this.crushingState = state.get(CRUSHING_STATE);
+
+        // Recipe support (currently unused).
         this.recipesUsed = DefaultedList.of();
         this.recipeType = BasaltCrusherRecipe.Type.INSTANCE;
-
-        this.crushingState = BasaltCrusherBlock.CrushingState.EMPTY;
 
         // Our mod is a simple mod.
         this.crushTimeTotal = 200;
@@ -122,8 +125,8 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         }
     };
 
-    // BasaltCrusherJawStorage is the transfer access to the Jaw Liner slot (1).
-    private final BasaltCrusherJawStorage jawStorage = new BasaltCrusherJawStorage() {
+    // The jawStorage is the transfer access to the Jaw Liner slot (1).
+    private final SingleStackStorage jawStorage = new SingleStackStorage() {
         @Override
         protected ItemStack getStack() {
             return BasaltCrusherEntity.this.inventory.getStack(1);
@@ -137,6 +140,11 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         @Override
         protected boolean canInsert(ItemVariant itemVariant) {
             return itemVariant.toStack().isIn(BasaltCrusher.JAW_LINERS);
+        }
+
+        @Override
+        protected int getCapacity(ItemVariant itemVariant) {
+            return 16;
         }
     };
 
