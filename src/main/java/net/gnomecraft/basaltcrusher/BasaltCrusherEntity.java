@@ -1,41 +1,37 @@
 package net.gnomecraft.basaltcrusher;
 
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.LockableContainerBlockEntity;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.*;
+import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-import java.util.Iterator;
-
 import static net.gnomecraft.basaltcrusher.BasaltCrusherBlock.CRUSHING_STATE;
 
-public class BasaltCrusherEntity extends LockableContainerBlockEntity implements RecipeInputProvider, RecipeUnlocker, SidedInventory {
-    private DefaultedList<ItemStack> inventory;
+public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandlerFactory, RecipeInputProvider, RecipeUnlocker {
     private Identifier lastRecipe;
     private final DefaultedList<Recipe<?>> recipesUsed;
     private final RecipeType<BasaltCrusherRecipe> recipeType;
-
-    private static final int[] TOP_SLOTS = new int[] {0};
-    private static final int[] SIDE_SLOTS = new int[] {1};
-    private static final int[] BOTTOM_SLOTS = new int[] {2};
-    // Crushing slot cannot be targeted: {3}
 
     private BasaltCrusherBlock.CrushingState crushingState;
 
@@ -48,7 +44,6 @@ public class BasaltCrusherEntity extends LockableContainerBlockEntity implements
     public BasaltCrusherEntity(BlockPos pos, BlockState state) {
         super(BasaltCrusher.BASALT_CRUSHER_ENTITY, pos, state);
 
-        this.inventory = DefaultedList.ofSize(4, ItemStack.EMPTY);
         this.recipesUsed = DefaultedList.of();
         this.recipeType = BasaltCrusherRecipe.Type.INSTANCE;
 
@@ -61,9 +56,102 @@ public class BasaltCrusherEntity extends LockableContainerBlockEntity implements
         this.expAccumulated = 0.0F;
     }
 
-    @Override
-    public ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
-        return new BasaltCrusherScreenHandler(syncId, playerInventory, this);
+    // BasaltCrusherInventory is the backing store for our Storage implementations.
+    private final BasaltCrusherInventory inventory = new BasaltCrusherInventory(4) {
+        private static final int[] TOP_SLOTS = new int[] {0};
+        private static final int[] SIDE_SLOTS = new int[] {1};
+        private static final int[] BOTTOM_SLOTS = new int[] {2};
+        // Crushing slot cannot be targeted: {3}
+
+        @Override
+        public int[] getAvailableSlots(Direction direction) {
+            if (direction == Direction.UP) {
+                return TOP_SLOTS;
+            } else if (direction == Direction.DOWN) {
+                return BOTTOM_SLOTS;
+            } else {
+                return SIDE_SLOTS;
+            }
+        }
+
+        @Override
+        public boolean isValid(int slot, ItemStack stack) {
+            boolean retVal = false;
+
+            switch (slot) {
+                case 0:
+                    // input slot
+                    // TODO: use the recipe
+                    retVal = stack.isIn(BasaltCrusher.BASALTS);
+                    break;
+                case 1:
+                    // jaw liner slot
+                    // TODO: use the recipe
+                    retVal = stack.isIn(BasaltCrusher.JAW_LINERS);
+                    break;
+                case 2:
+                    // output slot
+                    break;
+                case 3:
+                    // crushing slot (active jaw liner)
+                    // TODO: use the recipe
+                    retVal = (stack.isIn(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !stack.isItemEqual(this.getStack(3)));
+                    break;
+            }
+
+            return retVal;
+        }
+
+        @Override
+        public void markDirty() {
+            BasaltCrusherEntity.this.markDirty();
+        }
+
+        @Override
+        public void setStack(int slot, ItemStack stack) {
+            ItemStack target = this.getStack(slot);
+            boolean sameItem = !stack.isEmpty() && stack.isItemEqualIgnoreDamage(target) && ItemStack.areNbtEqual(stack, target);
+
+            super.setStack(slot, stack);
+
+            if (slot == 0 && !sameItem) {
+                BasaltCrusherEntity.this.crushTime = 0;
+            }
+
+            BasaltCrusherEntity.this.markDirty();
+        }
+    };
+
+    // BasaltCrusherJawStorage is the transfer access to the Jaw Liner slot (1).
+    private final BasaltCrusherJawStorage jawStorage = new BasaltCrusherJawStorage() {
+        @Override
+        protected ItemStack getStack() {
+            return BasaltCrusherEntity.this.inventory.getStack(1);
+        }
+
+        @Override
+        protected void setStack(ItemStack stack) {
+            BasaltCrusherEntity.this.inventory.setStack(1, stack);
+        }
+
+        @Override
+        protected boolean canInsert(ItemVariant itemVariant) {
+            return itemVariant.toStack().isIn(BasaltCrusher.JAW_LINERS);
+        }
+    };
+
+    public Storage<ItemVariant> getSidedStorage(World world, BlockPos pos, BlockState state, BlockEntity blockEntity, Direction direction) {
+        if (direction == null) {
+            return null;
+        } else if (direction == Direction.DOWN || direction == Direction.UP) {
+            return InventoryStorage.of(inventory, direction);
+        } else {
+            return jawStorage;
+        }
+    }
+
+    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+        return new BasaltCrusherScreenHandler(syncId, playerInventory, this.inventory);
     }
 
     @Override
@@ -72,13 +160,8 @@ public class BasaltCrusherEntity extends LockableContainerBlockEntity implements
     }
 
     @Override
-    public Text getContainerName() {
-        return new TranslatableText(getCachedState().getBlock().getTranslationKey());
-    }
-
-    @Override
     public void writeNbt(NbtCompound tag) {
-        Inventories.writeNbt(tag, this.inventory);
+        tag.put("Inventory", this.inventory.toNbtList());
 
         if (lastRecipe != null) {
             tag.putString("LastRecipeLocation", lastRecipe.toString());
@@ -96,8 +179,7 @@ public class BasaltCrusherEntity extends LockableContainerBlockEntity implements
     public void readNbt(NbtCompound tag) {
         super.readNbt(tag);
 
-        inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
-        Inventories.readNbt(tag, this.inventory);
+        inventory.readNbtList(tag.getList("Inventory", NbtList.COMPOUND_TYPE));
 
         String lastRecipeLocation = tag.getString("LastRecipeLocation");
         if (lastRecipeLocation != null && !lastRecipeLocation.isEmpty()) {
@@ -116,8 +198,8 @@ public class BasaltCrusherEntity extends LockableContainerBlockEntity implements
     }
 
     private void tickJawLiner(World world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
-        ItemStack liners = entity.getStack(1);
-        ItemStack crushing = entity.getStack(3);
+        ItemStack liners = entity.inventory.getStack(1);
+        ItemStack crushing = entity.inventory.getStack(3);
 
         // Make sure there is a jaw liner in the active slot if we have one available.
         if (crushing.isEmpty()) {
@@ -126,16 +208,16 @@ public class BasaltCrusherEntity extends LockableContainerBlockEntity implements
                 entity.setCrushingState(state, BasaltCrusherBlock.CrushingState.EMPTY);
             } else {
                 // Move a jaw liner into the jaws slot.
-                entity.setStack(3, entity.removeStack(1, 1));
+                entity.inventory.setStack(3, entity.inventory.removeStack(1, 1));
                 entity.markDirty();
             }
         }
     }
 
     private void tickCrusher(World world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
-        ItemStack input = entity.getStack(0);
-        ItemStack output = entity.getStack(2);
-        ItemStack crushing = entity.getStack(3);
+        ItemStack input = entity.inventory.getStack(0);
+        ItemStack output = entity.inventory.getStack(2);
+        ItemStack crushing = entity.inventory.getStack(3);
 
         // We can't crush if our output is full.  Short circuit.
         if (output.getCount() == output.getMaxCount()) {
@@ -174,13 +256,13 @@ public class BasaltCrusherEntity extends LockableContainerBlockEntity implements
             // TODO: use the recipe (probably not; we only make gravel).
             input.decrement(1);
             if (output.isEmpty()) {
-                entity.setStack(2, new ItemStack(Blocks.GRAVEL, 1));
+                entity.inventory.setStack(2, new ItemStack(Blocks.GRAVEL, 1));
             } else {
                 output.increment(1);
             }
             // Damage the jaw liner (if possible).
             if (crushing.isDamageable()) {
-                if ((1.0d / (1.0d + (double)EnchantmentHelper.getLevel(Enchantments.UNBREAKING, crushing))) > world.random.nextDouble()) {
+                if ((1.0d / (1.0d + (double) EnchantmentHelper.getLevel(Enchantments.UNBREAKING, crushing))) > world.random.nextDouble()) {
                     crushing.setDamage(crushing.getDamage() + 1);
                 }
                 if (crushing.getDamage() >= crushing.getMaxDamage()) {
@@ -198,82 +280,7 @@ public class BasaltCrusherEntity extends LockableContainerBlockEntity implements
         }
     }
 
-    @Override
-    public int[] getAvailableSlots(Direction direction) {
-        if (direction == Direction.UP) {
-            return TOP_SLOTS;
-        } else if (direction == Direction.DOWN) {
-            return BOTTOM_SLOTS;
-        } else {
-            return SIDE_SLOTS;
-        }
-    }
-
-    @Override
-    public boolean canInsert(int slot, ItemStack stack, Direction direction) {
-        return this.isValid(slot, stack);
-    }
-
-    @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction direction) {
-        // Allow extracting anything from any slot that matches the direction.
-        return true;
-    }
-
-    @Override
-    public int size() {
-        return this.inventory.size();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        Iterator<ItemStack> invIterator = this.inventory.iterator();
-
-        ItemStack stack;
-        do {
-            if (!invIterator.hasNext()) {
-                return true;
-            }
-
-            stack = (ItemStack) invIterator.next();
-        } while (stack.isEmpty());
-
-        return false;
-    }
-
-    @Override
-    public ItemStack getStack(int slot) {
-        return this.inventory.get(slot);
-    }
-
-    @Override
-    public ItemStack removeStack(int slot, int amount) {
-        return Inventories.splitStack(this.inventory, slot, amount);
-    }
-
-    @Override
-    public ItemStack removeStack(int slot) {
-        return Inventories.removeStack(this.inventory, slot);
-    }
-
-    @Override
-    public void setStack(int slot, ItemStack stack) {
-        ItemStack target = this.inventory.get(slot);
-        boolean sameItem = !stack.isEmpty() && stack.isItemEqualIgnoreDamage(target) && ItemStack.areNbtEqual(stack, target);
-
-        this.inventory.set(slot, stack);
-        if (stack.getCount() > this.getMaxCountPerStack()) {
-            stack.setCount(this.getMaxCountPerStack());
-        }
-
-        if (slot == 0 && !sameItem) {
-            this.crushTime = 0;
-            this.markDirty();
-        }
-    }
-
-    @Override
-    public boolean canPlayerUse(PlayerEntity player) {
+    public boolean canUse(PlayerEntity player) {
         if (this.world == null || this.world.getBlockEntity(this.pos) != this) {
             return false;
         } else {
@@ -281,38 +288,8 @@ public class BasaltCrusherEntity extends LockableContainerBlockEntity implements
         }
     }
 
-    @Override
-    public boolean isValid(int slot, ItemStack stack) {
-        //Item newItem = stack.isEmpty() ? Items.AIR : stack.getItem();
-        boolean retVal = false;
-
-        switch (slot) {
-            case 0:
-                // input slot
-                // TODO: use the recipe
-                retVal = stack.isIn(BasaltCrusher.BASALTS);
-                break;
-            case 1:
-                // jaw liner slot
-                // TODO: use the recipe
-                retVal = stack.isIn(BasaltCrusher.JAW_LINERS);
-                break;
-            case 2:
-                // output slot
-                break;
-            case 3:
-                // crushing slot (active jaw liner)
-                // TODO: use the recipe
-                retVal = (stack.isIn(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !stack.isItemEqual(this.inventory.get(3)));
-                break;
-        }
-
-        return retVal;
-    }
-
-    @Override
-    public void clear() {
-        this.inventory.clear();
+    public void scatterInventory(World world, BlockPos pos) {
+        ItemScatterer.spawn(world, pos, this.inventory);
     }
 
     @Override
@@ -324,6 +301,10 @@ public class BasaltCrusherEntity extends LockableContainerBlockEntity implements
 
     @Override
     public Recipe<?> getLastRecipe() {
+        if (this.world == null) {
+            return null;
+        }
+
         return this.world.getRecipeManager().get(lastRecipe).orElse(null);
     }
 
@@ -348,8 +329,8 @@ public class BasaltCrusherEntity extends LockableContainerBlockEntity implements
 
     @Override
     public void provideRecipeInputs(RecipeMatcher finder) {
-        for (ItemStack stack : this.inventory) {
-            finder.addInput(stack);
+        for (int slot = 0; slot < this.inventory.size(); ++slot) {
+            finder.addInput(this.inventory.getStack(slot));
         }
     }
 

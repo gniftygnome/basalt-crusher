@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
@@ -54,6 +55,9 @@ public class BasaltCrusher implements ModInitializer {
         // Basalt Crusher gravel recipe
         Registry.register(Registry.RECIPE_SERIALIZER, BasaltCrusherRecipeSerializer.ID, BasaltCrusherRecipeSerializer.INSTANCE);
         Registry.register(Registry.RECIPE_TYPE, new Identifier(modId, BasaltCrusherRecipe.Type.ID), BasaltCrusherRecipe.Type.INSTANCE);
+
+        // Basalt Crusher Storage
+        ItemStorage.SIDED.registerForBlocks((world, pos, state, blockEntity, direction) -> ((BasaltCrusherEntity) blockEntity).getSidedStorage(world, pos, state, blockEntity, direction), BASALT_CRUSHER_BLOCK);
     }
 
     static {
