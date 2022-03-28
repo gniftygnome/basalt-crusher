@@ -26,7 +26,12 @@ public class BasaltCrusherScreenHandler extends ScreenHandler {
 
         // BasaltCrusher inventory slots
         this.addSlot(new Slot(inventory, 0, 84,  35));  // input
-        this.addSlot(new Slot(inventory, 1, 17,  35));  // jaw liners
+        this.addSlot(new Slot(inventory, 1, 17,  35) {  // jaw liners
+            @Override
+            public int getMaxItemCount(ItemStack stack) {
+                return 16;
+            }
+        });
         this.addSlot(new Slot(inventory, 2, 136, 35));  // output
         this.addSlot(new Slot(inventory, 3, 45,  35));  // active jaw liner
 
@@ -91,7 +96,7 @@ public class BasaltCrusherScreenHandler extends ScreenHandler {
         ItemStack newStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(invSlot);
 
-        // Reimplement to filter transfers to the Crusher inventory for acceptable items in.
+        // Reimplement to filter transfers to the Crusher inventory for acceptable items & counts in.
         if (slot.hasStack()) {
             ItemStack originalStack = slot.getStack();
             newStack = originalStack.copy();
@@ -107,10 +112,26 @@ public class BasaltCrusherScreenHandler extends ScreenHandler {
                     // First try to place one jaw liner in the crushing slot.
                     if (this.inventory.getStack(3).isEmpty()) {
                         this.inventory.setStack(3, originalStack.split(1));
+                        this.slots.get(3).markDirty();
                     }
 
                     // Then try to place up to a stack of jaw liners into the jaw liner slot.
-                    if (!this.insertItem(originalStack, 1, 2, false)) {
+                    ItemStack targetStack = this.inventory.getStack(1).copy();
+                    if (targetStack.isEmpty()) {
+                        this.inventory.setStack(1, originalStack.split(originalStack.getCount()));
+                        this.slots.get(1).markDirty();
+                    } else if (ItemStack.areItemsEqual(originalStack, targetStack) && ItemStack.areNbtEqual(originalStack, targetStack)) {
+                        int insertable = Math.min(originalStack.getCount(), 16 - targetStack.getCount());
+                        if (insertable > 0) {
+                            originalStack.decrement(insertable);
+                            targetStack.increment(insertable);
+                            this.inventory.setStack(1, targetStack);
+                            this.slots.get(1).markDirty();
+                        }
+                    }
+
+                    // If neither process above moved any items.
+                    if (ItemStack.areEqual(originalStack, newStack)) {
                         return ItemStack.EMPTY;
                     }
                 } else if (originalStack.isIn(BasaltCrusher.BASALTS)) {
