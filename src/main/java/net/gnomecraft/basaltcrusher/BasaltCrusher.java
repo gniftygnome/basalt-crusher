@@ -57,7 +57,7 @@ public class BasaltCrusher implements ModInitializer {
         Registry.register(Registry.RECIPE_TYPE, new Identifier(modId, BasaltCrusherRecipe.Type.ID), BasaltCrusherRecipe.Type.INSTANCE);
 
         // Basalt Crusher Storage
-        ItemStorage.SIDED.registerForBlocks((world, pos, state, blockEntity, direction) -> ((BasaltCrusherEntity) blockEntity).getSidedStorage(world, pos, state, blockEntity, direction), BASALT_CRUSHER_BLOCK);
+        ItemStorage.SIDED.registerForBlocks((world, pos, state, blockEntity, direction) -> blockEntity instanceof BasaltCrusherEntity ? ((BasaltCrusherEntity) blockEntity).getSidedStorage(direction) : null, BASALT_CRUSHER_BLOCK);
     }
 
     static {

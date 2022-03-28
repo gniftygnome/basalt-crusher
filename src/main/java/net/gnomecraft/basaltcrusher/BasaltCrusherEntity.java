@@ -27,14 +27,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
+import java.util.EnumMap;
+
 import static net.gnomecraft.basaltcrusher.BasaltCrusherBlock.CRUSHING_STATE;
 
 public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandlerFactory, RecipeInputProvider, RecipeUnlocker {
+    private BasaltCrusherBlock.CrushingState crushingState;
+    private EnumMap<Direction, Storage<ItemVariant>> storageCache;
+
     private Identifier lastRecipe;
     private final DefaultedList<Recipe<?>> recipesUsed;
     private final RecipeType<BasaltCrusherRecipe> recipeType;
-
-    private BasaltCrusherBlock.CrushingState crushingState;
 
     private int crushTimeTotal;
     private int crushTime;
@@ -47,6 +50,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
 
         // Initialize cached crushing state.
         this.crushingState = state.get(CRUSHING_STATE);
+        this.storageCache = new EnumMap<>(Direction.class);
 
         // Recipe support (currently unused).
         this.recipesUsed = DefaultedList.of();
@@ -148,14 +152,22 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         }
     };
 
-    public Storage<ItemVariant> getSidedStorage(World world, BlockPos pos, BlockState state, BlockEntity blockEntity, Direction direction) {
+    public Storage<ItemVariant> getSidedStorage(Direction direction) {
         if (direction == null) {
             return null;
-        } else if (direction == Direction.DOWN || direction == Direction.UP) {
-            return InventoryStorage.of(inventory, direction);
-        } else {
-            return jawStorage;
         }
+
+        if (storageCache.get(direction) == null) {
+            if (direction == Direction.DOWN || direction == Direction.UP) {
+                // slots 0 and 2 via InventoryStorage
+                storageCache.put(direction, InventoryStorage.of(inventory, direction));
+            } else {
+                // slot 1 via SingleStackStorage
+                storageCache.put(direction, jawStorage);
+            }
+        }
+
+        return storageCache.get(direction);
     }
 
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
