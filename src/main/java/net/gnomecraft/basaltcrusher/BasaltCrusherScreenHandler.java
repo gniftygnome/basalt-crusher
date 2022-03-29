@@ -5,27 +5,34 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ArrayPropertyDelegate;
+import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 
 public class BasaltCrusherScreenHandler extends ScreenHandler {
     private final Inventory inventory;
+    PropertyDelegate propertyDelegate;
 
     public BasaltCrusherScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, new SimpleInventory(4));
+        this(syncId, playerInventory, new SimpleInventory(5), new ArrayPropertyDelegate(2));
     }
 
-    public BasaltCrusherScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
+    public BasaltCrusherScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
         super(BasaltCrusher.BASALT_CRUSHER_SCREEN_HANDLER, syncId);
 
-        checkSize(inventory, 4);
+        checkSize(inventory, 5);
         this.inventory = inventory;
 
-        inventory.onOpen(playerInventory.player);
+        checkDataCount(propertyDelegate, 2);
+        this.propertyDelegate = propertyDelegate;
+
+        this.inventory.onOpen(playerInventory.player);
+        this.addProperties(propertyDelegate);
 
         // BasaltCrusher inventory slots
-        this.addSlot(new Slot(inventory, 0, 84,  35));  // input
+        this.addSlot(new Slot(inventory, 0, 88,  35));  // input
         this.addSlot(new Slot(inventory, 1, 17,  35) {  // jaw liners
             @Override
             public int getMaxItemCount(ItemStack stack) {
@@ -33,7 +40,8 @@ public class BasaltCrusherScreenHandler extends ScreenHandler {
             }
         });
         this.addSlot(new Slot(inventory, 2, 136, 35));  // output
-        this.addSlot(new Slot(inventory, 3, 45,  35));  // active jaw liner
+        this.addSlot(new Slot(inventory, 3, 59,  23));  // active top jaw liner
+        this.addSlot(new Slot(inventory, 4, 59,  48));  // active bottom jaw liner
 
         // Player inventory slots
         for (int m = 0; m < 3; ++m) {
@@ -77,8 +85,14 @@ public class BasaltCrusherScreenHandler extends ScreenHandler {
                     // (nothing is acceptable)
                     break;
                 case 3:
-                    // crushing slot
+                    // top crushing slot
                     if (newStack.isIn(BasaltCrusher.JAW_LINERS) && newStack.getCount() == 1 && !newStack.isItemEqual(this.inventory.getStack(3))) {
+                        super.onSlotClick(slotNumber, button, action, player);
+                    }
+                    break;
+                case 4:
+                    // bottom crushing slot
+                    if (newStack.isIn(BasaltCrusher.JAW_LINERS) && newStack.getCount() == 1 && !newStack.isItemEqual(this.inventory.getStack(4))) {
                         super.onSlotClick(slotNumber, button, action, player);
                     }
                     break;
@@ -109,13 +123,19 @@ public class BasaltCrusherScreenHandler extends ScreenHandler {
             } else {
                 // From the Player inventory to the Crusher.
                 if (originalStack.isIn(BasaltCrusher.JAW_LINERS)) {
-                    // First try to place one jaw liner in the crushing slot.
+                    // First try to place one jaw liner in the top crushing slot.
                     if (this.inventory.getStack(3).isEmpty()) {
                         this.inventory.setStack(3, originalStack.split(1));
                         this.slots.get(3).markDirty();
                     }
 
-                    // Then try to place up to a stack of jaw liners into the jaw liner slot.
+                    // Next try to place one jaw liner in the bottom crushing slot.
+                    if (this.inventory.getStack(4).isEmpty()) {
+                        this.inventory.setStack(4, originalStack.split(1));
+                        this.slots.get(4).markDirty();
+                    }
+
+                    // Finally, try to place up to a stack of jaw liners into the jaw liner slot.
                     ItemStack targetStack = this.inventory.getStack(1).copy();
                     if (targetStack.isEmpty()) {
                         this.inventory.setStack(1, originalStack.split(originalStack.getCount()));
@@ -153,5 +173,17 @@ public class BasaltCrusherScreenHandler extends ScreenHandler {
         }
 
         return newStack;
+    }
+
+    // Crushing progress as a fraction of 24 (the size of the arrow image).
+    public int crushProgress24() {
+        int crushTime = propertyDelegate.get(0);
+        int crushTimeTotal = propertyDelegate.get(1);
+
+        if (crushTimeTotal <= 0) {
+            crushTimeTotal = 240;
+        }
+
+        return (crushTime * 24) / crushTimeTotal;
     }
 }

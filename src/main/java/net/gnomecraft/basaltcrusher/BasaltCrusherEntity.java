@@ -17,6 +17,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.*;
 import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -64,11 +65,11 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
     }
 
     // BasaltCrusherInventory is the backing store for our Storage implementations.
-    private final BasaltCrusherInventory inventory = new BasaltCrusherInventory(4) {
+    private final BasaltCrusherInventory inventory = new BasaltCrusherInventory(5) {
         private static final int[] TOP_SLOTS = new int[] {0};
         private static final int[] SIDE_SLOTS = new int[] {1};
         private static final int[] BOTTOM_SLOTS = new int[] {2};
-        // Crushing slot cannot be targeted: {3}
+        // Crushing slots cannot be targeted: {3,4}
 
         @Override
         public int[] getAvailableSlots(Direction direction) {
@@ -100,9 +101,14 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
                     // output slot
                     break;
                 case 3:
-                    // crushing slot (active jaw liner)
+                    // top crushing slot (active jaw liner)
                     // TODO: use the recipe
                     retVal = (stack.isIn(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !stack.isItemEqual(this.getStack(3)));
+                    break;
+                case 4:
+                    // bottom crushing slot (active jaw liner)
+                    // TODO: use the recipe
+                    retVal = (stack.isIn(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !stack.isItemEqual(this.getStack(4)));
                     break;
             }
 
@@ -170,8 +176,34 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         return storageCache.get(direction);
     }
 
+    // Provide the crushing progress to the menu.
+    private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
+        @Override
+        public int get(int index) {
+            return switch (index) {
+                case 0 -> BasaltCrusherEntity.this.crushTime;
+                case 1 -> BasaltCrusherEntity.this.crushTimeTotal;
+                default -> 0;
+            };
+        }
+
+        @Override
+        public void set(int index, int value) {
+            switch (index) {
+                case 0 -> BasaltCrusherEntity.this.crushTime = value;
+                case 1 -> BasaltCrusherEntity.this.crushTimeTotal = value;
+            }
+        }
+
+        @Override
+        public int size() {
+            return 2;
+        }
+    };
+
+    @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new BasaltCrusherScreenHandler(syncId, playerInventory, this.inventory);
+        return new BasaltCrusherScreenHandler(syncId, playerInventory, this.inventory, this.propertyDelegate);
     }
 
     @Override
@@ -219,16 +251,29 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
 
     private void tickJawLiner(World world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
         ItemStack liners = entity.inventory.getStack(1);
-        ItemStack crushing = entity.inventory.getStack(3);
+        ItemStack upperJaw = entity.inventory.getStack(3);
+        ItemStack lowerJaw = entity.inventory.getStack(4);
 
-        // Make sure there is a jaw liner in the active slot if we have one available.
-        if (crushing.isEmpty()) {
+        // Make sure there is a jaw liner in the top slot if we have one available.
+        if (upperJaw.isEmpty()) {
             if (liners.isEmpty()) {
                 // Update the display because we have no jaw liners available.
                 entity.setCrushingState(state, BasaltCrusherBlock.CrushingState.EMPTY);
             } else {
-                // Move a jaw liner into the jaws slot.
+                // Move a jaw liner into the top jaw slot.
                 entity.inventory.setStack(3, entity.inventory.removeStack(1, 1));
+                entity.markDirty();
+            }
+        }
+
+        // Make sure there is a jaw liner in the bottom slot if we have one available.
+        if (lowerJaw.isEmpty()) {
+            if (liners.isEmpty()) {
+                // Update the display because we have no jaw liners available.
+                entity.setCrushingState(state, BasaltCrusherBlock.CrushingState.EMPTY);
+            } else {
+                // Move a jaw liner into the bottom jaw slot.
+                entity.inventory.setStack(4, entity.inventory.removeStack(1, 1));
                 entity.markDirty();
             }
         }
@@ -237,7 +282,8 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
     private void tickCrusher(World world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
         ItemStack input = entity.inventory.getStack(0);
         ItemStack output = entity.inventory.getStack(2);
-        ItemStack crushing = entity.inventory.getStack(3);
+        ItemStack upperJaw = entity.inventory.getStack(3);
+        ItemStack lowerJaw = entity.inventory.getStack(4);
 
         // We can't crush if our output is full.  Short circuit.
         if (output.getCount() == output.getMaxCount()) {
@@ -246,7 +292,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
             return;
         }
 
-        if (!crushing.isEmpty()) {
+        if (!upperJaw.isEmpty() && !lowerJaw.isEmpty()) {
             if (input.isEmpty()) {
                 // We can't be crushing so ensure crushing is reset.
                 entity.setCrushingState(state, BasaltCrusherBlock.CrushingState.IDLE);
@@ -280,13 +326,22 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
             } else {
                 output.increment(1);
             }
-            // Damage the jaw liner (if possible).
-            if (crushing.isDamageable()) {
-                if ((1.0d / (1.0d + (double) EnchantmentHelper.getLevel(Enchantments.UNBREAKING, crushing))) > world.random.nextDouble()) {
-                    crushing.setDamage(crushing.getDamage() + 1);
+            // Try to damage the top jaw liner (if possible).
+            if (upperJaw.isDamageable()) {
+                if ((0.5d / (1.0d + (double) EnchantmentHelper.getLevel(Enchantments.UNBREAKING, upperJaw))) > world.random.nextDouble()) {
+                    upperJaw.setDamage(upperJaw.getDamage() + 1);
                 }
-                if (crushing.getDamage() >= crushing.getMaxDamage()) {
-                    crushing.decrement(1);
+                if (upperJaw.getDamage() >= upperJaw.getMaxDamage()) {
+                    upperJaw.decrement(1);
+                }
+            }
+            // Try to damage the bottom jaw liner (if possible).
+            if (lowerJaw.isDamageable()) {
+                if ((0.5d / (1.0d + (double) EnchantmentHelper.getLevel(Enchantments.UNBREAKING, lowerJaw))) > world.random.nextDouble()) {
+                    lowerJaw.setDamage(lowerJaw.getDamage() + 1);
+                }
+                if (lowerJaw.getDamage() >= lowerJaw.getMaxDamage()) {
+                    lowerJaw.decrement(1);
                 }
             }
             // Add recipe utilization and XP.
@@ -297,14 +352,6 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
             // Reset crush timer.
             entity.crushTime = 0;
             entity.markDirty();
-        }
-    }
-
-    public boolean canUse(PlayerEntity player) {
-        if (this.world == null || this.world.getBlockEntity(this.pos) != this) {
-            return false;
-        } else {
-            return player.squaredDistanceTo((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D, (double) this.pos.getZ() + 0.5D) <= 64.0D;
         }
     }
 

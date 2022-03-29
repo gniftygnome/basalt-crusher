@@ -11,9 +11,11 @@ import net.minecraft.util.Identifier;
 
 public class BasaltCrusherScreen extends HandledScreen<ScreenHandler> {
     private static final Identifier TEXTURE = new Identifier("basalt-crusher", "textures/gui/container/basalt_crusher_screen.png");
+    BasaltCrusherScreenHandler screenHandler;
 
     public BasaltCrusherScreen(ScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
+        screenHandler = (BasaltCrusherScreenHandler) handler;
     }
 
     @Override
@@ -24,6 +26,9 @@ public class BasaltCrusherScreen extends HandledScreen<ScreenHandler> {
         int x = (width - backgroundWidth) / 2;
         int y = (height - backgroundHeight) / 2;
         drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
+
+        int progress24 = ((BasaltCrusherScreenHandler)this.handler).crushProgress24();
+        this.drawTexture(matrices, x + 106, y + 34, 176, 0, progress24 + 1, 16);
     }
 
     @Override
