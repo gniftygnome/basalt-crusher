@@ -58,7 +58,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         this.recipeType = BasaltCrusherRecipe.Type.INSTANCE;
 
         // Our mod is a simple mod.
-        this.crushTimeTotal = 200;
+        this.crushTimeTotal = 420;
         this.crushTime = 0;
         this.expPerCrush = 0.1F;
         this.expAccumulated = 0.0F;
@@ -245,11 +245,11 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
-        entity.tickJawLiner(world, pos, state, entity);
+        entity.tickJawLiners(world, pos, state, entity);
         entity.tickCrusher(world, pos, state, entity);
     }
 
-    private void tickJawLiner(World world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
+    private void tickJawLiners(World world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
         ItemStack liners = entity.inventory.getStack(1);
         ItemStack upperJaw = entity.inventory.getStack(3);
         ItemStack lowerJaw = entity.inventory.getStack(4);
@@ -302,8 +302,10 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
                 }
             } else {
                 // Start or continue crushing.
-                // The jaws cycle 4 times per 200-tick crush, every 2.5 seconds.
-                switch ((int) ((crushTime % 50) / 8)) {
+                // The jaws cycle 3 times per 210-tick crush, every 3.5 seconds.
+                // Ideally the math produces numbers evenly distributed between 0 and 6 except
+                // that the last (highest) result should be as close to 6 as possible, over or under.
+                switch ((int) ((crushTime % 140) / 23)) {
                     case 0 -> entity.setCrushingState(state, BasaltCrusherBlock.CrushingState.OPEN);
                     case 1 -> entity.setCrushingState(state, BasaltCrusherBlock.CrushingState.OPENISH);
                     case 2 -> entity.setCrushingState(state, BasaltCrusherBlock.CrushingState.CLOSEDISH);
@@ -312,7 +314,10 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
                     case 5 -> entity.setCrushingState(state, BasaltCrusherBlock.CrushingState.OPENISH);
                     case 6 -> entity.setCrushingState(state, BasaltCrusherBlock.CrushingState.OPEN);
                 }
-                ++entity.crushTime;
+
+                // Rate of crushing varies from 2 to 7 depending on use of Efficiency enchants.
+                // Total time can vary from 210 (no Efficiency) to 60 (two Efficiency V) ticks in duration.
+                entity.crushTime += 2 + (EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, upperJaw) + EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, lowerJaw)) / 2;
                 entity.markDirty();
             }
         }

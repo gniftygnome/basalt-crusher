@@ -181,7 +181,7 @@ public class BasaltCrusherScreenHandler extends ScreenHandler {
         int crushTimeTotal = propertyDelegate.get(1);
 
         if (crushTimeTotal <= 0) {
-            crushTimeTotal = 240;
+            crushTimeTotal = 420;
         }
 
         return (crushTime * 24) / crushTimeTotal;
