@@ -23,8 +23,9 @@ liner will crush 250 basalt blocks at a cost of 31 iron ingots.  (Late game,
 there are options to increase the output quite a bit...)
 
 ## Why are there two jaw liner slots?
-The mod is intended to allow the user to input a stack of jaw liners to the
-left slot and have them move one at a time to the right slot where they get
-damaged.  However, so far the only way I have found to do this is with two
-different items per jaw liner.  If I figure out a better way, that's how it
-will work.  If not, I'll rework the GUI once I've given up.
+Since 0.2.0, the mod allows the user to input a stack of jaw liners to the
+left slot and have them move one at a time to the right slots where they get
+damaged.  Minecraft does not admit it is possible to stack things that can
+be damaged or enchanted and jaw liners are both.  This means you may see
+slightly strange behavior in your inventory related to this feature.  I
+think overall it's worth the convenience, though.
