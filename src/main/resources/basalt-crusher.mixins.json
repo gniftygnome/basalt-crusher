@@ -4,6 +4,7 @@
   "package": "net.gnomecraft.basaltcrusher.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "EfficiencyEnchantmentMixin"
   ],
   "client": [
   ],
