@@ -1,4 +1,4 @@
-package net.gnomecraft.basaltcrusher;
+package net.gnomecraft.basaltcrusher.crusher;
 
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;

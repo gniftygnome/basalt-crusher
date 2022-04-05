@@ -1,5 +1,6 @@
-package net.gnomecraft.basaltcrusher;
+package net.gnomecraft.basaltcrusher.crusher;
 
+import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;

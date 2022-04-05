@@ -1,9 +1,11 @@
-package net.gnomecraft.basaltcrusher;
+package net.gnomecraft.basaltcrusher.crusher;
 
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.base.SingleStackStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.gnomecraft.basaltcrusher.BasaltCrusher;
+import net.gnomecraft.basaltcrusher.utils.BasaltCrusherInventory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -30,7 +32,7 @@ import net.minecraft.world.World;
 
 import java.util.EnumMap;
 
-import static net.gnomecraft.basaltcrusher.BasaltCrusherBlock.CRUSHING_STATE;
+import static net.gnomecraft.basaltcrusher.crusher.BasaltCrusherBlock.CRUSHING_STATE;
 
 public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandlerFactory, RecipeInputProvider, RecipeUnlocker {
     private BasaltCrusherBlock.CrushingState crushingState;
@@ -80,6 +82,18 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
             } else {
                 return SIDE_SLOTS;
             }
+        }
+
+        @Override
+        public boolean canInsert(int slot, ItemStack stack, Direction direction) {
+            // All slots filter insertion.
+            return this.isValid(slot, stack);
+        }
+
+        @Override
+        public boolean canExtract(int slot, ItemStack stack, Direction direction) {
+            // Allow extracting anything from any slot that matches the direction.
+            return true;
         }
 
         @Override
@@ -245,8 +259,10 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
-        entity.tickJawLiners(world, pos, state, entity);
-        entity.tickCrusher(world, pos, state, entity);
+        if (entity != null && world != null && !world.isClient()) {
+            entity.tickJawLiners(world, pos, state, entity);
+            entity.tickCrusher(world, pos, state, entity);
+        }
     }
 
     private void tickJawLiners(World world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
@@ -362,6 +378,10 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
 
     public void scatterInventory(World world, BlockPos pos) {
         ItemScatterer.spawn(world, pos, this.inventory);
+    }
+
+    public int calculateComparatorOutput() {
+        return ScreenHandler.calculateComparatorOutput(this.inventory);
     }
 
     @Override

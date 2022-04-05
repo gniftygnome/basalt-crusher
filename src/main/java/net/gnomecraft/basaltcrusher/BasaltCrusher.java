@@ -5,6 +5,8 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.gnomecraft.basaltcrusher.crusher.*;
+import net.gnomecraft.basaltcrusher.grizzly.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
@@ -21,6 +23,10 @@ public class BasaltCrusher implements ModInitializer {
     public static BlockItem BASALT_CRUSHER_ITEM;
     public static BlockEntityType<BasaltCrusherEntity> BASALT_CRUSHER_ENTITY;
 
+    public static Block GRIZZLY_BLOCK;
+    public static BlockItem GRIZZLY_ITEM;
+    public static BlockEntityType<GrizzlyEntity> GRIZZLY_ENTITY;
+
     public static ToolItem IRON_JAW_LINER_ITEM;
     public static ToolItem DIAMOND_JAW_LINER_ITEM;
     public static ToolItem NETHERITE_JAW_LINER_ITEM;
@@ -29,8 +35,10 @@ public class BasaltCrusher implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(modId);
 
     public static final ScreenHandlerType<BasaltCrusherScreenHandler> BASALT_CRUSHER_SCREEN_HANDLER;
+    public static final ScreenHandlerType<GrizzlyScreenHandler> GRIZZLY_SCREEN_HANDLER;
 
     public static final Identifier BasaltCrusherBlockId = new Identifier(modId, "basalt_crusher");
+    public static final Identifier GrizzlyBlockId = new Identifier(modId, "grizzly");
     public static final Identifier IronJawLinerId = new Identifier(modId, "iron_jaw_liner");
     public static final Identifier DiamondJawLinerId = new Identifier(modId, "diamond_jaw_liner");
     public static final Identifier NetheriteJawLinerId = new Identifier(modId, "netherite_jaw_liner");
@@ -47,6 +55,11 @@ public class BasaltCrusher implements ModInitializer {
         BASALT_CRUSHER_ITEM = Registry.register(Registry.ITEM, BasaltCrusherBlockId, new BlockItem(BASALT_CRUSHER_BLOCK, new Item.Settings().group(ItemGroup.DECORATIONS)));
         BASALT_CRUSHER_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, BasaltCrusherBlockId, FabricBlockEntityTypeBuilder.create(BasaltCrusherEntity::new, BASALT_CRUSHER_BLOCK).build(null));
 
+        // Grizzly block
+        GRIZZLY_BLOCK = Registry.register(Registry.BLOCK, GrizzlyBlockId, new GrizzlyBlock(FabricBlockSettings.of(Material.METAL).hardness(4.0f).nonOpaque()));
+        GRIZZLY_ITEM = Registry.register(Registry.ITEM, GrizzlyBlockId, new BlockItem(GRIZZLY_BLOCK, new Item.Settings().group(ItemGroup.DECORATIONS)));
+        GRIZZLY_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, GrizzlyBlockId, FabricBlockEntityTypeBuilder.create(GrizzlyEntity::new, GRIZZLY_BLOCK).build(null));
+
         // Basalt Crusher Jaw Liners
         IRON_JAW_LINER_ITEM      = Registry.register(Registry.ITEM, IronJawLinerId,      new ToolItem(ToolMaterials.IRON,      new Item.Settings().group(ItemGroup.MISC)));
         DIAMOND_JAW_LINER_ITEM   = Registry.register(Registry.ITEM, DiamondJawLinerId,   new ToolItem(ToolMaterials.DIAMOND,   new Item.Settings().group(ItemGroup.MISC)));
@@ -58,9 +71,11 @@ public class BasaltCrusher implements ModInitializer {
 
         // Basalt Crusher Storage
         ItemStorage.SIDED.registerForBlocks((world, pos, state, blockEntity, direction) -> blockEntity instanceof BasaltCrusherEntity ? ((BasaltCrusherEntity) blockEntity).getSidedStorage(direction) : null, BASALT_CRUSHER_BLOCK);
+        ItemStorage.SIDED.registerForBlocks((world, pos, state, blockEntity, direction) -> blockEntity instanceof GrizzlyEntity ? ((GrizzlyEntity) blockEntity).getSidedStorage(direction) : null, GRIZZLY_BLOCK);
     }
 
     static {
         BASALT_CRUSHER_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(BasaltCrusherBlockId, BasaltCrusherScreenHandler::new);
+        GRIZZLY_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(GrizzlyBlockId, GrizzlyScreenHandler::new);
     }
 }

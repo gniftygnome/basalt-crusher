@@ -1,4 +1,4 @@
-package net.gnomecraft.basaltcrusher;
+package net.gnomecraft.basaltcrusher.utils;
 
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.inventory.SimpleInventory;
@@ -14,16 +14,10 @@ public abstract class BasaltCrusherInventory extends SimpleInventory implements 
     }
 
     @Override
-    public boolean canInsert(int slot, ItemStack stack, Direction direction) {
-        // All slots filter insertion.
-        return this.isValid(slot, stack);
-    }
+    public abstract boolean canInsert(int slot, ItemStack stack, Direction direction);
 
     @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction direction) {
-        // Allow extracting anything from any slot that matches the direction.
-        return true;
-    }
+    public abstract boolean canExtract(int slot, ItemStack stack, Direction direction);
 
     @Override
     public void readNbtList(NbtList nbtList) {

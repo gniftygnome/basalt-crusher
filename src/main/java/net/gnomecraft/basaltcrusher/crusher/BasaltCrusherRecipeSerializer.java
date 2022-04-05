@@ -1,4 +1,4 @@
-package net.gnomecraft.basaltcrusher;
+package net.gnomecraft.basaltcrusher.crusher;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

@@ -13,19 +13,30 @@ Vanilla friendly fabric mod to make basalt great again.
 &lt;<font color=yellow>@jyasu</font>&gt; Hardest part is the graphics.
 
 ## What does this thing even do?
-At present, just one thing.  You feed it consumable jaw liners and any kind
-of basalt and it gives you back sweet, sweet gravel.
+For the sordid details, see [the wiki](https://github.com/gniftygnome/basalt-crusher/wiki).
 
-I wanted this mod to fit in with a fairly minimalist Vanilla aesthetic.  It
-does just one thing in what I think is a pretty Vanilla way.  And if you
-want a lot of gravel you are going to need an iron farm.  The iron jaw
-liner will crush 250 basalt blocks at a cost of 31 iron ingots.  (Late game,
-there are options to increase the output quite a bit...)
+The Basalt Crusher does just one thing.  You feed it consumable jaw liners
+and any kind of basalt and it gives you back sweet, sweet gravel.  Its
+friend the Grizzly does what a grizzly does: it sorts out bigger stuff from
+smaller stuff.  Placed beneath the Basalt crusher, it will turn 1/4 of your
+gravel into sand.  Fed coarse dirt, it will sift the gravel back out of the
+coarse dirt for you.
 
-## Why are there two jaw liner slots?
+I wanted this mod to fit in with a fairly minimalist Vanilla aesthetic. 
+The Basalt Crusher provides a nice use for the ugly[^1] basalt blocks, and
+it does so in what I think is a pretty Vanilla way.  If you want a lot of
+gravel you are going to need an iron farm.  The iron jaw liner will crush
+250 basalt blocks at a cost of 31 iron ingots.  (Late game, there are
+options to increase the output quite a bit...)
+
+## How do the jaw liner slots work?
 Since 0.2.0, the mod allows the user to input a stack of jaw liners to the
 left slot and have them move one at a time to the right slots where they get
 damaged.  Minecraft does not admit it is possible to stack things that can
 be damaged or enchanted and jaw liners are both.  This means you may see
 slightly strange behavior in your inventory related to this feature.  I
 think overall it's worth the convenience, though.
+
+
+[^1]:  Opinions may vary because some folks are wrong.  I've even met people
+who don't like the look of acacia wood!  =)

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "basalt-crusher:block/grizzly" },
+    "facing=east":  { "model": "basalt-crusher:block/grizzly", "y":  90 },
+    "facing=south": { "model": "basalt-crusher:block/grizzly", "y":  180 },
+    "facing=west":  { "model": "basalt-crusher:block/grizzly", "y":  270 }
+  }
+}

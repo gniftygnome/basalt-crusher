@@ -3,6 +3,7 @@
   "textures": {
     "top": "basalt-crusher:block/basalt_crusher/basalt_crusher_side",
     "front": "basalt-crusher:block/basalt_crusher/basalt_crusher_front_empty",
-    "side": "basalt-crusher:block/basalt_crusher/basalt_crusher_side"
+    "side": "basalt-crusher:block/basalt_crusher/basalt_crusher_side",
+    "bottom": "basalt-crusher:block/basalt_crusher/basalt_crusher_bottom"
   }
 }

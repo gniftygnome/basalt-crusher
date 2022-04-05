@@ -1,4 +1,4 @@
-package net.gnomecraft.basaltcrusher;
+package net.gnomecraft.basaltcrusher.crusher;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;

@@ -1,7 +1,8 @@
-package net.gnomecraft.basaltcrusher;
+package net.gnomecraft.basaltcrusher.crusher;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -11,7 +12,6 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.ScreenHandler;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
@@ -87,7 +87,7 @@ public class BasaltCrusherBlock extends BlockWithEntity {
 
     @Override
     public List<ItemStack> getDroppedStacks(BlockState blockState, LootContext.Builder lootContext$Builder) {
-        ArrayList<ItemStack> dropList = new ArrayList<ItemStack>();
+        ArrayList<ItemStack> dropList = new ArrayList<>();
         dropList.add(new ItemStack(this));
         return dropList;
     }
@@ -133,7 +133,13 @@ public class BasaltCrusherBlock extends BlockWithEntity {
 
     @Override
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
-        return ScreenHandler.calculateComparatorOutput(world.getBlockEntity(pos));
+        BlockEntity entity = world.getBlockEntity(pos);
+
+        if (entity instanceof BasaltCrusherEntity) {
+            return ((BasaltCrusherEntity) entity).calculateComparatorOutput();
+        }
+
+        return 0;
     }
 
     @Override
