@@ -1,8 +1,10 @@
 package net.gnomecraft.basaltcrusher.mill;
 
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
 import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.gnomecraft.basaltcrusher.utils.BasaltCrusherInventory;
 import net.minecraft.block.BlockState;
@@ -39,6 +41,8 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
     private float expPerMilling;
     private float expAccumulated;
 
+    private int transferCooldown;
+
     public GravelMillEntity(BlockPos pos, BlockState state) {
         super(BasaltCrusher.GRAVEL_MILL_ENTITY, pos, state);
 
@@ -51,6 +55,7 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
         this.millTime = 0;
         this.expPerMilling = 0.1F;
         this.expAccumulated = 0.0F;
+        this.transferCooldown = 0;
     }
 
     // BasaltCrusherInventory is the backing store for our Storage implementations.
@@ -187,6 +192,7 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
         tag.putShort("MillTime", (short) this.millTime);
         tag.putFloat("ExpPerMilling", expPerMilling);
         tag.putFloat("ExpAccumulated", expAccumulated);
+        tag.putShort("TransferCooldown", (short) this.transferCooldown);
 
         super.writeNbt(tag);
     }
@@ -201,11 +207,13 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
         millTime = tag.getShort("MillTime");
         expPerMilling = tag.getFloat("ExpPerMilling");
         expAccumulated = tag.getFloat("ExpAccumulated");
+        transferCooldown = tag.getShort("TransferCooldown");
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, GravelMillEntity entity) {
         if (entity != null && world != null && !world.isClient()) {
             entity.tickMill(world, pos, state, entity);
+            entity.tickTransfer(world, pos, state, entity);
         }
     }
 
@@ -288,6 +296,30 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
             // Reset milling timer.
             entity.millTime = 0;
             entity.markDirty();
+        }
+    }
+
+    private void tickTransfer(World world, BlockPos pos, BlockState state, GravelMillEntity entity) {
+        ItemStack output = entity.inventory.getStack(2);
+
+        // Implement transfer cooldown.
+        if (entity.transferCooldown > 0) {
+            --transferCooldown;
+            entity.markDirty();
+        }
+
+        if (entity.transferCooldown <= 0 && !output.isEmpty()) {
+            // Try to push an item into adjacent storage.
+            Direction vent = state.get(GravelMillBlock.FACING).getOpposite();
+            Storage<ItemVariant> sourceStorage = entity.getSidedStorage(vent);
+            Storage<ItemVariant> targetStorage = ItemStorage.SIDED.find(world, pos.offset(vent), vent.getOpposite());
+
+            if (sourceStorage != null && targetStorage != null) {
+                if (StorageUtil.move(sourceStorage, targetStorage, variant -> true, 1, null) > 0) {
+                    entity.transferCooldown = 8;
+                    entity.markDirty();
+                }
+            }
         }
     }
 
