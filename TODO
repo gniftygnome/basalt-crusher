@@ -1,20 +1,13 @@
 Some Things
 
-* Add support for supplying a redstone signal to "power up" the crushing and get sand?
-  * Doubles the crushing time.
-  * Add a sand recipe.
-  * Logic in the successful crushing section.
-* Alternatively, how about a second block called a Gravel Screener that...
-  * Has to be attached to the base of a Basalt Crusher.
-  * Takes gravel from the Basalt Crusher output.
-  * When it has 3 stacks of gravel, consumes them and outputs 2 of gravel and 1 of sand.
-  * Support for other mods' rock crushers?
-
 * Add an advancement?  Crushing Success!?
 
-* Create the crushing random tick sound...
+* Create the crushing and milling random tick sounds...
+
+* Implement Cooldown Coordinator support for the Gravel Mill?
 
 
 Done Things
 
 * Add support for Efficiency enchantment to speed up crushing time?
+* Add a way to generate sand too.

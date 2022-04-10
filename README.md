@@ -20,14 +20,16 @@ and any kind of basalt and it gives you back sweet, sweet gravel.  Its
 friend the Grizzly does what a grizzly does: it sorts out bigger stuff from
 smaller stuff.  Placed beneath the Basalt crusher, it will turn 1/4 of your
 gravel into sand.  Fed coarse dirt, it will sift the gravel back out of the
-coarse dirt for you.
+coarse dirt for you.  The Gravel Mill uses rods (called Mill Rod Charge) to
+crush gravel into sand.
 
 I wanted this mod to fit in with a fairly minimalist Vanilla aesthetic. 
 The Basalt Crusher provides a nice use for the ugly[^1] basalt blocks, and
 it does so in what I think is a pretty Vanilla way.  If you want a lot of
 gravel you are going to need an iron farm.  The iron jaw liner will crush
-250 basalt blocks at a cost of 31 iron ingots.  (Late game, there are
-options to increase the output quite a bit...)
+250 basalt blocks at a cost of 31 iron ingots (but late game, there are
+options to increase the output quite a bit).  The Gravel Mill also uses a
+fair amount of iron for its consumable mill rods.
 
 ## How do the jaw liner slots work?
 Since 0.2.0, the mod allows the user to input a stack of jaw liners to the
