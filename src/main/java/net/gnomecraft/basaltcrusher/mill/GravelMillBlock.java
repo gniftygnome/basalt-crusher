@@ -1,4 +1,4 @@
-package net.gnomecraft.basaltcrusher.crusher;
+package net.gnomecraft.basaltcrusher.mill;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -16,10 +16,9 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.EnumProperty;
+import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -29,31 +28,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class BasaltCrusherBlock extends BlockWithEntity {
-    enum CrushingState implements StringIdentifiable {
-        EMPTY, IDLE, OPEN, OPENISH, CLOSEDISH, CLOSED;
-
-        public String asString() {
-            return this.toString().toLowerCase();
-        }
-    }
-    static final EnumProperty<CrushingState> CRUSHING_STATE = EnumProperty.of("crushing_state", CrushingState.class);
+public class GravelMillBlock extends BlockWithEntity {
+    static final IntProperty MILL_STATE = IntProperty.of("mill_state",0, 21);
     static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
 
-    public BasaltCrusherBlock(Settings settings) {
+    public GravelMillBlock(Settings settings) {
         super(settings);
 
-        setDefaultState(getStateManager().getDefaultState().with(FACING, Direction.NORTH).with(CRUSHING_STATE, CrushingState.EMPTY));
+        setDefaultState(getStateManager().getDefaultState().with(FACING, Direction.NORTH).with(MILL_STATE, 21));
     }
 
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new BasaltCrusherEntity(pos, state);
+        return new GravelMillEntity(pos, state);
     }
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, BasaltCrusher.BASALT_CRUSHER_ENTITY, BasaltCrusherEntity::tick);
+        return checkType(type, BasaltCrusher.GRAVEL_MILL_ENTITY, GravelMillEntity::tick);
     }
 
     @Override
@@ -69,8 +61,8 @@ public class BasaltCrusherBlock extends BlockWithEntity {
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
 
-        if (blockEntity instanceof BasaltCrusherEntity) {
-            ((BasaltCrusherEntity) blockEntity).dropExperience(player);
+        if (blockEntity instanceof GravelMillEntity) {
+            ((GravelMillEntity) blockEntity).dropExperience(player);
         }
 
         super.onBreak(world, pos, state, player);
@@ -79,9 +71,9 @@ public class BasaltCrusherBlock extends BlockWithEntity {
     private void openContainer(World world, BlockPos blockPos, PlayerEntity playerEntity) {
         BlockEntity blockEntity = world.getBlockEntity(blockPos);
 
-        if (blockEntity instanceof BasaltCrusherEntity) {
+        if (blockEntity instanceof GravelMillEntity) {
             playerEntity.openHandledScreen((NamedScreenHandlerFactory) blockEntity);
-            // TODO: playerEntity.increaseStat(Stats.INTERACT_WITH_CRUSHER, 1);
+            // TODO: playerEntity.increaseStat(Stats.INTERACT_WITH_MILL, 1);
         }
     }
 
@@ -95,7 +87,7 @@ public class BasaltCrusherBlock extends BlockWithEntity {
     @Environment(EnvType.CLIENT)
     @Override
     public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
-        if (state.get(CRUSHING_STATE) != CrushingState.EMPTY && state.get(CRUSHING_STATE) != CrushingState.IDLE) {
+        if (state.get(MILL_STATE) < 20) {
             double x = (double) pos.getX() + 0.5D;
             double y = (double) pos.getY();
             double z = (double) pos.getZ() + 0.5D;
@@ -117,8 +109,8 @@ public class BasaltCrusherBlock extends BlockWithEntity {
         if (state.getBlock() != newState.getBlock()) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
 
-            if (blockEntity instanceof BasaltCrusherEntity) {
-                ((BasaltCrusherEntity) blockEntity).scatterInventory(world, pos);
+            if (blockEntity instanceof GravelMillEntity) {
+                ((GravelMillEntity) blockEntity).scatterInventory(world, pos);
                 world.updateComparators(pos,this);
             }
 
@@ -135,8 +127,8 @@ public class BasaltCrusherBlock extends BlockWithEntity {
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
         BlockEntity entity = world.getBlockEntity(pos);
 
-        if (entity instanceof BasaltCrusherEntity) {
-            return ((BasaltCrusherEntity) entity).calculateComparatorOutput();
+        if (entity instanceof GravelMillEntity) {
+            return ((GravelMillEntity) entity).calculateComparatorOutput();
         }
 
         return 0;
@@ -149,6 +141,6 @@ public class BasaltCrusherBlock extends BlockWithEntity {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING, CRUSHING_STATE);
+        builder.add(FACING, MILL_STATE);
     }
 }

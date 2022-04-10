@@ -4,6 +4,7 @@
     "top": "basalt-crusher:block/basalt_crusher/basalt_crusher_side",
     "front": "basalt-crusher:block/basalt_crusher/basalt_crusher_front_jaws_idle",
     "side": "basalt-crusher:block/basalt_crusher/basalt_crusher_side",
-    "bottom": "basalt-crusher:block/basalt_crusher/basalt_crusher_bottom"
+    "bottom": "basalt-crusher:block/basalt_crusher/basalt_crusher_bottom",
+    "particle": "basalt-crusher:block/basalt_crusher/basalt_crusher_side"
   }
 }

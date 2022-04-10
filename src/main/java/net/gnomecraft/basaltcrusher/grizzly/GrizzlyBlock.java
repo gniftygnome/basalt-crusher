@@ -28,8 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GrizzlyBlock extends BlockWithEntity {
-    public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
-    public static final VoxelShape GRIZZLY_SHAPE_NORTH = VoxelShapes.union(
+    static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
+
+    private static final VoxelShape GRIZZLY_SHAPE_NORTH = VoxelShapes.union(
             // base, front, left, right, back
             Block.createCuboidShape(0, 0, 0, 16, 4, 16),
             Block.createCuboidShape(0, 4, 0, 16, 8, 1),
@@ -44,9 +45,9 @@ public class GrizzlyBlock extends BlockWithEntity {
             Block.createCuboidShape(1, 4, 12, 15, 14, 14),
             Block.createCuboidShape(1, 4, 14, 15, 16, 16)
     ).simplify();
-    public static final VoxelShape GRIZZLY_SHAPE_EAST  = rotateShape(Direction.NORTH, Direction.EAST,  GRIZZLY_SHAPE_NORTH);
-    public static final VoxelShape GRIZZLY_SHAPE_SOUTH = rotateShape(Direction.NORTH, Direction.SOUTH, GRIZZLY_SHAPE_NORTH);
-    public static final VoxelShape GRIZZLY_SHAPE_WEST  = rotateShape(Direction.NORTH, Direction.WEST,  GRIZZLY_SHAPE_NORTH);
+    private static final VoxelShape GRIZZLY_SHAPE_EAST  = rotateShape(Direction.NORTH, Direction.EAST,  GRIZZLY_SHAPE_NORTH);
+    private static final VoxelShape GRIZZLY_SHAPE_SOUTH = rotateShape(Direction.NORTH, Direction.SOUTH, GRIZZLY_SHAPE_NORTH);
+    private static final VoxelShape GRIZZLY_SHAPE_WEST  = rotateShape(Direction.NORTH, Direction.WEST,  GRIZZLY_SHAPE_NORTH);
 
     public GrizzlyBlock(AbstractBlock.Settings settings) {
         super(settings);

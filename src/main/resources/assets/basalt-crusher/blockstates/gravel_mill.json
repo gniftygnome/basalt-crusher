@@ -1,0 +1,113 @@
+{
+  "variants": {
+    "mill_state=21,facing=north": { "model": "basalt-crusher:block/gravel_mill_empty" },
+    "mill_state=21,facing=east":  { "model": "basalt-crusher:block/gravel_mill_empty", "y":  90 },
+    "mill_state=21,facing=south": { "model": "basalt-crusher:block/gravel_mill_empty", "y":  180 },
+    "mill_state=21,facing=west":  { "model": "basalt-crusher:block/gravel_mill_empty", "y":  270 },
+
+    "mill_state=20,facing=north": { "model": "basalt-crusher:block/gravel_mill_idle" },
+    "mill_state=20,facing=east":  { "model": "basalt-crusher:block/gravel_mill_idle", "y":  90 },
+    "mill_state=20,facing=south": { "model": "basalt-crusher:block/gravel_mill_idle", "y":  180 },
+    "mill_state=20,facing=west":  { "model": "basalt-crusher:block/gravel_mill_idle", "y":  270 },
+
+    "mill_state=0,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_00" },
+    "mill_state=0,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_00", "y":  90 },
+    "mill_state=0,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_00", "y":  180 },
+    "mill_state=0,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_00", "y":  270 },
+
+    "mill_state=1,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_01" },
+    "mill_state=1,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_01", "y":  90 },
+    "mill_state=1,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_01", "y":  180 },
+    "mill_state=1,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_01", "y":  270 },
+
+    "mill_state=2,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_02" },
+    "mill_state=2,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_02", "y":  90 },
+    "mill_state=2,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_02", "y":  180 },
+    "mill_state=2,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_02", "y":  270 },
+
+    "mill_state=3,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_03" },
+    "mill_state=3,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_03", "y":  90 },
+    "mill_state=3,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_03", "y":  180 },
+    "mill_state=3,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_03", "y":  270 },
+
+    "mill_state=4,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_04" },
+    "mill_state=4,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_04", "y":  90 },
+    "mill_state=4,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_04", "y":  180 },
+    "mill_state=4,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_04", "y":  270 },
+
+    "mill_state=5,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_05" },
+    "mill_state=5,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_05", "y":  90 },
+    "mill_state=5,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_05", "y":  180 },
+    "mill_state=5,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_05", "y":  270 },
+
+    "mill_state=6,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_06" },
+    "mill_state=6,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_06", "y":  90 },
+    "mill_state=6,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_06", "y":  180 },
+    "mill_state=6,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_06", "y":  270 },
+
+    "mill_state=7,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_07" },
+    "mill_state=7,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_07", "y":  90 },
+    "mill_state=7,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_07", "y":  180 },
+    "mill_state=7,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_07", "y":  270 },
+
+    "mill_state=8,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_08" },
+    "mill_state=8,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_08", "y":  90 },
+    "mill_state=8,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_08", "y":  180 },
+    "mill_state=8,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_08", "y":  270 },
+
+    "mill_state=9,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_09" },
+    "mill_state=9,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_09", "y":  90 },
+    "mill_state=9,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_09", "y":  180 },
+    "mill_state=9,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_09", "y":  270 },
+
+    "mill_state=10,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_10" },
+    "mill_state=10,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_10", "y":  90 },
+    "mill_state=10,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_10", "y":  180 },
+    "mill_state=10,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_10", "y":  270 },
+
+    "mill_state=11,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_11" },
+    "mill_state=11,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_11", "y":  90 },
+    "mill_state=11,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_11", "y":  180 },
+    "mill_state=11,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_11", "y":  270 },
+
+    "mill_state=12,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_12" },
+    "mill_state=12,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_12", "y":  90 },
+    "mill_state=12,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_12", "y":  180 },
+    "mill_state=12,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_12", "y":  270 },
+
+    "mill_state=13,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_13" },
+    "mill_state=13,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_13", "y":  90 },
+    "mill_state=13,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_13", "y":  180 },
+    "mill_state=13,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_13", "y":  270 },
+
+    "mill_state=14,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_14" },
+    "mill_state=14,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_14", "y":  90 },
+    "mill_state=14,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_14", "y":  180 },
+    "mill_state=14,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_14", "y":  270 },
+
+    "mill_state=15,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_15" },
+    "mill_state=15,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_15", "y":  90 },
+    "mill_state=15,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_15", "y":  180 },
+    "mill_state=15,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_15", "y":  270 },
+
+    "mill_state=16,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_16" },
+    "mill_state=16,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_16", "y":  90 },
+    "mill_state=16,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_16", "y":  180 },
+    "mill_state=16,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_16", "y":  270 },
+
+    "mill_state=17,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_17" },
+    "mill_state=17,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_17", "y":  90 },
+    "mill_state=17,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_17", "y":  180 },
+    "mill_state=17,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_17", "y":  270 },
+
+    "mill_state=18,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_18" },
+    "mill_state=18,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_18", "y":  90 },
+    "mill_state=18,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_18", "y":  180 },
+    "mill_state=18,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_18", "y":  270 },
+
+    "mill_state=19,facing=north": { "model": "basalt-crusher:block/gravel_mill_active_19" },
+    "mill_state=19,facing=east":  { "model": "basalt-crusher:block/gravel_mill_active_19", "y":  90 },
+    "mill_state=19,facing=south": { "model": "basalt-crusher:block/gravel_mill_active_19", "y":  180 },
+    "mill_state=19,facing=west":  { "model": "basalt-crusher:block/gravel_mill_active_19", "y":  270 }
+  }
+}
