@@ -1,0 +1,15 @@
+{
+  "block.basalt-crusher.basalt_crusher":      "Triturador de basalto",
+  "block.basalt-crusher.gravel_mill":         "Moinho de cascalho",
+  "block.basalt-crusher.grizzly":             "Grisalho",
+
+  "item.basalt-crusher.basalt_crusher":       "Triturador de basalto",
+  "item.basalt-crusher.gravel_mill":          "Moinho de cascalho",
+  "item.basalt-crusher.grizzly":              "Grisalho",
+
+  "item.basalt-crusher.iron_jaw_liner":       "Mandíbula de ferro",
+  "item.basalt-crusher.diamond_jaw_liner":    "Mandíbula de diamante",
+  "item.basalt-crusher.netherite_jaw_liner":  "Mandíbula de netherita",
+
+  "item.basalt-crusher.mill_rod_charge":      "Carga de moinho de hastes"
+}
