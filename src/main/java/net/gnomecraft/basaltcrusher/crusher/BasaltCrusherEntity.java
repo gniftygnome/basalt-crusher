@@ -34,6 +34,7 @@ import java.util.EnumMap;
 
 import static net.gnomecraft.basaltcrusher.crusher.BasaltCrusherBlock.CRUSHING_STATE;
 
+@SuppressWarnings("UnstableApiUsage")
 public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandlerFactory, RecipeInputProvider, RecipeUnlocker {
     private BasaltCrusherBlock.CrushingState crushingState;
     private EnumMap<Direction, Storage<ItemVariant>> storageCache;

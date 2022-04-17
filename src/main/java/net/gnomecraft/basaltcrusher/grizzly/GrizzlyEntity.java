@@ -29,6 +29,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("UnstableApiUsage")
 public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFactory {
     private final EnumMap<Direction, Storage<ItemVariant>> storageCache;
 

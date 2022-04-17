@@ -19,6 +19,7 @@ import net.minecraft.util.registry.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("UnstableApiUsage")
 public class BasaltCrusher implements ModInitializer {
     public static Block BASALT_CRUSHER_BLOCK;
     public static BlockItem BASALT_CRUSHER_ITEM;
