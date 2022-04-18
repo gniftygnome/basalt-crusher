@@ -29,6 +29,11 @@ public class BasaltCrusherScreen extends HandledScreen<ScreenHandler> {
 
         int progress24 = ((BasaltCrusherScreenHandler)this.handler).crushProgress24();
         this.drawTexture(matrices, x + 106, y + 34, 176, 0, progress24 + 1, 16);
+
+        // Keep the title bar background clear (it's longer than I allowed for in some languages).
+        if (textRenderer.getWidth(title) > 80) {
+            this.drawTexture(matrices, x + 88, y + 4, 4, 4, 16, 12);
+        }
     }
 
     @Override
