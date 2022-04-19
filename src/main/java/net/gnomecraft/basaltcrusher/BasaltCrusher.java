@@ -13,6 +13,7 @@ import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.*;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -57,6 +58,11 @@ public class BasaltCrusher implements ModInitializer {
     public static final TagKey<Item> BASALTS = TagKey.of(Registry.ITEM_KEY, new Identifier("c", "basalt"));
     public static final TagKey<Item> JAW_LINERS = TagKey.of(Registry.ITEM_KEY, new Identifier("basalt-crusher", "jaw_liners"));
 
+    public static final Identifier BASALT_CRUSHER_SOUND_ID = new Identifier("basalt-crusher:basalt_crusher_sound");
+    public static final Identifier GRAVEL_MILL_SOUND_ID = new Identifier("basalt-crusher:gravel_mill_sound");
+    public static SoundEvent BASALT_CRUSHER_SOUND_EVENT = new SoundEvent(BASALT_CRUSHER_SOUND_ID);
+    public static SoundEvent GRAVEL_MILL_SOUND_EVENT = new SoundEvent(GRAVEL_MILL_SOUND_ID);
+
     @Override
     public void onInitialize() {
         LOGGER.info("Basalt Crusher block is hungry...");
@@ -92,6 +98,9 @@ public class BasaltCrusher implements ModInitializer {
         ItemStorage.SIDED.registerForBlocks((world, pos, state, blockEntity, direction) -> blockEntity instanceof BasaltCrusherEntity ? ((BasaltCrusherEntity) blockEntity).getSidedStorage(direction) : null, BASALT_CRUSHER_BLOCK);
         ItemStorage.SIDED.registerForBlocks((world, pos, state, blockEntity, direction) -> blockEntity instanceof GrizzlyEntity ? ((GrizzlyEntity) blockEntity).getSidedStorage(direction) : null, GRIZZLY_BLOCK);
         ItemStorage.SIDED.registerForBlocks((world, pos, state, blockEntity, direction) -> blockEntity instanceof GravelMillEntity ? ((GravelMillEntity) blockEntity).getSidedStorage(direction) : null, GRAVEL_MILL_BLOCK);
+
+        Registry.register(Registry.SOUND_EVENT, BasaltCrusher.BASALT_CRUSHER_SOUND_ID, BASALT_CRUSHER_SOUND_EVENT);
+        Registry.register(Registry.SOUND_EVENT, BasaltCrusher.GRAVEL_MILL_SOUND_ID,    GRAVEL_MILL_SOUND_EVENT);
     }
 
     static {

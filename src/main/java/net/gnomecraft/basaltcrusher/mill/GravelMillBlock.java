@@ -13,7 +13,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.IntProperty;
@@ -92,9 +91,9 @@ public class GravelMillBlock extends BlockWithEntity {
             double y = (double) pos.getY();
             double z = (double) pos.getZ() + 0.5D;
 
-            if (random.nextDouble() < 0.1D) {
-                // TODO: Replace with a custom sound.
-                world.playSound(x, y, z, SoundEvents.BLOCK_FURNACE_FIRE_CRACKLE, SoundCategory.BLOCKS, 1.0F, 1.0F, false);
+            if (random.nextDouble() < 0.015D) {
+                // If the mill is running, play its sound about once every minute.
+                world.playSound(x, y, z, BasaltCrusher.GRAVEL_MILL_SOUND_EVENT, SoundCategory.BLOCKS, 1.0F, 1.0F, false);
             }
         }
     }
