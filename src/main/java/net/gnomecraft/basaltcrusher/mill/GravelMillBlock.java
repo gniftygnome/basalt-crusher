@@ -21,11 +21,11 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class GravelMillBlock extends BlockWithEntity {
     static final IntProperty MILL_STATE = IntProperty.of("mill_state",0, 21);
