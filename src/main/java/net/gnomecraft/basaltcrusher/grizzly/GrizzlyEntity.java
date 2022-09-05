@@ -138,7 +138,6 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
     }
 
     // Provide the stockpile levels to the menu.
-    // TODO: Display for Terrestria Black Sand
     private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
         @Override
         public int get(int index) {
