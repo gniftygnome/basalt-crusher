@@ -7,8 +7,9 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
 import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.gnomecraft.basaltcrusher.utils.BasaltCrusherInventory;
+import net.gnomecraft.basaltcrusher.utils.IOTypeMatchers;
+import net.gnomecraft.basaltcrusher.utils.TerrestriaIntegration;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -103,7 +104,8 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
             switch (slot) {
                 case 0:
                     // input slot
-                    retVal = stack.isOf(Items.GRAVEL) || stack.isOf(Items.SAND);
+                    retVal = stack.isOf(Items.GRAVEL) || stack.isOf(Items.SAND) ||
+                            TerrestriaIntegration.ENABLED && stack.isOf(TerrestriaIntegration.BLACK_GRAVEL_ITEM);
                     break;
                 case 1:
                     // rod charge slot
@@ -236,8 +238,9 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
             return;
         }
 
-        if (input.isEmpty()) {
+        if (input.isEmpty() || !IOTypeMatchers.matchGravelSand(input, output)) {
             // We can't be milling so ensure milling is reset.
+            // Conditions: [empty input] OR [mismatched input and output]
             entity.setMillState(state, 20);
             if (entity.millTime != 0) {
                 entity.millTime = 0;
@@ -249,7 +252,27 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
             // However the mill could be fed a sandy mix (and just have the mill rate adjusted).
             input.decrement(1);
             if (output.isEmpty()) {
-                entity.inventory.setStack(2, new ItemStack(Blocks.SAND, 1));
+                entity.inventory.setStack(2, new ItemStack(Items.SAND, 1));
+            } else {
+                output.increment(1);
+            }
+            // Try to damage the rod charge (if possible), but less than with gravel.
+            if (rodCharge.isDamageable()) {
+                if (0.25d > world.random.nextDouble()) {
+                    rodCharge.setDamage(rodCharge.getDamage() + 1);
+                }
+                if (rodCharge.getDamage() >= rodCharge.getMaxDamage()) {
+                    rodCharge.decrement(1);
+                }
+            }
+            entity.markDirty();
+        } else if (TerrestriaIntegration.ENABLED && input.isOf(TerrestriaIntegration.BLACK_SAND_ITEM)) {
+            // Bypass sand input for user convenience.
+            // Typically in a real implementation it would be pre-screened to save mill wear.
+            // However the mill could be fed a sandy mix (and just have the mill rate adjusted).
+            input.decrement(1);
+            if (output.isEmpty()) {
+                entity.inventory.setStack(2, new ItemStack(TerrestriaIntegration.BLACK_SAND_ITEM, 1));
             } else {
                 output.increment(1);
             }
@@ -280,7 +303,11 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
             // Successful milling.
             input.decrement(1);
             if (output.isEmpty()) {
-                entity.inventory.setStack(2, new ItemStack(Blocks.SAND, 1));
+                if (TerrestriaIntegration.ENABLED && input.isOf(TerrestriaIntegration.BLACK_GRAVEL_ITEM)) {
+                    entity.inventory.setStack(2, new ItemStack(TerrestriaIntegration.BLACK_SAND_ITEM, 1));
+                } else {
+                    entity.inventory.setStack(2, new ItemStack(Items.SAND, 1));
+                }
             } else {
                 output.increment(1);
             }

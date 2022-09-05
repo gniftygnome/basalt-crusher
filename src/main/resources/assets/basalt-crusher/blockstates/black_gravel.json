@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "basalt-crusher:block/black_gravel"
+      },
+      {
+        "model": "basalt-crusher:block/black_gravel",
+        "y": 90
+      },
+      {
+        "model": "basalt-crusher:block/black_gravel",
+        "y": 180
+      },
+      {
+        "model": "basalt-crusher:block/black_gravel",
+        "y": 270
+      }
+    ]
+  }
+}

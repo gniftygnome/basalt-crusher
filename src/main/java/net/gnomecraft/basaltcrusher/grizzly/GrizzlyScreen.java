@@ -2,10 +2,12 @@ package net.gnomecraft.basaltcrusher.grizzly;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.gnomecraft.basaltcrusher.BasaltCrusher;
+import net.gnomecraft.basaltcrusher.utils.TerrestriaIntegration;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
@@ -43,20 +45,25 @@ public class GrizzlyScreen extends HandledScreen<ScreenHandler> {
          */
         ItemStack damage = new ItemStack(BasaltCrusher.NETHERITE_JAW_LINER_ITEM);
 
+        // If we are processing Terrestria volcanic materials at the moment, show those stockpiles instead.
+        boolean black = TerrestriaIntegration.ENABLED && ((GrizzlyScreenHandler) this.handler).stockpileOf(Items.AIR) > 0.0f;
+
         // gravel: 62, 41 -  77, 56
-        float gravel = ((GrizzlyScreenHandler) this.handler).stockpileOf(Items.GRAVEL);
+        Item gravelType = black ? TerrestriaIntegration.BLACK_GRAVEL_ITEM : Items.GRAVEL;
+        float gravel = ((GrizzlyScreenHandler) this.handler).stockpileOf(gravelType);
         damage.setDamage(Math.round(BasaltCrusher.NETHERITE_JAW_LINER_ITEM.getMaxDamage() * (1.0f - gravel % 1.0f)));
-        this.itemRenderer.renderGuiItemIcon(Items.GRAVEL.getDefaultStack(), x + 62, y + 41);
+        this.itemRenderer.renderGuiItemIcon(gravelType.getDefaultStack(), x + 62, y + 41);
         this.itemRenderer.renderGuiItemOverlay(this.textRenderer, damage, x + 62, y + 41);
-        this.itemRenderer.renderGuiItemOverlay(this.textRenderer, new ItemStack(Items.GRAVEL), x + 62, y + 41,
+        this.itemRenderer.renderGuiItemOverlay(this.textRenderer, new ItemStack(gravelType), x + 62, y + 41,
                 gravel < 100 ? "" : Integer.toString((int) (gravel)));
 
         // sand:   78, 57 -  93, 72
-        float sand = ((GrizzlyScreenHandler) this.handler).stockpileOf(Items.SAND);
+        Item sandType = black ? TerrestriaIntegration.BLACK_SAND_ITEM : Items.SAND;
+        float sand = ((GrizzlyScreenHandler) this.handler).stockpileOf(sandType);
         damage.setDamage(Math.round(BasaltCrusher.NETHERITE_JAW_LINER_ITEM.getMaxDamage() * (1.0f - sand % 1.0f)));
-        this.itemRenderer.renderGuiItemIcon(Items.SAND.getDefaultStack(), x + 78, y + 57);
+        this.itemRenderer.renderGuiItemIcon(sandType.getDefaultStack(), x + 78, y + 57);
         this.itemRenderer.renderGuiItemOverlay(this.textRenderer, damage, x + 78, y + 57);
-        this.itemRenderer.renderGuiItemOverlay(this.textRenderer, new ItemStack(Items.SAND), x + 78, y + 57,
+        this.itemRenderer.renderGuiItemOverlay(this.textRenderer, new ItemStack(sandType), x + 78, y + 57,
                 sand < 100 ? "" : Integer.toString((int) (sand)));
 
         // dirt:   98, 57 - 113, 72

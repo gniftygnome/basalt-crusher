@@ -6,6 +6,8 @@ import net.fabricmc.fabric.api.transfer.v1.item.base.SingleStackStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.gnomecraft.basaltcrusher.utils.BasaltCrusherInventory;
+import net.gnomecraft.basaltcrusher.utils.IOTypeMatchers;
+import net.gnomecraft.basaltcrusher.utils.TerrestriaIntegration;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -309,8 +311,9 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         }
 
         if (!upperJaw.isEmpty() && !lowerJaw.isEmpty()) {
-            if (input.isEmpty()) {
+            if (input.isEmpty() || !IOTypeMatchers.matchStoneGravel(input, output)) {
                 // We can't be crushing so ensure crushing is reset.
+                // Conditions: [empty input] OR [mismatched input and output]
                 entity.setCrushingState(state, BasaltCrusherBlock.CrushingState.IDLE);
                 if (entity.crushTime != 0) {
                     entity.crushTime = 0;
@@ -340,10 +343,14 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
 
         if (entity.crushTime >= entity.crushTimeTotal) {
             // Successful crushing.
-            // TODO: use the recipe (probably not; we only make gravel).
+            // TODO: use recipes.
             input.decrement(1);
             if (output.isEmpty()) {
-                entity.inventory.setStack(2, new ItemStack(Blocks.GRAVEL, 1));
+                if (TerrestriaIntegration.ENABLED && input.isIn(TerrestriaIntegration.TERRESTRIA_BASALTS)) {
+                    entity.inventory.setStack(2, new ItemStack(TerrestriaIntegration.BLACK_GRAVEL_ITEM, 1));
+                } else {
+                    entity.inventory.setStack(2, new ItemStack(Blocks.GRAVEL, 1));
+                }
             } else {
                 output.increment(1);
             }

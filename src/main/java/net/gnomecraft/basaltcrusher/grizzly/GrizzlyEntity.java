@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.gnomecraft.basaltcrusher.crusher.BasaltCrusherEntity;
 import net.gnomecraft.basaltcrusher.utils.BasaltCrusherInventory;
+import net.gnomecraft.basaltcrusher.utils.TerrestriaIntegration;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -35,6 +36,8 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
     private int processingTimeTotal;
     private int processingTime;
 
+    private ItemStack lastInput;
+
     private final HashMap<Item, Double> stockpile;
 
     public GrizzlyEntity(BlockPos pos, BlockState state) {
@@ -45,7 +48,15 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
         this.processingTimeTotal = 16;
         this.processingTime = 0;
 
-        this.stockpile = new HashMap<>(Map.of(Items.DIRT, 0.0d, Items.GRAVEL, 0.0d, Items.SAND, 0.0d));
+        lastInput = Items.COARSE_DIRT.getDefaultStack();
+
+        if (TerrestriaIntegration.ENABLED) {
+            this.stockpile = new HashMap<>(Map.of(Items.DIRT, 0.0d,
+                    Items.GRAVEL, 0.0d, TerrestriaIntegration.BLACK_GRAVEL_ITEM, 0.0d,
+                    Items.SAND, 0.0d, TerrestriaIntegration.BLACK_SAND_ITEM, 0.0d));
+        } else {
+            this.stockpile = new HashMap<>(Map.of(Items.DIRT, 0.0d, Items.GRAVEL, 0.0d, Items.SAND, 0.0d));
+        }
     }
 
     // BasaltCrusherInventory is the backing store for our Storage implementations.
@@ -127,29 +138,54 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
     }
 
     // Provide the stockpile levels to the menu.
+    // TODO: Display for Terrestria Black Sand
     private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
         @Override
         public int get(int index) {
-            return switch (index) {
-                case 0 -> (int) (100 * GrizzlyEntity.this.stockpile.get(Items.GRAVEL));
-                case 1 -> (int) (100 * GrizzlyEntity.this.stockpile.get(Items.SAND));
-                case 2 -> (int) (100 * GrizzlyEntity.this.stockpile.get(Items.DIRT));
-                default -> 0;
-            };
+            if (TerrestriaIntegration.ENABLED) {
+                return switch (index) {
+                    case 0 -> GrizzlyEntity.this.lastInput.isOf(TerrestriaIntegration.BLACK_GRAVEL_ITEM) ? 1 : 0;
+                    case 1 -> (int) (100 * GrizzlyEntity.this.stockpile.get(Items.DIRT));
+                    case 2 -> (int) (100 * GrizzlyEntity.this.stockpile.get(Items.GRAVEL));
+                    case 3 -> (int) (100 * GrizzlyEntity.this.stockpile.get(Items.SAND));
+                    case 4 -> (int) (100 * GrizzlyEntity.this.stockpile.get(TerrestriaIntegration.BLACK_GRAVEL_ITEM));
+                    case 5 -> (int) (100 * GrizzlyEntity.this.stockpile.get(TerrestriaIntegration.BLACK_SAND_ITEM));
+                    default -> 0;
+                };
+            } else {
+                return switch (index) {
+                    case 1 -> (int) (100 * GrizzlyEntity.this.stockpile.get(Items.DIRT));
+                    case 2 -> (int) (100 * GrizzlyEntity.this.stockpile.get(Items.GRAVEL));
+                    case 3 -> (int) (100 * GrizzlyEntity.this.stockpile.get(Items.SAND));
+                    default -> 0;
+                };
+            }
         }
 
         @Override
         public void set(int index, int value) {
-            switch (index) {
-                case 0 -> GrizzlyEntity.this.stockpile.put(Items.GRAVEL, (double) (value / 100));
-                case 1 -> GrizzlyEntity.this.stockpile.put(Items.SAND, (double) (value / 100));
-                case 2 -> GrizzlyEntity.this.stockpile.put(Items.DIRT, (double) (value / 100));
+            if (TerrestriaIntegration.ENABLED) {
+                switch (index) {
+                    case 1 -> GrizzlyEntity.this.stockpile.put(Items.DIRT, (double) (value / 100));
+                    case 2 -> GrizzlyEntity.this.stockpile.put(Items.GRAVEL, (double) (value / 100));
+                    case 3 -> GrizzlyEntity.this.stockpile.put(Items.SAND, (double) (value / 100));
+                    case 4 -> GrizzlyEntity.this.stockpile.put(TerrestriaIntegration.BLACK_GRAVEL_ITEM, (double) (value / 100));
+                    case 5 -> GrizzlyEntity.this.stockpile.put(TerrestriaIntegration.BLACK_SAND_ITEM, (double) (value / 100));
+                    default -> {}
+                }
+            } else {
+                switch (index) {
+                    case 1 -> GrizzlyEntity.this.stockpile.put(Items.DIRT, (double) (value / 100));
+                    case 2 -> GrizzlyEntity.this.stockpile.put(Items.GRAVEL, (double) (value / 100));
+                    case 3 -> GrizzlyEntity.this.stockpile.put(Items.SAND, (double) (value / 100));
+                    default -> {}
+                }
             }
         }
 
         @Override
         public int size() {
-            return 3;
+            return 6;
         }
     };
 
@@ -164,6 +200,8 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
 
         tag.putShort("ProcessingTimeTotal", (short) this.processingTimeTotal);
         tag.putShort("ProcessingTime", (short) this.processingTime);
+
+        tag.put("LastInput", ItemVariant.of(this.lastInput).toNbt());
 
         NbtCompound outer = new NbtCompound();
         this.stockpile.forEach((item, amount) -> {
@@ -186,11 +224,18 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
         this.processingTimeTotal = tag.getShort("ProcessingTimeTotal");
         this.processingTime = tag.getShort("ProcessingTime");
 
+        ItemVariant variant = ItemVariant.fromNbt((NbtCompound) (tag.get("LastInput")));
+        if (variant.isBlank()) {
+            this.lastInput = Items.COARSE_DIRT.getDefaultStack();
+        } else {
+            this.lastInput = variant.toStack();
+        }
+
         this.stockpile.clear();
         NbtCompound outer = tag.getCompound("stockpile");
-        for (String key : outer.getKeys()
-             ) {
+        for (String key : outer.getKeys()) {
             NbtCompound inner = (NbtCompound) (outer.get(key));
+            assert inner != null;
             this.stockpile.put(ItemVariant.fromNbt((NbtCompound) (inner.get("item"))).getItem(), inner.getDouble("amount"));
         }
 
@@ -222,15 +267,25 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
         }
 
         // If we can insert gravel to our input slot we will try to get some from a crusher above.
-        if (input.isEmpty() || (input.isOf(Items.GRAVEL) && input.getCount() < input.getMaxCount())) {
+        if (input.getCount() < input.getMaxCount()) {
             BlockEntity companion = world.getBlockEntity(pos.offset(Direction.UP));
 
             if (companion instanceof BasaltCrusherEntity) {
                 Storage<ItemVariant> source = ((BasaltCrusherEntity) companion).getSidedStorage(Direction.DOWN);
 
                 try (Transaction transaction = Transaction.openOuter()) {
-                    if (source.extract(ItemVariant.of(Items.GRAVEL), 1, transaction) > 0) {
+                    if ((input.isEmpty() || input.isOf(Items.GRAVEL)) && source.extract(ItemVariant.of(Items.GRAVEL), 1, transaction) > 0) {
                         input = new ItemStack(Items.GRAVEL, input.getCount() + 1);
+                        this.inventory.setStack(0, input);
+                        transaction.commit();
+
+                        // Input at Item Hopper speed.
+                        this.processingTime = 8;
+                        this.markDirty();
+                    } else if (TerrestriaIntegration.ENABLED &&
+                            (input.isEmpty() || input.isOf(TerrestriaIntegration.BLACK_GRAVEL_ITEM))
+                            && source.extract(ItemVariant.of(TerrestriaIntegration.BLACK_GRAVEL_ITEM), 1, transaction) > 0) {
+                        input = new ItemStack(TerrestriaIntegration.BLACK_GRAVEL_ITEM, input.getCount() + 1);
                         this.inventory.setStack(0, input);
                         transaction.commit();
 
@@ -246,6 +301,8 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
         if (input.isEmpty()) {
             // There is nothing to do.
             return;
+        } else {
+            this.lastInput = input.copy();
         }
 
         // Sloppy mess wherein I reinvent the wheel to implement funky recipes entirely in code.
@@ -318,6 +375,44 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
                 this.markDirty();
             }
         }
+
+        // Second pass for Terrestria integration
+        if (TerrestriaIntegration.ENABLED && (coarse.isEmpty() || (coarse.isOf(TerrestriaIntegration.BLACK_GRAVEL_ITEM) && coarse.getCount() < coarse.getMaxCount()))) {
+            if (input.isOf(TerrestriaIntegration.BLACK_GRAVEL_ITEM) && (fine.isEmpty() || (fine.isOf(TerrestriaIntegration.BLACK_SAND_ITEM) && fine.getCount() < fine.getMaxCount()))) {
+                // RECIPE: 4 gravel yields 3 gravel and 1 sand
+                input.decrement(1);
+                this.inventory.setStack(0, input);
+
+                // Increment the gravel fraction; maybe move some to the coarse output.
+                double gravel = this.stockpile.get(TerrestriaIntegration.BLACK_GRAVEL_ITEM) + 0.75d;
+                if (gravel >= 1.0d) {
+                    gravel -= 1.0d;
+                    if (coarse.isEmpty()) {
+                        coarse = new ItemStack(TerrestriaIntegration.BLACK_GRAVEL_ITEM, 1);
+                    } else {
+                        coarse.increment(1);
+                    }
+                    this.inventory.setStack(1, coarse);
+                }
+                this.stockpile.put(TerrestriaIntegration.BLACK_GRAVEL_ITEM, gravel);
+
+                // Increment the sand fraction; maybe move some to the fine output.
+                double sand = this.stockpile.get(TerrestriaIntegration.BLACK_SAND_ITEM) + 0.25d;
+                if (sand >= 1.0d) {
+                    sand -= 1.0d;
+                    if (fine.isEmpty()) {
+                        fine = new ItemStack(TerrestriaIntegration.BLACK_SAND_ITEM, 1);
+                    } else {
+                        fine.increment(1);
+                    }
+                    this.inventory.setStack(2, fine);
+                }
+                this.stockpile.put(TerrestriaIntegration.BLACK_SAND_ITEM, sand);
+
+                this.processingTime = this.processingTimeTotal;
+                this.markDirty();
+            }
+        }
     }
 
     public void scatterInventory(World world, BlockPos pos) {
@@ -327,5 +422,4 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
     public int calculateComparatorOutput() {
         return ScreenHandler.calculateComparatorOutput(this.inventory);
     }
-
 }

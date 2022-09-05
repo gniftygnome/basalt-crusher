@@ -1,6 +1,7 @@
 package net.gnomecraft.basaltcrusher.grizzly;
 
 import net.gnomecraft.basaltcrusher.BasaltCrusher;
+import net.gnomecraft.basaltcrusher.utils.TerrestriaIntegration;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -19,7 +20,7 @@ public class GrizzlyScreenHandler extends ScreenHandler {
     PropertyDelegate propertyDelegate;
 
     public GrizzlyScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, new SimpleInventory(3), new ArrayPropertyDelegate(3));
+        this(syncId, playerInventory, new SimpleInventory(3), new ArrayPropertyDelegate(6));
     }
 
     public GrizzlyScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
@@ -28,7 +29,7 @@ public class GrizzlyScreenHandler extends ScreenHandler {
         checkSize(inventory, 3);
         this.inventory = inventory;
 
-        checkDataCount(propertyDelegate, 3);
+        checkDataCount(propertyDelegate, 6);
         this.propertyDelegate = propertyDelegate;
 
         this.inventory.onOpen(playerInventory.player);
@@ -128,12 +129,18 @@ public class GrizzlyScreenHandler extends ScreenHandler {
     // Stockpile level as a fraction of one of the given block.
     // This is a rounded version of the real thing AND it can briefly meet or exceed 1.0f.
     public float stockpileOf(Item item) {
-        if (item == Items.GRAVEL) {
-            return propertyDelegate.get(0) / 100.0f;
-        } else if (item == Items.SAND) {
-            return propertyDelegate.get(1) / 100.0f;
+        if (item == Items.AIR) {
+            return propertyDelegate.get(0);
         } else if (item == Items.DIRT) {
+            return propertyDelegate.get(1) / 100.0f;
+        } else if (item == Items.GRAVEL) {
             return propertyDelegate.get(2) / 100.0f;
+        } else if (item == Items.SAND) {
+            return propertyDelegate.get(3) / 100.0f;
+        } else if (TerrestriaIntegration.ENABLED && item == TerrestriaIntegration.BLACK_GRAVEL_ITEM) {
+            return propertyDelegate.get(4) / 100.0f;
+        } else if (TerrestriaIntegration.ENABLED && item == TerrestriaIntegration.BLACK_SAND_ITEM) {
+            return propertyDelegate.get(5) / 100.0f;
         } else {
             return 0.0f;
         }

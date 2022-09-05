@@ -31,6 +31,13 @@ gravel you are going to need an iron farm.  The iron jaw liner will crush
 options to increase the output quite a bit).  The Gravel Mill also uses a
 fair amount of iron for its consumable mill rods.
 
+## Terrestria integration!
+If you play with [Terrestria](https://modrinth.com/mod/terrestria) installed,
+Basalt Crusher adds some extras based on Terrestria's Volcanic Island biome. 
+You can crush Volcanic Rock into Black Gravel and from there to Black Sand. 
+Black Gravel yields Obsidian Shards in the same manner Gravel yields Flint. 
+And Obsidian Shards have several convenient uses...
+
 ## How do the jaw liner slots work?
 Since 0.2.0, the mod allows the user to input a stack of jaw liners to the
 left slot and have them move one at a time to the right slots where they get

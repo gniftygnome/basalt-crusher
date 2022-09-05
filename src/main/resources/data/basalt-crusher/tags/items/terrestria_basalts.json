@@ -1,0 +1,19 @@
+{
+  "replace": false,
+  "values": [
+    "terrestria:basalt",
+    "terrestria:basalt_bricks",
+    "terrestria:basalt_cobblestone",
+    "terrestria:mossy_basalt_bricks",
+    "terrestria:mossy_basalt_cobblestone",
+    "terrestria:smooth_basalt"
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "terrestria"
+      ]
+    }
+  ]
+}

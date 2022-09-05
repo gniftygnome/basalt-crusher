@@ -5,10 +5,12 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.loader.api.FabricLoader;
 import net.gnomecraft.basaltcrusher.crusher.*;
 import net.gnomecraft.basaltcrusher.grizzly.*;
 import net.gnomecraft.basaltcrusher.mill.*;
 import net.minecraft.block.Block;
+import net.minecraft.block.GravelBlock;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.*;
@@ -22,6 +24,13 @@ import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("UnstableApiUsage")
 public class BasaltCrusher implements ModInitializer {
+    public static boolean extendTerrestria = false;
+
+    public static Block BLACK_GRAVEL_BLOCK;
+    public static BlockItem BLACK_GRAVEL_ITEM;
+    public static Item OBSIDIAN_PILE_ITEM;
+    public static Item OBSIDIAN_SHARD_ITEM;
+
     public static Block BASALT_CRUSHER_BLOCK;
     public static BlockItem BASALT_CRUSHER_ITEM;
     public static BlockEntityType<BasaltCrusherEntity> BASALT_CRUSHER_ENTITY;
@@ -47,6 +56,10 @@ public class BasaltCrusher implements ModInitializer {
     public static final ScreenHandlerType<GrizzlyScreenHandler> GRIZZLY_SCREEN_HANDLER;
     public static final ScreenHandlerType<GravelMillScreenHandler> GRAVEL_MILL_SCREEN_HANDLER;
 
+    public static final Identifier BlackGravelBlockId = new Identifier(modId, "black_gravel");
+    public static final Identifier ObsidianPileId = new Identifier(modId, "obsidian_pile");
+    public static final Identifier ObsidianShardId = new Identifier(modId, "obsidian_shard");
+
     public static final Identifier BasaltCrusherBlockId = new Identifier(modId, "basalt_crusher");
     public static final Identifier GrizzlyBlockId = new Identifier(modId, "grizzly");
     public static final Identifier GravelMillBlockId = new Identifier(modId, "gravel_mill");
@@ -66,6 +79,17 @@ public class BasaltCrusher implements ModInitializer {
     @Override
     public void onInitialize() {
         LOGGER.info("Basalt Crusher block is hungry...");
+
+        if (FabricLoader.getInstance().isModLoaded("terrestria")) {
+            LOGGER.debug("Enabling Terrestria integration...");
+            extendTerrestria = true;
+
+            BLACK_GRAVEL_BLOCK = Registry.register(Registry.BLOCK, BlackGravelBlockId, new GravelBlock(FabricBlockSettings.of(Material.AGGREGATE)));
+            BLACK_GRAVEL_ITEM = Registry.register(Registry.ITEM, BlackGravelBlockId, new BlockItem(BLACK_GRAVEL_BLOCK, new Item.Settings().group(ItemGroup.BUILDING_BLOCKS)));
+
+            OBSIDIAN_PILE_ITEM = Registry.register(Registry.ITEM, ObsidianPileId, new Item(new Item.Settings().group(ItemGroup.MISC)));
+            OBSIDIAN_SHARD_ITEM = Registry.register(Registry.ITEM, ObsidianShardId, new Item(new Item.Settings().group(ItemGroup.MISC)));
+        }
 
         // Basalt Crusher block
         BASALT_CRUSHER_BLOCK = Registry.register(Registry.BLOCK, BasaltCrusherBlockId, new BasaltCrusherBlock(FabricBlockSettings.of(Material.METAL).hardness(4.0f)));
