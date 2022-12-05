@@ -7,10 +7,11 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.tag.ItemTags;
-import net.minecraft.tag.TagKey;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 /**
  * Lazy loaded Terrestria integration.  Terrestria blocks are not available (via the registry)
@@ -29,7 +30,7 @@ public final class TerrestriaIntegration {
     public static final TagKey<Item> TERRESTRIA_BASALTS;
 
     static {
-        BLACK_SAND_ITEM = Registry.ITEM.getOrEmpty(Identifier.of("terrestria", "basalt_sand")).orElse(Items.SAND);
+        BLACK_SAND_ITEM = Registries.ITEM.getOrEmpty(Identifier.of("terrestria", "basalt_sand")).orElse(Items.SAND);
 
         if (BasaltCrusher.extendTerrestria && new ItemStack(Items.SAND).isOf(BLACK_SAND_ITEM)) {
             // Safety mechanism in case the registry fails to cough up the Terrestria block.
@@ -44,7 +45,7 @@ public final class TerrestriaIntegration {
             BLACK_GRAVEL_ITEM = BasaltCrusher.BLACK_GRAVEL_ITEM;
             OBSIDIAN_PILE_ITEM = BasaltCrusher.OBSIDIAN_PILE_ITEM;
             OBSIDIAN_SHARD_ITEM = BasaltCrusher.OBSIDIAN_SHARD_ITEM;
-            TERRESTRIA_BASALTS = TagKey.of(Registry.ITEM_KEY, new Identifier("basalt-crusher", "terrestria_basalts"));
+            TERRESTRIA_BASALTS = TagKey.of(RegistryKeys.ITEM, Identifier.of(BasaltCrusher.MOD_ID, "terrestria_basalts"));
         } else {
             // Have some coal in your stocking.  (Hey at least it's not null!)
             BLACK_GRAVEL_BLOCK = Blocks.COAL_BLOCK;

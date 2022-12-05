@@ -3,17 +3,18 @@ package net.gnomecraft.basaltcrusher.crusher;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class BasaltCrusherRecipeSerializer implements RecipeSerializer<BasaltCrusherRecipe> {
     // This will be the "type" field in the JSON.
-    public static final Identifier ID = new Identifier("basalt-crusher:basalt_crusher_recipe");
+    public static final Identifier ID = Identifier.of(BasaltCrusher.MOD_ID,"basalt_crusher_recipe");
 
     private BasaltCrusherRecipeSerializer() {}
     public static final BasaltCrusherRecipeSerializer INSTANCE = new BasaltCrusherRecipeSerializer();
@@ -41,7 +42,7 @@ public class BasaltCrusherRecipeSerializer implements RecipeSerializer<BasaltCru
 
         // The JSON will specify the item ID.
         // We can get the Item instance based off of that from the Item registry.
-        Item outputItem = Registry.ITEM.getOrEmpty(new Identifier(recipeJson.outputItem))
+        Item outputItem = Registries.ITEM.getOrEmpty(new Identifier(recipeJson.outputItem))
                 // Validate the inputted item actually exists
                 .orElseThrow(() -> new JsonSyntaxException("Basalt Crusher recipe: no such item '" + recipeJson.outputItem + "'"));
         ItemStack outputStack = new ItemStack(outputItem, recipeJson.outputAmount);

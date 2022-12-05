@@ -139,7 +139,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         @Override
         public void setStack(int slot, ItemStack stack) {
             ItemStack target = this.getStack(slot);
-            boolean sameItem = !stack.isEmpty() && stack.isItemEqualIgnoreDamage(target) && ItemStack.areNbtEqual(stack, target);
+            boolean sameItem = !stack.isEmpty() && stack.isItemEqual(target) && ItemStack.areNbtEqual(stack, target);
 
             super.setStack(slot, stack);
 

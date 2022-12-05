@@ -1,6 +1,7 @@
 package net.gnomecraft.basaltcrusher.mill;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -10,7 +11,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class GravelMillScreen extends HandledScreen<ScreenHandler> {
-    private static final Identifier TEXTURE = new Identifier("basalt-crusher", "textures/gui/container/gravel_mill_screen.png");
+    private static final Identifier TEXTURE = new Identifier(BasaltCrusher.MOD_ID, "textures/gui/container/gravel_mill_screen.png");
     GravelMillScreenHandler screenHandler;
 
     public GravelMillScreen(ScreenHandler handler, PlayerInventory inventory, Text title) {
@@ -20,7 +21,7 @@ public class GravelMillScreen extends HandledScreen<ScreenHandler> {
 
     @Override
     protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
         int x = (width - backgroundWidth) / 2;

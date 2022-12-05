@@ -15,7 +15,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class GrizzlyScreen extends HandledScreen<ScreenHandler> {
-    private static final Identifier TEXTURE = new Identifier("basalt-crusher", "textures/gui/container/grizzly_screen.png");
+    private static final Identifier TEXTURE = new Identifier(BasaltCrusher.MOD_ID, "textures/gui/container/grizzly_screen.png");
     GrizzlyScreenHandler screenHandler;
 
     public GrizzlyScreen(ScreenHandler handler, PlayerInventory inventory, Text title) {
@@ -28,7 +28,7 @@ public class GrizzlyScreen extends HandledScreen<ScreenHandler> {
         int x = (width - backgroundWidth) / 2;
         int y = (height - backgroundHeight) / 2;
 
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
         drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
