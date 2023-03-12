@@ -377,6 +377,22 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
                 entity.recipesUsed.add(entity.getLastRecipe());
             }
             entity.expAccumulated += entity.expPerCrush;
+
+            // Draw down stored XP to mend jaw liners.
+            if (entity.expAccumulated >= 1.0f) {
+                if (0.5d > world.random.nextDouble()) {
+                    if (EnchantmentHelper.getLevel(Enchantments.MENDING, upperJaw) > 0 && upperJaw.isDamaged()) {
+                        upperJaw.setDamage(upperJaw.getDamage() - 1);
+                        entity.expAccumulated -= 1.0f;
+                    }
+                } else {
+                    if (EnchantmentHelper.getLevel(Enchantments.MENDING, lowerJaw) > 0 && lowerJaw.isDamaged()) {
+                        lowerJaw.setDamage(lowerJaw.getDamage() - 1);
+                        entity.expAccumulated -= 1.0f;
+                    }
+                }
+            }
+
             // Reset crush timer.
             entity.crushTime = 0;
             entity.markDirty();

@@ -52,26 +52,26 @@ public class GrizzlyScreen extends HandledScreen<ScreenHandler> {
         Item gravelType = black ? TerrestriaIntegration.BLACK_GRAVEL_ITEM : Items.GRAVEL;
         float gravel = ((GrizzlyScreenHandler) this.handler).stockpileOf(gravelType);
         damage.setDamage(Math.round(BasaltCrusher.NETHERITE_JAW_LINER_ITEM.getMaxDamage() * (1.0f - gravel % 1.0f)));
-        this.itemRenderer.renderGuiItemIcon(gravelType.getDefaultStack(), x + 62, y + 41);
-        this.itemRenderer.renderGuiItemOverlay(this.textRenderer, damage, x + 62, y + 41);
-        this.itemRenderer.renderGuiItemOverlay(this.textRenderer, new ItemStack(gravelType), x + 62, y + 41,
+        this.itemRenderer.renderGuiItemIcon(matrices, gravelType.getDefaultStack(), x + 62, y + 41);
+        this.itemRenderer.renderGuiItemOverlay(matrices, this.textRenderer, damage, x + 62, y + 41);
+        this.itemRenderer.renderGuiItemOverlay(matrices, this.textRenderer, new ItemStack(gravelType), x + 62, y + 41,
                 gravel < 100 ? "" : Integer.toString((int) (gravel)));
 
         // sand:   78, 57 -  93, 72
         Item sandType = black ? TerrestriaIntegration.BLACK_SAND_ITEM : Items.SAND;
         float sand = ((GrizzlyScreenHandler) this.handler).stockpileOf(sandType);
         damage.setDamage(Math.round(BasaltCrusher.NETHERITE_JAW_LINER_ITEM.getMaxDamage() * (1.0f - sand % 1.0f)));
-        this.itemRenderer.renderGuiItemIcon(sandType.getDefaultStack(), x + 78, y + 57);
-        this.itemRenderer.renderGuiItemOverlay(this.textRenderer, damage, x + 78, y + 57);
-        this.itemRenderer.renderGuiItemOverlay(this.textRenderer, new ItemStack(sandType), x + 78, y + 57,
+        this.itemRenderer.renderGuiItemIcon(matrices, sandType.getDefaultStack(), x + 78, y + 57);
+        this.itemRenderer.renderGuiItemOverlay(matrices, this.textRenderer, damage, x + 78, y + 57);
+        this.itemRenderer.renderGuiItemOverlay(matrices, this.textRenderer, new ItemStack(sandType), x + 78, y + 57,
                 sand < 100 ? "" : Integer.toString((int) (sand)));
 
         // dirt:   98, 57 - 113, 72
         float dirt = ((GrizzlyScreenHandler) this.handler).stockpileOf(Items.DIRT);
         damage.setDamage(Math.round(BasaltCrusher.NETHERITE_JAW_LINER_ITEM.getMaxDamage() * (1.0f - dirt % 1.0f)));
-        this.itemRenderer.renderGuiItemIcon(Items.DIRT.getDefaultStack(), x + 98, y + 57);
-        this.itemRenderer.renderGuiItemOverlay(this.textRenderer, damage, x + 98, y + 57);
-        this.itemRenderer.renderGuiItemOverlay(this.textRenderer, new ItemStack(Items.DIRT), x + 98, y + 57,
+        this.itemRenderer.renderGuiItemIcon(matrices, Items.DIRT.getDefaultStack(), x + 98, y + 57);
+        this.itemRenderer.renderGuiItemOverlay(matrices, this.textRenderer, damage, x + 98, y + 57);
+        this.itemRenderer.renderGuiItemOverlay(matrices, this.textRenderer, new ItemStack(Items.DIRT), x + 98, y + 57,
                 dirt < 100 ? "" : Integer.toString((int) (dirt)));
     }
 

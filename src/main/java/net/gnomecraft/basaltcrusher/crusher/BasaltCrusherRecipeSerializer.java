@@ -56,7 +56,7 @@ public class BasaltCrusherRecipeSerializer implements RecipeSerializer<BasaltCru
 
         recipe.getInputA().write(packetData);
         recipe.getInputB().write(packetData);
-        packetData.writeItemStack(recipe.getOutput());
+        packetData.writeItemStack(recipe.getOutput(null));
     }
 
     // Turns PacketByteBuf into Recipe.

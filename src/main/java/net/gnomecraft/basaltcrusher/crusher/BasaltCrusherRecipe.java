@@ -6,6 +6,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -37,7 +38,7 @@ public class BasaltCrusherRecipe implements Recipe<SidedInventory> {
     }
 
     @Override
-    public ItemStack getOutput() {
+    public ItemStack getOutput(DynamicRegistryManager registryManager) {
         return this.outputStack;
     }
 
@@ -48,7 +49,7 @@ public class BasaltCrusherRecipe implements Recipe<SidedInventory> {
     }
 
     @Override
-    public ItemStack craft(SidedInventory inv) {
+    public ItemStack craft(SidedInventory inventory, DynamicRegistryManager registryManager) {
         return ItemStack.EMPTY;
     }
 
