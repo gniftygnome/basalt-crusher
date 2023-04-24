@@ -25,10 +25,15 @@
   "mixins": [
     "basalt-crusher.mixins.json"
   ],
+  "custom": {
+    "loom:injected_interfaces": {
+      "net/minecraft/class_332": ["net/gnomecraft/basaltcrusher/utils/InterfaceStockpile"]
+    }
+  },
   "depends": {
     "fabricloader": ">=0.13.3",
     "fabric": "*",
-    "minecraft": ">=1.19.4-pre1 <1.20",
+    "minecraft": ">=23w16a <1.21",
     "java": ">=17"
   }
 }

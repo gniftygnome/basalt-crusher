@@ -423,11 +423,6 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         return this.world.getRecipeManager().get(lastRecipe).orElse(null);
     }
 
-    @Override
-    public void unlockLastRecipe(PlayerEntity player) {
-        player.unlockRecipes(new Identifier[] { lastRecipe });
-    }
-
     public void dropExperience(PlayerEntity player) {
         int expOrb;
 

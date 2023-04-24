@@ -12,13 +12,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EfficiencyEnchantment.class)
-public abstract class EfficiencyEnchantmentMixin extends Enchantment {
-    protected EfficiencyEnchantmentMixin(Rarity weight, EnchantmentTarget type, EquipmentSlot[] slotTypes) {
+public abstract class MixinEnchantment extends Enchantment {
+    protected MixinEnchantment(Rarity weight, EnchantmentTarget type, EquipmentSlot[] slotTypes) {
         super(weight, type, slotTypes);
     }
 
     @Inject(at = @At(value = "HEAD"), method = "isAcceptableItem(Lnet/minecraft/item/ItemStack;)Z", cancellable = true)
-    public void injectJawLiners(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
+    public void basaltCrusher$injectJawLinerEfficiency(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         // Insert Jaw Liners as valid targets just like Vanilla does for Shears.
         if (stack.isIn(BasaltCrusher.JAW_LINERS)) {
             cir.setReturnValue(true);
