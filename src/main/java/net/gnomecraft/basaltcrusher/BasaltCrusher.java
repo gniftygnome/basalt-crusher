@@ -2,6 +2,7 @@ package net.gnomecraft.basaltcrusher;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
@@ -86,7 +87,7 @@ public class BasaltCrusher implements ModInitializer {
             LOGGER.debug("Enabling Terrestria integration...");
             extendTerrestria = true;
 
-            BLACK_GRAVEL_BLOCK = Registry.register(Registries.BLOCK, BlackGravelBlockId, new GravelBlock(AbstractBlock.Settings.of(Material.BLOCKS_LIGHT, MapColor.DEEPSLATE_GRAY).instrument(Instrument.SNARE).strength(0.6f).sounds(BlockSoundGroup.GRAVEL)));
+            BLACK_GRAVEL_BLOCK = Registry.register(Registries.BLOCK, BlackGravelBlockId, new GravelBlock(FabricBlockSettings.copyOf(Blocks.GRAVEL).mapColor(MapColor.DEEPSLATE_GRAY)));
             BLACK_GRAVEL_ITEM = Registry.register(Registries.ITEM, BlackGravelBlockId, new BlockItem(BLACK_GRAVEL_BLOCK, new Item.Settings()));
 
             OBSIDIAN_PILE_ITEM = Registry.register(Registries.ITEM, ObsidianPileId, new Item(new Item.Settings()));
@@ -102,17 +103,17 @@ public class BasaltCrusher implements ModInitializer {
         }
 
         // Basalt Crusher block
-        BASALT_CRUSHER_BLOCK = Registry.register(Registries.BLOCK, BasaltCrusherBlockId, new BasaltCrusherBlock(AbstractBlock.Settings.of(Material.BLOCKS_LIGHT, MapColor.IRON_GRAY).requiresTool().strength(3.0f, 4.8f).sounds(BlockSoundGroup.METAL).nonOpaque()));
+        BASALT_CRUSHER_BLOCK = Registry.register(Registries.BLOCK, BasaltCrusherBlockId, new BasaltCrusherBlock(AbstractBlock.Settings.of().mapColor(MapColor.IRON_GRAY).instrument(Instrument.BASEDRUM).requiresTool().strength(3.f, 4.8f).sounds(BlockSoundGroup.METAL)));
         BASALT_CRUSHER_ITEM = Registry.register(Registries.ITEM, BasaltCrusherBlockId, new BlockItem(BASALT_CRUSHER_BLOCK, new Item.Settings()));
         BASALT_CRUSHER_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, BasaltCrusherBlockId, FabricBlockEntityTypeBuilder.create(BasaltCrusherEntity::new, BASALT_CRUSHER_BLOCK).build(null));
 
         // Grizzly block
-        GRIZZLY_BLOCK = Registry.register(Registries.BLOCK, GrizzlyBlockId, new GrizzlyBlock(AbstractBlock.Settings.of(Material.BLOCKS_LIGHT, MapColor.IRON_GRAY).requiresTool().strength(3.0f, 4.8f).sounds(BlockSoundGroup.METAL).nonOpaque()));
+        GRIZZLY_BLOCK = Registry.register(Registries.BLOCK, GrizzlyBlockId, new GrizzlyBlock(AbstractBlock.Settings.of().mapColor(MapColor.IRON_GRAY).instrument(Instrument.BASEDRUM).requiresTool().strength(3.0f, 4.8f).sounds(BlockSoundGroup.METAL).nonOpaque()));
         GRIZZLY_ITEM = Registry.register(Registries.ITEM, GrizzlyBlockId, new BlockItem(GRIZZLY_BLOCK, new Item.Settings()));
         GRIZZLY_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, GrizzlyBlockId, FabricBlockEntityTypeBuilder.create(GrizzlyEntity::new, GRIZZLY_BLOCK).build(null));
 
         // Gravel Mill block
-        GRAVEL_MILL_BLOCK = Registry.register(Registries.BLOCK, GravelMillBlockId, new GravelMillBlock(AbstractBlock.Settings.of(Material.BLOCKS_LIGHT, MapColor.IRON_GRAY).requiresTool().strength(3.0f, 4.8f).sounds(BlockSoundGroup.METAL).nonOpaque()));
+        GRAVEL_MILL_BLOCK = Registry.register(Registries.BLOCK, GravelMillBlockId, new GravelMillBlock(AbstractBlock.Settings.of().mapColor(MapColor.IRON_GRAY).instrument(Instrument.BASEDRUM).requiresTool().strength(3.0f, 4.8f).sounds(BlockSoundGroup.METAL)));
         GRAVEL_MILL_ITEM = Registry.register(Registries.ITEM, GravelMillBlockId, new BlockItem(GRAVEL_MILL_BLOCK, new Item.Settings()));
         GRAVEL_MILL_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, GravelMillBlockId, FabricBlockEntityTypeBuilder.create(GravelMillEntity::new, GRAVEL_MILL_BLOCK).build(null));
 

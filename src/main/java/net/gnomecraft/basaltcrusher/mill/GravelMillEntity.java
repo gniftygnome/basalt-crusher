@@ -366,7 +366,7 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
         while (expAccumulated >= 1.0F) {
             expOrb = ExperienceOrbEntity.roundToOrbSize((int) expAccumulated);
             expAccumulated -= expOrb;
-            player.world.spawnEntity(new ExperienceOrbEntity(player.world, player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, expOrb));
+            player.getWorld().spawnEntity(new ExperienceOrbEntity(player.getWorld(), player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, expOrb));
         }
 
         this.markDirty();
