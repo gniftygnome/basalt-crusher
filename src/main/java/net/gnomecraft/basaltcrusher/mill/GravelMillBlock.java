@@ -9,8 +9,6 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.context.LootContext;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
@@ -23,9 +21,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GravelMillBlock extends BlockWithEntity {
     static final IntProperty MILL_STATE = IntProperty.of("mill_state",0, 21);
@@ -74,13 +69,6 @@ public class GravelMillBlock extends BlockWithEntity {
             playerEntity.openHandledScreen((NamedScreenHandlerFactory) blockEntity);
             // TODO: playerEntity.increaseStat(Stats.INTERACT_WITH_MILL, 1);
         }
-    }
-
-    @Override
-    public List<ItemStack> getDroppedStacks(BlockState blockState, LootContext.Builder lootContext$Builder) {
-        ArrayList<ItemStack> dropList = new ArrayList<>();
-        dropList.add(new ItemStack(this));
-        return dropList;
     }
 
     @Environment(EnvType.CLIENT)

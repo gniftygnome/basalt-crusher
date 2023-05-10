@@ -7,8 +7,6 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.context.LootContext;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
@@ -23,9 +21,6 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GrizzlyBlock extends BlockWithEntity {
     static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
@@ -81,13 +76,6 @@ public class GrizzlyBlock extends BlockWithEntity {
             playerEntity.openHandledScreen((NamedScreenHandlerFactory) blockEntity);
             // TODO: playerEntity.increaseStat(Stats.INTERACT_WITH_GRIZZLY, 1);
         }
-    }
-
-    @Override
-    public List<ItemStack> getDroppedStacks(BlockState blockState, LootContext.Builder lootContext$Builder) {
-        ArrayList<ItemStack> dropList = new ArrayList<>();
-        dropList.add(new ItemStack(this));
-        return dropList;
     }
 
     @Override

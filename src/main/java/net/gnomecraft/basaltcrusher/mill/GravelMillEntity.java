@@ -127,7 +127,7 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
         @Override
         public void setStack(int slot, ItemStack stack) {
             ItemStack target = this.getStack(slot);
-            boolean sameItem = !stack.isEmpty() && stack.isItemEqual(target) && ItemStack.areNbtEqual(stack, target);
+            boolean sameItem = !stack.isEmpty() && ItemStack.canCombine(stack, target);
 
             super.setStack(slot, stack);
 

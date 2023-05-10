@@ -119,12 +119,12 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
                 case 3:
                     // top crushing slot (active jaw liner)
                     // TODO: use the recipe
-                    retVal = (stack.isIn(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !stack.isItemEqual(this.getStack(3)));
+                    retVal = (stack.isIn(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !ItemStack.canCombine(stack, this.getStack(3)));
                     break;
                 case 4:
                     // bottom crushing slot (active jaw liner)
                     // TODO: use the recipe
-                    retVal = (stack.isIn(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !stack.isItemEqual(this.getStack(4)));
+                    retVal = (stack.isIn(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !ItemStack.canCombine(stack, this.getStack(4)));
                     break;
             }
 
@@ -139,7 +139,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         @Override
         public void setStack(int slot, ItemStack stack) {
             ItemStack target = this.getStack(slot);
-            boolean sameItem = !stack.isEmpty() && stack.isItemEqual(target) && ItemStack.areNbtEqual(stack, target);
+            boolean sameItem = !stack.isEmpty() && ItemStack.canCombine(stack, target);
 
             super.setStack(slot, stack);
 
