@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.gnomecraft.basaltcrusher.utils.InterfaceStockpile;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +25,7 @@ public abstract class MixinDrawContext implements InterfaceStockpile {
     public abstract int drawText(TextRenderer textRenderer, @Nullable String text, int x, int y, int color, boolean shadow);
 
     @Shadow
-    public abstract void fill(int x1, int y1, int x2, int y2, int color);
+    public abstract void fill(RenderLayer layer, int x1, int y1, int x2, int y2, int color);
 
     // This is based on the new merged item renderer in 23w16a's "new" DrawContext class.
     // Drawing the ItemStack and drawing the damage are no longer two separate methods, so...
@@ -38,23 +39,21 @@ public abstract class MixinDrawContext implements InterfaceStockpile {
 
         // layer metadata on top
         this.matrices.push();
+        RenderSystem.disableDepthTest();
 
         // render stockpile fill level bar
         int k = Math.round(13.0f * (quantity % 1.0f));
-        RenderSystem.disableDepthTest();
-        this.fill(x + 2, y + 13, x + 15, y + 15, 0xFF000000);
-        this.fill(x + 2, y + 13, x + 2 + k, y + 14, 0xFF877BAE);
-        RenderSystem.enableDepthTest();
+        this.fill(RenderLayer.getGuiOverlay(), x + 2, y + 13, x + 15, y + 15, 0xFF000000);
+        this.fill(RenderLayer.getGuiOverlay(), x + 2, y + 13, x + 2 + k, y + 14, 0xFF877BAE);
 
         // render item stack count
         if (quantity >= 2.0f) {
             String count = String.valueOf((int) quantity);
             this.matrices.translate(0.0f, 0.0f, 200.0f);
-            RenderSystem.disableDepthTest();
             this.drawText(textRenderer, count, x + 17 - textRenderer.getWidth(count), y + 9, 0xFFFFFF, true);
-            RenderSystem.enableDepthTest();
         }
 
+        RenderSystem.enableDepthTest();
         this.matrices.pop();
     }
 }
