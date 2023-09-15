@@ -34,7 +34,7 @@ import static net.gnomecraft.basaltcrusher.mill.GravelMillBlock.MILL_STATE;
 @SuppressWarnings("UnstableApiUsage")
 public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerFactory {
     private int millState;
-    private EnumMap<Direction, Storage<ItemVariant>> storageCache;
+    private final EnumMap<Direction, Storage<ItemVariant>> storageCache;
 
     private int millTimeTotal;
     private int millTime;

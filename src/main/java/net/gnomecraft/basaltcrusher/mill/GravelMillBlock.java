@@ -39,7 +39,7 @@ public class GravelMillBlock extends BlockWithEntity {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, BasaltCrusher.GRAVEL_MILL_ENTITY, GravelMillEntity::tick);
+        return validateTicker(type, BasaltCrusher.GRAVEL_MILL_ENTITY, GravelMillEntity::tick);
     }
 
     @Override

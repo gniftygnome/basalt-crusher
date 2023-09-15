@@ -19,14 +19,11 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.recipe.*;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -36,13 +33,9 @@ import java.util.EnumMap;
 import static net.gnomecraft.basaltcrusher.crusher.BasaltCrusherBlock.CRUSHING_STATE;
 
 @SuppressWarnings("UnstableApiUsage")
-public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandlerFactory, RecipeInputProvider, RecipeUnlocker {
+public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandlerFactory {
     private BasaltCrusherBlock.CrushingState crushingState;
-    private EnumMap<Direction, Storage<ItemVariant>> storageCache;
-
-    private Identifier lastRecipe;
-    private final DefaultedList<Recipe<?>> recipesUsed;
-    private final RecipeType<BasaltCrusherRecipe> recipeType;
+    private final EnumMap<Direction, Storage<ItemVariant>> storageCache;
 
     private int crushTimeTotal;
     private int crushTime;
@@ -56,10 +49,6 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         // Initialize cached crushing state.
         this.crushingState = state.get(CRUSHING_STATE);
         this.storageCache = new EnumMap<>(Direction.class);
-
-        // Recipe support (currently unused).
-        this.recipesUsed = DefaultedList.of();
-        this.recipeType = BasaltCrusherRecipe.Type.INSTANCE;
 
         // Our mod is a simple mod.
         this.crushTimeTotal = 420;
@@ -105,12 +94,12 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
             switch (slot) {
                 case 0:
                     // input slot
-                    // TODO: use the recipe
+                    // TODO: use recipes
                     retVal = stack.isIn(BasaltCrusher.BASALTS);
                     break;
                 case 1:
                     // jaw liner slot
-                    // TODO: use the recipe
+                    // TODO: use recipes
                     retVal = stack.isIn(BasaltCrusher.JAW_LINERS);
                     break;
                 case 2:
@@ -118,12 +107,12 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
                     break;
                 case 3:
                     // top crushing slot (active jaw liner)
-                    // TODO: use the recipe
+                    // TODO: use recipes
                     retVal = (stack.isIn(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !ItemStack.canCombine(stack, this.getStack(3)));
                     break;
                 case 4:
                     // bottom crushing slot (active jaw liner)
-                    // TODO: use the recipe
+                    // TODO: use recipes
                     retVal = (stack.isIn(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !ItemStack.canCombine(stack, this.getStack(4)));
                     break;
             }
@@ -231,10 +220,6 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
     public void writeNbt(NbtCompound tag) {
         tag.put("Inventory", this.inventory.toNbtList());
 
-        if (lastRecipe != null) {
-            tag.putString("LastRecipeLocation", lastRecipe.toString());
-        }
-
         tag.putShort("CrushTimeTotal", (short) this.crushTimeTotal);
         tag.putShort("CrushTime", (short) this.crushTime);
         tag.putFloat("ExpPerCrush", expPerCrush);
@@ -248,11 +233,6 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         super.readNbt(tag);
 
         inventory.readNbtList(tag.getList("Inventory", NbtList.COMPOUND_TYPE));
-
-        String lastRecipeLocation = tag.getString("LastRecipeLocation");
-        if (lastRecipeLocation != null && !lastRecipeLocation.isEmpty()) {
-            lastRecipe = new Identifier(lastRecipeLocation);
-        }
 
         crushTimeTotal = tag.getShort("CrushTimeTotal");
         crushTime = tag.getShort("CrushTime");
@@ -372,10 +352,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
                     lowerJaw.decrement(1);
                 }
             }
-            // Add recipe utilization and XP.
-            if (entity.getLastRecipe() != null) {
-                entity.recipesUsed.add(entity.getLastRecipe());
-            }
+            // Add XP.
             entity.expAccumulated += entity.expPerCrush;
 
             // Draw down stored XP to mend jaw liners.
@@ -407,22 +384,6 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         return ScreenHandler.calculateComparatorOutput(this.inventory);
     }
 
-    @Override
-    public void setLastRecipe(Recipe<?> recipe) {
-        if (recipe != null) {
-            lastRecipe = recipe.getId();
-        }
-    }
-
-    @Override
-    public Recipe<?> getLastRecipe() {
-        if (this.world == null) {
-            return null;
-        }
-
-        return this.world.getRecipeManager().get(lastRecipe).orElse(null);
-    }
-
     public void dropExperience(PlayerEntity player) {
         int expOrb;
 
@@ -435,13 +396,6 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         }
 
         this.markDirty();
-    }
-
-    @Override
-    public void provideRecipeInputs(RecipeMatcher finder) {
-        for (int slot = 0; slot < this.inventory.size(); ++slot) {
-            finder.addInput(this.inventory.getStack(slot));
-        }
     }
 
     // Local cache in the BE so we only update the BS when the state changes.

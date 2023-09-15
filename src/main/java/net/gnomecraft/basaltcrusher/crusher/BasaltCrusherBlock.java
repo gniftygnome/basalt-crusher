@@ -47,7 +47,7 @@ public class BasaltCrusherBlock extends BlockWithEntity {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, BasaltCrusher.BASALT_CRUSHER_ENTITY, BasaltCrusherEntity::tick);
+        return validateTicker(type, BasaltCrusher.BASALT_CRUSHER_ENTITY, BasaltCrusherEntity::tick);
     }
 
     @Override

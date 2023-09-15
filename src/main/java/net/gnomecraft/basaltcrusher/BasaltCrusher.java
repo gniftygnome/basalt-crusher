@@ -4,7 +4,6 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.loader.api.FabricLoader;
 import net.gnomecraft.basaltcrusher.crusher.*;
@@ -18,6 +17,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvent;
@@ -94,12 +94,10 @@ public class BasaltCrusher implements ModInitializer {
             OBSIDIAN_SHARD_ITEM = Registry.register(Registries.ITEM, ObsidianShardId, new Item(new Item.Settings()));
 
             // Register Terrestria extension items for Item Groups
-            ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register((content) -> {
-                content.addAfter(Items.GRAVEL, BLACK_GRAVEL_ITEM);
-            });
-            ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register((content) -> {
-                content.addAfter(Items.FLINT, OBSIDIAN_SHARD_ITEM, OBSIDIAN_PILE_ITEM);
-            });
+            ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS)
+                    .register(content -> content.addAfter(Items.GRAVEL, BLACK_GRAVEL_ITEM));
+            ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS)
+                    .register(content -> content.addAfter(Items.FLINT, OBSIDIAN_SHARD_ITEM, OBSIDIAN_PILE_ITEM));
         }
 
         // Basalt Crusher block
@@ -126,16 +124,10 @@ public class BasaltCrusher implements ModInitializer {
         MILL_ROD_CHARGE_ITEM = Registry.register(Registries.ITEM, MillRodChargeId, new ToolItem(ToolMaterials.IRON, new Item.Settings()));
 
         // Register standard items for Item Groups
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register((content) -> {
-            content.addAfter(Items.BLAST_FURNACE, BASALT_CRUSHER_ITEM, GRAVEL_MILL_ITEM, GRIZZLY_ITEM);
-        });
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register((content) -> {
-            content.addBefore(Items.WHITE_DYE, IRON_JAW_LINER_ITEM, DIAMOND_JAW_LINER_ITEM, NETHERITE_JAW_LINER_ITEM, MILL_ROD_CHARGE_ITEM);
-        });
-
-        // Basalt Crusher gravel recipe
-        Registry.register(Registries.RECIPE_SERIALIZER, BasaltCrusherRecipeSerializer.ID, BasaltCrusherRecipeSerializer.INSTANCE);
-        Registry.register(Registries.RECIPE_TYPE, Identifier.of(MOD_ID, BasaltCrusherRecipe.Type.ID), BasaltCrusherRecipe.Type.INSTANCE);
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL)
+                .register(content -> content.addAfter(Items.BLAST_FURNACE, BASALT_CRUSHER_ITEM, GRAVEL_MILL_ITEM, GRIZZLY_ITEM));
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS)
+                .register(content -> content.addBefore(Items.WHITE_DYE, IRON_JAW_LINER_ITEM, DIAMOND_JAW_LINER_ITEM, NETHERITE_JAW_LINER_ITEM, MILL_ROD_CHARGE_ITEM));
 
         // Basalt Crusher Storage
         ItemStorage.SIDED.registerForBlocks((world, pos, state, blockEntity, direction) -> blockEntity instanceof BasaltCrusherEntity ? ((BasaltCrusherEntity) blockEntity).getSidedStorage(direction) : null, BASALT_CRUSHER_BLOCK);
@@ -147,8 +139,8 @@ public class BasaltCrusher implements ModInitializer {
     }
 
     static {
-        BASALT_CRUSHER_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(BasaltCrusherBlockId, BasaltCrusherScreenHandler::new);
-        GRIZZLY_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(GrizzlyBlockId, GrizzlyScreenHandler::new);
-        GRAVEL_MILL_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(GravelMillBlockId, GravelMillScreenHandler::new);
+        BASALT_CRUSHER_SCREEN_HANDLER = new ScreenHandlerType<>(BasaltCrusherScreenHandler::new, FeatureSet.empty());
+        GRIZZLY_SCREEN_HANDLER = new ScreenHandlerType<>(GrizzlyScreenHandler::new, FeatureSet.empty());
+        GRAVEL_MILL_SCREEN_HANDLER = new ScreenHandlerType<>(GravelMillScreenHandler::new, FeatureSet.empty());
     }
 }

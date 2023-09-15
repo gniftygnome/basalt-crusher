@@ -57,7 +57,7 @@ public class GrizzlyBlock extends BlockWithEntity {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, BasaltCrusher.GRIZZLY_ENTITY, GrizzlyEntity::tick);
+        return validateTicker(type, BasaltCrusher.GRIZZLY_ENTITY, GrizzlyEntity::tick);
     }
 
     @Override
