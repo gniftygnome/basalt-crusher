@@ -1,5 +1,6 @@
 package net.gnomecraft.basaltcrusher.mill;
 
+import com.mojang.serialization.MapCodec;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.gnomecraft.basaltcrusher.BasaltCrusher;
@@ -33,6 +34,11 @@ public class GravelMillBlock extends BlockWithEntity {
     }
 
     @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return null;
+    }
+
+    @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new GravelMillEntity(pos, state);
     }
@@ -52,14 +58,14 @@ public class GravelMillBlock extends BlockWithEntity {
     }
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
 
         if (blockEntity instanceof GravelMillEntity) {
             ((GravelMillEntity) blockEntity).dropExperience(player);
         }
 
-        super.onBreak(world, pos, state, player);
+        return super.onBreak(world, pos, state, player);
     }
 
     private void openContainer(World world, BlockPos blockPos, PlayerEntity playerEntity) {

@@ -1,5 +1,6 @@
 package net.gnomecraft.basaltcrusher.grizzly;
 
+import com.mojang.serialization.MapCodec;
 import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -48,6 +49,11 @@ public class GrizzlyBlock extends BlockWithEntity {
         super(settings);
 
         setDefaultState(getStateManager().getDefaultState().with(FACING, Direction.NORTH));
+    }
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return null;
     }
 
     @Override

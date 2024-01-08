@@ -1,5 +1,6 @@
 package net.gnomecraft.basaltcrusher.crusher;
 
+import com.mojang.serialization.MapCodec;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.gnomecraft.basaltcrusher.BasaltCrusher;
@@ -41,6 +42,11 @@ public class BasaltCrusherBlock extends BlockWithEntity {
     }
 
     @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return null;
+    }
+
+    @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new BasaltCrusherEntity(pos, state);
     }
@@ -60,14 +66,14 @@ public class BasaltCrusherBlock extends BlockWithEntity {
     }
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
 
         if (blockEntity instanceof BasaltCrusherEntity) {
             ((BasaltCrusherEntity) blockEntity).dropExperience(player);
         }
 
-        super.onBreak(world, pos, state, player);
+        return super.onBreak(world, pos, state, player);
     }
 
     private void openContainer(World world, BlockPos blockPos, PlayerEntity playerEntity) {

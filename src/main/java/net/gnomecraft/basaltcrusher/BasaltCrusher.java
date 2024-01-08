@@ -21,11 +21,11 @@ import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.ColorCode;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("UnstableApiUsage")
 public class BasaltCrusher implements ModInitializer {
     public static boolean extendTerrestria = false;
 
@@ -87,7 +87,7 @@ public class BasaltCrusher implements ModInitializer {
             LOGGER.debug("Enabling Terrestria integration...");
             extendTerrestria = true;
 
-            BLACK_GRAVEL_BLOCK = Registry.register(Registries.BLOCK, BlackGravelBlockId, new GravelBlock(FabricBlockSettings.copyOf(Blocks.GRAVEL).mapColor(MapColor.DEEPSLATE_GRAY)));
+            BLACK_GRAVEL_BLOCK = Registry.register(Registries.BLOCK, BlackGravelBlockId, new ColoredFallingBlock(new ColorCode(0x202020), FabricBlockSettings.copyOf(Blocks.GRAVEL).mapColor(MapColor.DEEPSLATE_GRAY)));
             BLACK_GRAVEL_ITEM = Registry.register(Registries.ITEM, BlackGravelBlockId, new BlockItem(BLACK_GRAVEL_BLOCK, new Item.Settings()));
 
             OBSIDIAN_PILE_ITEM = Registry.register(Registries.ITEM, ObsidianPileId, new Item(new Item.Settings()));
