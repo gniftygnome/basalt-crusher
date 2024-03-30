@@ -11,7 +11,7 @@
     }
   },
   "result": {
-    "item": "basalt-crusher:obsidian_pile"
+    "id": "basalt-crusher:obsidian_pile"
   },
   "fabric:load_conditions": [
     {

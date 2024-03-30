@@ -10,6 +10,6 @@
     "item": "minecraft:netherite_ingot"
   },
   "result": {
-    "item": "basalt-crusher:netherite_jaw_liner"
+    "id": "basalt-crusher:netherite_jaw_liner"
   }
 }

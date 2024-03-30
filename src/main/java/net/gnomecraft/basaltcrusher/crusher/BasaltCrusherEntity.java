@@ -19,6 +19,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
@@ -32,7 +33,6 @@ import java.util.EnumMap;
 
 import static net.gnomecraft.basaltcrusher.crusher.BasaltCrusherBlock.CRUSHING_STATE;
 
-@SuppressWarnings("UnstableApiUsage")
 public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandlerFactory {
     private BasaltCrusherBlock.CrushingState crushingState;
     private final EnumMap<Direction, Storage<ItemVariant>> storageCache;
@@ -108,12 +108,12 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
                 case 3:
                     // top crushing slot (active jaw liner)
                     // TODO: use recipes
-                    retVal = (stack.isIn(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !ItemStack.canCombine(stack, this.getStack(3)));
+                    retVal = (stack.isIn(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !ItemStack.areItemsAndComponentsEqual(stack, this.getStack(3)));
                     break;
                 case 4:
                     // bottom crushing slot (active jaw liner)
                     // TODO: use recipes
-                    retVal = (stack.isIn(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !ItemStack.canCombine(stack, this.getStack(4)));
+                    retVal = (stack.isIn(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !ItemStack.areItemsAndComponentsEqual(stack, this.getStack(4)));
                     break;
             }
 
@@ -128,7 +128,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         @Override
         public void setStack(int slot, ItemStack stack) {
             ItemStack target = this.getStack(slot);
-            boolean sameItem = !stack.isEmpty() && ItemStack.canCombine(stack, target);
+            boolean sameItem = !stack.isEmpty() && ItemStack.areItemsAndComponentsEqual(stack, target);
 
             super.setStack(slot, stack);
 
@@ -157,10 +157,12 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
             return itemVariant.toStack().isIn(BasaltCrusher.JAW_LINERS);
         }
 
+        /* TODO: review whether we can restore the 16-stack behavior somehow
         @Override
         protected int getCapacity(ItemVariant itemVariant) {
             return 16;
         }
+        */
     };
 
     public Storage<ItemVariant> getSidedStorage(Direction direction) {
@@ -217,22 +219,22 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
     }
 
     @Override
-    public void writeNbt(NbtCompound tag) {
-        tag.put("Inventory", this.inventory.toNbtList());
+    public void writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+        tag.put("Inventory", this.inventory.toNbtList(registryLookup));
 
         tag.putShort("CrushTimeTotal", (short) this.crushTimeTotal);
         tag.putShort("CrushTime", (short) this.crushTime);
         tag.putFloat("ExpPerCrush", expPerCrush);
         tag.putFloat("ExpAccumulated", expAccumulated);
 
-        super.writeNbt(tag);
+        super.writeNbt(tag, registryLookup);
     }
 
     @Override
-    public void readNbt(NbtCompound tag) {
-        super.readNbt(tag);
+    public void readNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(tag, registryLookup);
 
-        inventory.readNbtList(tag.getList("Inventory", NbtList.COMPOUND_TYPE));
+        inventory.readNbtList(tag.getList("Inventory", NbtList.COMPOUND_TYPE), registryLookup);
 
         crushTimeTotal = tag.getShort("CrushTimeTotal");
         crushTime = tag.getShort("CrushTime");

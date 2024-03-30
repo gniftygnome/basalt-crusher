@@ -18,6 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
@@ -31,7 +32,6 @@ import java.util.EnumMap;
 
 import static net.gnomecraft.basaltcrusher.mill.GravelMillBlock.MILL_STATE;
 
-@SuppressWarnings("UnstableApiUsage")
 public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerFactory {
     private int millState;
     private final EnumMap<Direction, Storage<ItemVariant>> storageCache;
@@ -127,7 +127,7 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
         @Override
         public void setStack(int slot, ItemStack stack) {
             ItemStack target = this.getStack(slot);
-            boolean sameItem = !stack.isEmpty() && ItemStack.canCombine(stack, target);
+            boolean sameItem = !stack.isEmpty() && ItemStack.areItemsAndComponentsEqual(stack, target);
 
             super.setStack(slot, stack);
 
@@ -187,8 +187,8 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
     }
 
     @Override
-    public void writeNbt(NbtCompound tag) {
-        tag.put("Inventory", this.inventory.toNbtList());
+    public void writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+        tag.put("Inventory", this.inventory.toNbtList(registryLookup));
 
         tag.putShort("MillTimeTotal", (short) this.millTimeTotal);
         tag.putShort("MillTime", (short) this.millTime);
@@ -196,14 +196,14 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
         tag.putFloat("ExpAccumulated", expAccumulated);
         tag.putShort("TransferCooldown", (short) this.transferCooldown);
 
-        super.writeNbt(tag);
+        super.writeNbt(tag, registryLookup);
     }
 
     @Override
-    public void readNbt(NbtCompound tag) {
-        super.readNbt(tag);
+    public void readNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(tag, registryLookup);
 
-        inventory.readNbtList(tag.getList("Inventory", NbtList.COMPOUND_TYPE));
+        inventory.readNbtList(tag.getList("Inventory", NbtList.COMPOUND_TYPE), registryLookup);
 
         millTimeTotal = tag.getShort("MillTimeTotal");
         millTime = tag.getShort("MillTime");

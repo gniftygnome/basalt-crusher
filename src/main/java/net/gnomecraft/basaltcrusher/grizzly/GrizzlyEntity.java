@@ -16,6 +16,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.*;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
@@ -29,7 +30,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("UnstableApiUsage")
 public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFactory {
     private final EnumMap<Direction, Storage<ItemVariant>> storageCache;
 
@@ -194,40 +194,41 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
     }
 
     @Override
-    public void writeNbt(NbtCompound tag) {
-        tag.put("Inventory", this.inventory.toNbtList());
+    public void writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+        tag.put("Inventory", this.inventory.toNbtList(registryLookup));
 
         tag.putShort("ProcessingTimeTotal", (short) this.processingTimeTotal);
         tag.putShort("ProcessingTime", (short) this.processingTime);
 
-        tag.put("LastInput", ItemVariant.of(this.lastInput).toNbt());
+        tag.put("LastInput", this.lastInput.encodeAllowEmpty(registryLookup));
 
         NbtCompound outer = new NbtCompound();
         this.stockpile.forEach((item, amount) -> {
             NbtCompound inner = new NbtCompound();
-            inner.put("item",  ItemVariant.of(item).toNbt());
+            inner.put("item",  item.getDefaultStack().encodeAllowEmpty(registryLookup));
             inner.put("amount", NbtDouble.of(amount));
             outer.put(item.toString(), inner);
         });
         tag.put("stockpile", outer);
 
-        super.writeNbt(tag);
+        super.writeNbt(tag, registryLookup);
     }
 
     @Override
-    public void readNbt(NbtCompound tag) {
-        super.readNbt(tag);
+    public void readNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(tag, registryLookup);
 
-        this.inventory.readNbtList(tag.getList("Inventory", NbtList.COMPOUND_TYPE));
+        this.inventory.readNbtList(tag.getList("Inventory", NbtList.COMPOUND_TYPE), registryLookup);
 
         this.processingTimeTotal = tag.getShort("ProcessingTimeTotal");
         this.processingTime = tag.getShort("ProcessingTime");
 
-        ItemVariant variant = ItemVariant.fromNbt((NbtCompound) (tag.get("LastInput")));
-        if (variant.isBlank()) {
+        ItemStack stack = ItemStack.fromNbtOrEmpty(registryLookup, tag.getCompound("LastInput"));
+        if (stack.isEmpty()) {
             this.lastInput = Items.COARSE_DIRT.getDefaultStack();
         } else {
-            this.lastInput = variant.toStack();
+            stack.setCount(1);
+            this.lastInput = stack;
         }
 
         this.stockpile.clear();
@@ -235,7 +236,7 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
         for (String key : outer.getKeys()) {
             NbtCompound inner = (NbtCompound) (outer.get(key));
             assert inner != null;
-            this.stockpile.put(ItemVariant.fromNbt((NbtCompound) (inner.get("item"))).getItem(), inner.getDouble("amount"));
+            this.stockpile.put(ItemStack.fromNbtOrEmpty(registryLookup, inner.getCompound("item")).getItem(), inner.getDouble("amount"));
         }
 
     }

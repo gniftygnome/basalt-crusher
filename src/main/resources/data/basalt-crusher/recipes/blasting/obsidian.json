@@ -3,7 +3,9 @@
   "ingredient": {
     "item": "basalt-crusher:obsidian_pile"
   },
-  "result": "minecraft:obsidian",
+  "result": {
+    "id": "minecraft:obsidian"
+  },
   "experience": 1.0,
   "cookingtime": 200,
   "fabric:load_conditions": [

@@ -87,13 +87,13 @@ public class BasaltCrusherScreenHandler extends ScreenHandler {
                     break;
                 case 3:
                     // top crushing slot
-                    if (newStack.isIn(BasaltCrusher.JAW_LINERS) && newStack.getCount() == 1 && !ItemStack.canCombine(newStack, this.inventory.getStack(3))) {
+                    if (newStack.isIn(BasaltCrusher.JAW_LINERS) && newStack.getCount() == 1 && !ItemStack.areItemsAndComponentsEqual(newStack, this.inventory.getStack(3))) {
                         super.onSlotClick(slotNumber, button, action, player);
                     }
                     break;
                 case 4:
                     // bottom crushing slot
-                    if (newStack.isIn(BasaltCrusher.JAW_LINERS) && newStack.getCount() == 1 && !ItemStack.canCombine(newStack, this.inventory.getStack(4))) {
+                    if (newStack.isIn(BasaltCrusher.JAW_LINERS) && newStack.getCount() == 1 && !ItemStack.areItemsAndComponentsEqual(newStack, this.inventory.getStack(4))) {
                         super.onSlotClick(slotNumber, button, action, player);
                     }
                     break;
@@ -141,7 +141,7 @@ public class BasaltCrusherScreenHandler extends ScreenHandler {
                     if (targetStack.isEmpty()) {
                         this.inventory.setStack(1, originalStack.split(originalStack.getCount()));
                         this.slots.get(1).markDirty();
-                    } else if (ItemStack.canCombine(originalStack, targetStack)) {
+                    } else if (ItemStack.areItemsAndComponentsEqual(originalStack, targetStack)) {
                         int insertable = Math.min(originalStack.getCount(), 16 - targetStack.getCount());
                         if (insertable > 0) {
                             originalStack.decrement(insertable);
