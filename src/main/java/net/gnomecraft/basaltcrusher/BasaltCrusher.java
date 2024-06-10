@@ -2,7 +2,6 @@ package net.gnomecraft.basaltcrusher;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.loader.api.FabricLoader;
 import net.gnomecraft.basaltcrusher.crusher.*;
@@ -10,7 +9,7 @@ import net.gnomecraft.basaltcrusher.grizzly.*;
 import net.gnomecraft.basaltcrusher.mill.*;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.enums.Instrument;
+import net.minecraft.block.enums.NoteBlockInstrument;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -41,8 +40,8 @@ public class BasaltCrusher implements ModInitializer {
     public static final Identifier NetheriteJawLinerId = Identifier.of(MOD_ID, "netherite_jaw_liner");
     public static final Identifier MillRodChargeId = Identifier.of(MOD_ID, "mill_rod_charge");
 
-    public static final TagKey<Item> BASALTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "basalt"));
-    public static final TagKey<Item> JAW_LINERS = TagKey.of(RegistryKeys.ITEM, Identifier.of("basalt-crusher", "jaw_liners"));
+    public static final TagKey<Item> BASALTS = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "basalts"));
+    public static final TagKey<Item> JAW_LINERS = TagKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "jaw_liners"));
 
     public static final Identifier BASALT_CRUSHER_SOUND_ID = Identifier.of(MOD_ID, "basalt_crusher_sound");
     public static final Identifier GRAVEL_MILL_SOUND_ID = Identifier.of(MOD_ID,"gravel_mill_sound");
@@ -93,28 +92,28 @@ public class BasaltCrusher implements ModInitializer {
             OBSIDIAN_SHARD_ITEM = Registry.register(Registries.ITEM, ObsidianShardId, new Item(new Item.Settings()));
 
             // Register Terrestria extension items for Item Groups
-            ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS)
+            ItemGroupEvents.modifyEntriesEvent(ItemGroups.NATURAL)
                     .register(content -> content.addAfter(Items.GRAVEL, BLACK_GRAVEL_ITEM));
             ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS)
                     .register(content -> content.addAfter(Items.FLINT, OBSIDIAN_SHARD_ITEM, OBSIDIAN_PILE_ITEM));
         }
 
         // Basalt Crusher block
-        BASALT_CRUSHER_BLOCK = Registry.register(Registries.BLOCK, BasaltCrusherBlockId, new BasaltCrusherBlock(AbstractBlock.Settings.create().mapColor(MapColor.IRON_GRAY).instrument(Instrument.BASEDRUM).requiresTool().strength(3.f, 4.8f).sounds(BlockSoundGroup.METAL)));
+        BASALT_CRUSHER_BLOCK = Registry.register(Registries.BLOCK, BasaltCrusherBlockId, new BasaltCrusherBlock(AbstractBlock.Settings.create().mapColor(MapColor.IRON_GRAY).instrument(NoteBlockInstrument.BASEDRUM).requiresTool().strength(3.f, 4.8f).sounds(BlockSoundGroup.METAL)));
         BASALT_CRUSHER_ITEM = Registry.register(Registries.ITEM, BasaltCrusherBlockId, new BlockItem(BASALT_CRUSHER_BLOCK, new Item.Settings()));
-        BASALT_CRUSHER_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, BasaltCrusherBlockId, FabricBlockEntityTypeBuilder.create(BasaltCrusherEntity::new, BASALT_CRUSHER_BLOCK).build(null));
+        BASALT_CRUSHER_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, BasaltCrusherBlockId, BlockEntityType.Builder.create(BasaltCrusherEntity::new, BASALT_CRUSHER_BLOCK).build(null));
         BASALT_CRUSHER_SCREEN_HANDLER = Registry.register(Registries.SCREEN_HANDLER, BasaltCrusherBlockId, new ScreenHandlerType<>(BasaltCrusherScreenHandler::new, FeatureSet.empty()));
 
         // Grizzly block
-        GRIZZLY_BLOCK = Registry.register(Registries.BLOCK, GrizzlyBlockId, new GrizzlyBlock(AbstractBlock.Settings.create().mapColor(MapColor.IRON_GRAY).instrument(Instrument.BASEDRUM).requiresTool().strength(3.0f, 4.8f).sounds(BlockSoundGroup.METAL).nonOpaque()));
+        GRIZZLY_BLOCK = Registry.register(Registries.BLOCK, GrizzlyBlockId, new GrizzlyBlock(AbstractBlock.Settings.create().mapColor(MapColor.IRON_GRAY).instrument(NoteBlockInstrument.BASEDRUM).requiresTool().strength(3.0f, 4.8f).sounds(BlockSoundGroup.METAL).nonOpaque()));
         GRIZZLY_ITEM = Registry.register(Registries.ITEM, GrizzlyBlockId, new BlockItem(GRIZZLY_BLOCK, new Item.Settings()));
-        GRIZZLY_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, GrizzlyBlockId, FabricBlockEntityTypeBuilder.create(GrizzlyEntity::new, GRIZZLY_BLOCK).build(null));
+        GRIZZLY_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, GrizzlyBlockId, BlockEntityType.Builder.create(GrizzlyEntity::new, GRIZZLY_BLOCK).build(null));
         GRIZZLY_SCREEN_HANDLER = Registry.register(Registries.SCREEN_HANDLER, GrizzlyBlockId, new ScreenHandlerType<>(GrizzlyScreenHandler::new, FeatureSet.empty()));
 
         // Gravel Mill block
-        GRAVEL_MILL_BLOCK = Registry.register(Registries.BLOCK, GravelMillBlockId, new GravelMillBlock(AbstractBlock.Settings.create().mapColor(MapColor.IRON_GRAY).instrument(Instrument.BASEDRUM).requiresTool().strength(3.0f, 4.8f).sounds(BlockSoundGroup.METAL)));
+        GRAVEL_MILL_BLOCK = Registry.register(Registries.BLOCK, GravelMillBlockId, new GravelMillBlock(AbstractBlock.Settings.create().mapColor(MapColor.IRON_GRAY).instrument(NoteBlockInstrument.BASEDRUM).requiresTool().strength(3.0f, 4.8f).sounds(BlockSoundGroup.METAL)));
         GRAVEL_MILL_ITEM = Registry.register(Registries.ITEM, GravelMillBlockId, new BlockItem(GRAVEL_MILL_BLOCK, new Item.Settings()));
-        GRAVEL_MILL_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, GravelMillBlockId, FabricBlockEntityTypeBuilder.create(GravelMillEntity::new, GRAVEL_MILL_BLOCK).build(null));
+        GRAVEL_MILL_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, GravelMillBlockId, BlockEntityType.Builder.create(GravelMillEntity::new, GRAVEL_MILL_BLOCK).build(null));
         GRAVEL_MILL_SCREEN_HANDLER = Registry.register(Registries.SCREEN_HANDLER, GravelMillBlockId, new ScreenHandlerType<>(GravelMillScreenHandler::new, FeatureSet.empty()));
 
         // Basalt Crusher Jaw Liners

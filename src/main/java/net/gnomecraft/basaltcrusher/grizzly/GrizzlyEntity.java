@@ -268,10 +268,8 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
 
         // If we can insert gravel to our input slot we will try to get some from a crusher above.
         if (input.getCount() < input.getMaxCount()) {
-            BlockEntity companion = world.getBlockEntity(pos.offset(Direction.UP));
-
-            if (companion instanceof BasaltCrusherEntity) {
-                Storage<ItemVariant> source = ((BasaltCrusherEntity) companion).getSidedStorage(Direction.DOWN);
+            if (world.getBlockEntity(pos.offset(Direction.UP)) instanceof BasaltCrusherEntity companion) {
+                Storage<ItemVariant> source = companion.getSidedStorage(Direction.DOWN);
 
                 try (Transaction transaction = Transaction.openOuter()) {
                     if ((input.isEmpty() || input.isOf(Items.GRAVEL)) && source.extract(ItemVariant.of(Items.GRAVEL), 1, transaction) > 0) {

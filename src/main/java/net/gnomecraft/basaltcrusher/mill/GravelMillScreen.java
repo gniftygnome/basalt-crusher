@@ -9,7 +9,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class GravelMillScreen extends HandledScreen<ScreenHandler> {
-    private static final Identifier TEXTURE = new Identifier(BasaltCrusher.MOD_ID, "textures/gui/container/gravel_mill_screen.png");
+    private static final Identifier TEXTURE = Identifier.of(BasaltCrusher.MOD_ID, "textures/gui/container/gravel_mill_screen.png");
     GravelMillScreenHandler screenHandler;
 
     public GravelMillScreen(ScreenHandler handler, PlayerInventory inventory, Text title) {

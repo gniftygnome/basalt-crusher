@@ -20,5 +20,10 @@
   "item.basalt-crusher.obsidian_shard":             "Obsidian Shard",
 
   "subtitles.basalt-crusher.basalt_crusher_sound":  "Basalt Crusher crunches",
-  "subtitles.basalt-crusher.gravel_mill_sound":     "Gravel Mill rumbles"
+  "subtitles.basalt-crusher.gravel_mill_sound":     "Gravel Mill rumbles",
+
+  "tag.item.c.basalts":                             "Basalts",
+  "tag.item.c.gravels":                             "Gravels",
+  "tag.item.basalt-crusher.jaw_liners":             "Basalt Crusher Jaw Liners",
+  "tag.item.basalt-crusher.terrestria_basalts":     "Crushable Terrestria Basalts"
 }

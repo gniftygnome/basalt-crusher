@@ -11,6 +11,7 @@ import net.gnomecraft.basaltcrusher.utils.TerrestriaIntegration;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.ExperienceOrbEntity;
@@ -19,7 +20,10 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
@@ -30,12 +34,14 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 
 import static net.gnomecraft.basaltcrusher.crusher.BasaltCrusherBlock.CRUSHING_STATE;
 
 public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandlerFactory {
     private BasaltCrusherBlock.CrushingState crushingState;
     private final EnumMap<Direction, Storage<ItemVariant>> storageCache;
+    private final HashMap<RegistryKey<Enchantment>, RegistryEntry<Enchantment>> enchantmentEntries = new HashMap<>(8);
 
     private int crushTimeTotal;
     private int crushTime;
@@ -306,7 +312,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
                 // The jaws cycle 3 times per 210-tick crush, every 3.5 seconds.
                 // Ideally the math produces numbers evenly distributed between 0 and 6 except
                 // that the last (highest) result should be as close to 6 as possible, over or under.
-                switch ((int) ((crushTime % 140) / 23)) {
+                switch ((crushTime % 140) / 23) {
                     case 0 -> entity.setCrushingState(state, BasaltCrusherBlock.CrushingState.OPEN);
                     case 1 -> entity.setCrushingState(state, BasaltCrusherBlock.CrushingState.OPENISH);
                     case 2 -> entity.setCrushingState(state, BasaltCrusherBlock.CrushingState.CLOSEDISH);
@@ -318,7 +324,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
 
                 // Rate of crushing varies from 2 to 7 depending on use of Efficiency enchants.
                 // Total time can vary from 210 (no Efficiency) to 60 (two Efficiency V) ticks in duration.
-                entity.crushTime += 2 + (EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, upperJaw) + EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, lowerJaw)) / 2;
+                entity.crushTime += 2 + (getEnchantmentLevel(world, Enchantments.EFFICIENCY, upperJaw) + getEnchantmentLevel(world, Enchantments.EFFICIENCY, lowerJaw)) / 2;
                 entity.markDirty();
             }
         }
@@ -338,7 +344,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
             }
             // Try to damage the top jaw liner (if possible).
             if (upperJaw.isDamageable()) {
-                if ((0.5d / (1.0d + (double) EnchantmentHelper.getLevel(Enchantments.UNBREAKING, upperJaw))) > world.random.nextDouble()) {
+                if ((0.5d / (1.0d + (double) getEnchantmentLevel(world, Enchantments.UNBREAKING, upperJaw))) > world.random.nextDouble()) {
                     upperJaw.setDamage(upperJaw.getDamage() + 1);
                 }
                 if (upperJaw.getDamage() >= upperJaw.getMaxDamage()) {
@@ -347,7 +353,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
             }
             // Try to damage the bottom jaw liner (if possible).
             if (lowerJaw.isDamageable()) {
-                if ((0.5d / (1.0d + (double) EnchantmentHelper.getLevel(Enchantments.UNBREAKING, lowerJaw))) > world.random.nextDouble()) {
+                if ((0.5d / (1.0d + (double) getEnchantmentLevel(world, Enchantments.UNBREAKING, lowerJaw))) > world.random.nextDouble()) {
                     lowerJaw.setDamage(lowerJaw.getDamage() + 1);
                 }
                 if (lowerJaw.getDamage() >= lowerJaw.getMaxDamage()) {
@@ -360,12 +366,12 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
             // Draw down stored XP to mend jaw liners.
             if (entity.expAccumulated >= 1.0f) {
                 if (0.5d > world.random.nextDouble()) {
-                    if (EnchantmentHelper.getLevel(Enchantments.MENDING, upperJaw) > 0 && upperJaw.isDamaged()) {
+                    if (getEnchantmentLevel(world, Enchantments.MENDING, upperJaw) > 0 && upperJaw.isDamaged()) {
                         upperJaw.setDamage(upperJaw.getDamage() - 1);
                         entity.expAccumulated -= 1.0f;
                     }
                 } else {
-                    if (EnchantmentHelper.getLevel(Enchantments.MENDING, lowerJaw) > 0 && lowerJaw.isDamaged()) {
+                    if (getEnchantmentLevel(world, Enchantments.MENDING, lowerJaw) > 0 && lowerJaw.isDamaged()) {
                         lowerJaw.setDamage(lowerJaw.getDamage() - 1);
                         entity.expAccumulated -= 1.0f;
                     }
@@ -376,6 +382,14 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
             entity.crushTime = 0;
             entity.markDirty();
         }
+    }
+
+    private int getEnchantmentLevel(World world, RegistryKey<Enchantment> enchantment, ItemStack stack) {
+        return EnchantmentHelper.getLevel(
+                enchantmentEntries.computeIfAbsent(
+                        enchantment,
+                        key -> world.getRegistryManager().get(RegistryKeys.ENCHANTMENT).getEntry(key).orElseThrow()),
+                stack);
     }
 
     public void scatterInventory(World world, BlockPos pos) {

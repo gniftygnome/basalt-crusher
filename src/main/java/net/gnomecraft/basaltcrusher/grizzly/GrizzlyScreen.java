@@ -12,7 +12,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class GrizzlyScreen extends HandledScreen<ScreenHandler> {
-    private static final Identifier TEXTURE = new Identifier(BasaltCrusher.MOD_ID, "textures/gui/container/grizzly_screen.png");
+    private static final Identifier TEXTURE = Identifier.of(BasaltCrusher.MOD_ID, "textures/gui/container/grizzly_screen.png");
     GrizzlyScreenHandler screenHandler;
 
     public GrizzlyScreen(ScreenHandler handler, PlayerInventory inventory, Text title) {

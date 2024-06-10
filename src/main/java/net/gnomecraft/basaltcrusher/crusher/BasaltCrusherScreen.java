@@ -9,7 +9,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class BasaltCrusherScreen extends HandledScreen<ScreenHandler> {
-    private static final Identifier TEXTURE = new Identifier(BasaltCrusher.MOD_ID, "textures/gui/container/basalt_crusher_screen.png");
+    private static final Identifier TEXTURE = Identifier.of(BasaltCrusher.MOD_ID, "textures/gui/container/basalt_crusher_screen.png");
     BasaltCrusherScreenHandler screenHandler;
 
     public BasaltCrusherScreen(ScreenHandler handler, PlayerInventory inventory, Text title) {
