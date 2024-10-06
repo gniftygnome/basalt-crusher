@@ -3,6 +3,7 @@ package net.gnomecraft.basaltcrusher.mill;
 import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
@@ -24,10 +25,10 @@ public class GravelMillScreen extends HandledScreen<ScreenHandler> {
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
         int x = (width - backgroundWidth) / 2;
         int y = (height - backgroundHeight) / 2;
-        context.drawTexture(TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight);
+        context.drawTexture(RenderLayer::getGuiTextured, TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight, 256, 256);
 
         int progress24 = ((GravelMillScreenHandler)this.handler).crushProgress24();
-        context.drawTexture(TEXTURE, x + 86, y + 34, 176, 0, progress24 + 1, 16);
+        context.drawTexture(RenderLayer::getGuiTextured, TEXTURE, x + 86, y + 34, 176, 0, progress24 + 1, 16, 256, 256);
     }
 
     @Override

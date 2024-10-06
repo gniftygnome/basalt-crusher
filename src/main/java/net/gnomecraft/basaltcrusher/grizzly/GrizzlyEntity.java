@@ -200,12 +200,12 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
         tag.putShort("ProcessingTimeTotal", (short) this.processingTimeTotal);
         tag.putShort("ProcessingTime", (short) this.processingTime);
 
-        tag.put("LastInput", this.lastInput.encodeAllowEmpty(registryLookup));
+        tag.put("LastInput", this.lastInput.toNbtAllowEmpty(registryLookup));
 
         NbtCompound outer = new NbtCompound();
         this.stockpile.forEach((item, amount) -> {
             NbtCompound inner = new NbtCompound();
-            inner.put("item",  item.getDefaultStack().encodeAllowEmpty(registryLookup));
+            inner.put("item",  item.getDefaultStack().toNbtAllowEmpty(registryLookup));
             inner.put("amount", NbtDouble.of(amount));
             outer.put(item.toString(), inner);
         });

@@ -30,7 +30,7 @@ public final class TerrestriaIntegration {
     public static final TagKey<Item> TERRESTRIA_BASALTS;
 
     static {
-        BLACK_SAND_ITEM = Registries.ITEM.getOrEmpty(Identifier.of("terrestria", "basalt_sand")).orElse(Items.SAND);
+        BLACK_SAND_ITEM = Registries.ITEM.getOptionalValue(Identifier.of("terrestria", "basalt_sand")).orElse(Items.SAND);
 
         if (BasaltCrusher.extendTerrestria && new ItemStack(Items.SAND).isOf(BLACK_SAND_ITEM)) {
             // Safety mechanism in case the registry fails to cough up the Terrestria block.

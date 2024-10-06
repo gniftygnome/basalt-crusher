@@ -25,7 +25,7 @@ public abstract class MixinDrawContext implements InterfaceStockpile {
     public abstract int drawText(TextRenderer textRenderer, @Nullable String text, int x, int y, int color, boolean shadow);
 
     @Shadow
-    public abstract void fill(RenderLayer layer, int x1, int y1, int x2, int y2, int color);
+    public abstract void fill(RenderLayer layer, int x1, int y1, int x2, int y2, int z, int color);
 
     // This is based on the new merged item renderer in 23w16a's "new" DrawContext class.
     // Drawing the ItemStack and drawing the damage are no longer two separate methods, so...
@@ -43,8 +43,8 @@ public abstract class MixinDrawContext implements InterfaceStockpile {
 
         // render stockpile fill level bar
         int k = Math.round(13.0f * (quantity % 1.0f));
-        this.fill(RenderLayer.getGuiOverlay(), x + 2, y + 13, x + 15, y + 15, 0xFF000000);
-        this.fill(RenderLayer.getGuiOverlay(), x + 2, y + 13, x + 2 + k, y + 14, 0xFF877BAE);
+        this.fill(RenderLayer.getGui(), x + 2, y + 13, x + 15, y + 15, 200, 0xFF000000);
+        this.fill(RenderLayer.getGui(), x + 2, y + 13, x + 2 + k, y + 14, 200, 0xFF877BAE);
 
         // render item stack count
         if (quantity >= 2.0f) {

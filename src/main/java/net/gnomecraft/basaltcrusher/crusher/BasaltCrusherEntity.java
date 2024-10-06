@@ -388,7 +388,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         return EnchantmentHelper.getLevel(
                 enchantmentEntries.computeIfAbsent(
                         enchantment,
-                        key -> world.getRegistryManager().get(RegistryKeys.ENCHANTMENT).getEntry(key).orElseThrow()),
+                        key -> world.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(key)),
                 stack);
     }
 

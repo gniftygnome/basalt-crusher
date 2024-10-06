@@ -32,7 +32,7 @@ public abstract class BasaltCrusherInventory extends SimpleInventory implements 
         NbtList nbtList = new NbtList();
         for (int slot = 0; slot < this.size(); ++slot) {
             ItemStack stack = this.getStack(slot);
-            nbtList.add(stack.encodeAllowEmpty(registryLookup));
+            nbtList.add(stack.toNbtAllowEmpty(registryLookup));
         }
         return nbtList;
     }

@@ -13,7 +13,6 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.StringIdentifiable;
@@ -32,7 +31,7 @@ public class BasaltCrusherBlock extends BlockWithEntity {
         }
     }
     static final EnumProperty<CrushingState> CRUSHING_STATE = EnumProperty.of("crushing_state", CrushingState.class);
-    static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
+    static final EnumProperty<Direction> FACING = HorizontalFacingBlock.FACING;
 
     public BasaltCrusherBlock(Settings settings) {
         super(settings);

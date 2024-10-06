@@ -10,7 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -23,7 +23,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 public class GrizzlyBlock extends BlockWithEntity {
-    static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
+    static final EnumProperty<Direction> FACING = HorizontalFacingBlock.FACING;
 
     private static final VoxelShape GRIZZLY_SHAPE_NORTH = VoxelShapes.union(
             // base, front, left, right, back
