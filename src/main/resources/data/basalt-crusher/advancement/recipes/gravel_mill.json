@@ -1,13 +1,12 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_shards": {
+    "has_iron": {
       "conditions": {
         "items": [
           {
             "items": [
-              "basalt-crusher:obsidian_pile",
-              "basalt-crusher:obsidian_shard"
+              "minecraft:iron_ingot"
             ]
           }
         ]
@@ -16,28 +15,20 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "basalt-crusher:blasting/obsidian"
+        "recipe": "basalt-crusher:gravel_mill"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_shards",
+      "has_iron",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "basalt-crusher:blasting/obsidian"
+      "basalt-crusher:gravel_mill"
     ]
-  },
-  "fabric:load_conditions": [
-    {
-      "condition": "fabric:all_mods_loaded",
-      "values": [
-        "terrestria"
-      ]
-    }
-  ]
+  }
 }

@@ -6,15 +6,9 @@
     "ipi"
   ],
   "key": {
-    "i": {
-      "item": "minecraft:iron_ingot"
-    },
-    "p": {
-      "item": "minecraft:piston"
-    },
-    "r": {
-      "item": "minecraft:redstone"
-    }
+    "i": "minecraft:iron_ingot",
+    "p": "minecraft:piston",
+    "r": "minecraft:redstone"
   },
   "result": {
     "id": "basalt-crusher:basalt_crusher"

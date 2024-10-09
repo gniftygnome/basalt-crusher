@@ -6,9 +6,7 @@
     "sss"
   ],
   "key": {
-    "s": {
-      "item": "basalt-crusher:obsidian_shard"
-    }
+    "s": "basalt-crusher:obsidian_shard"
   },
   "result": {
     "id": "basalt-crusher:obsidian_pile"

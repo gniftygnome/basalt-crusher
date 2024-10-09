@@ -6,15 +6,9 @@
     "F"
   ],
   "key": {
-    "O": {
-      "item": "basalt-crusher:obsidian_shard"
-    },
-    "S": {
-      "item": "minecraft:stick"
-    },
-    "F": {
-      "item": "minecraft:feather"
-    }
+    "O": "basalt-crusher:obsidian_shard",
+    "S": "minecraft:stick",
+    "F": "minecraft:feather"
   },
   "result": {
     "id": "minecraft:arrow"

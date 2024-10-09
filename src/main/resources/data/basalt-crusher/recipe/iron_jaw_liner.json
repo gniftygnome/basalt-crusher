@@ -6,12 +6,8 @@
     " i "
   ],
   "key": {
-    "i": {
-      "item": "minecraft:iron_ingot"
-    },
-    "I": {
-      "item": "minecraft:iron_block"
-    }
+    "i": "minecraft:iron_ingot",
+    "I": "minecraft:iron_block"
   },
   "result": {
     "id": "basalt-crusher:iron_jaw_liner"

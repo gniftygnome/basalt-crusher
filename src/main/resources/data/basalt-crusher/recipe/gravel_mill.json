@@ -6,12 +6,8 @@
     "iri"
   ],
   "key": {
-    "i": {
-      "item": "minecraft:iron_ingot"
-    },
-    "r": {
-      "item": "minecraft:redstone"
-    }
+    "i": "minecraft:iron_ingot",
+    "r": "minecraft:redstone"
   },
   "result": {
     "id": "basalt-crusher:gravel_mill"

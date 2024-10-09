@@ -1,21 +1,37 @@
 {
   "replace": false,
   "values": [
-    "terrestria:basalt",
-    "terrestria:basalt_bricks",
-    "terrestria:basalt_cobblestone",
-    "terrestria:chiseled_basalt_bricks",
-    "terrestria:cracked_basalt_bricks",
-    "terrestria:mossy_basalt_bricks",
-    "terrestria:mossy_basalt_cobblestone",
-    "terrestria:smooth_basalt"
-  ],
-  "fabric:load_conditions": [
     {
-      "condition": "fabric:all_mods_loaded",
-      "values": [
-        "terrestria"
-      ]
+      "id": "terrestria:basalt",
+      "required": false
+    },
+    {
+      "id": "terrestria:basalt_bricks",
+      "required": false
+    },
+    {
+      "id": "terrestria:basalt_cobblestone",
+      "required": false
+    },
+    {
+      "id": "terrestria:chiseled_basalt_bricks",
+      "required": false
+    },
+    {
+      "id": "terrestria:cracked_basalt_bricks",
+      "required": false
+    },
+    {
+      "id": "terrestria:mossy_basalt_bricks",
+      "required": false
+    },
+    {
+      "id": "terrestria:mossy_basalt_cobblestone",
+      "required": false
+    },
+    {
+      "id": "terrestria:smooth_basalt",
+      "required": false
     }
   ]
 }
