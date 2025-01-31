@@ -52,8 +52,8 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
 
         if (TerrestriaIntegration.ENABLED) {
             this.stockpile = new HashMap<>(Map.of(Items.DIRT, 0.0d,
-                    Items.GRAVEL, 0.0d, TerrestriaIntegration.BLACK_GRAVEL_ITEM, 0.0d,
-                    Items.SAND, 0.0d, TerrestriaIntegration.BLACK_SAND_ITEM, 0.0d));
+                    Items.GRAVEL, 0.0d, TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM, 0.0d,
+                    Items.SAND, 0.0d, TerrestriaIntegration.VOLCANIC_SAND_ITEM, 0.0d));
         } else {
             this.stockpile = new HashMap<>(Map.of(Items.DIRT, 0.0d, Items.GRAVEL, 0.0d, Items.SAND, 0.0d));
         }
@@ -143,12 +143,12 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
         public int get(int index) {
             if (TerrestriaIntegration.ENABLED) {
                 return switch (index) {
-                    case 0 -> GrizzlyEntity.this.lastInput.isOf(TerrestriaIntegration.BLACK_GRAVEL_ITEM) ? 1 : 0;
+                    case 0 -> GrizzlyEntity.this.lastInput.isOf(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM) ? 1 : 0;
                     case 1 -> (int) (100 * GrizzlyEntity.this.stockpile.get(Items.DIRT));
                     case 2 -> (int) (100 * GrizzlyEntity.this.stockpile.get(Items.GRAVEL));
                     case 3 -> (int) (100 * GrizzlyEntity.this.stockpile.get(Items.SAND));
-                    case 4 -> (int) (100 * GrizzlyEntity.this.stockpile.get(TerrestriaIntegration.BLACK_GRAVEL_ITEM));
-                    case 5 -> (int) (100 * GrizzlyEntity.this.stockpile.get(TerrestriaIntegration.BLACK_SAND_ITEM));
+                    case 4 -> (int) (100 * GrizzlyEntity.this.stockpile.get(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM));
+                    case 5 -> (int) (100 * GrizzlyEntity.this.stockpile.get(TerrestriaIntegration.VOLCANIC_SAND_ITEM));
                     default -> 0;
                 };
             } else {
@@ -168,8 +168,8 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
                     case 1 -> GrizzlyEntity.this.stockpile.put(Items.DIRT, (double) (value / 100));
                     case 2 -> GrizzlyEntity.this.stockpile.put(Items.GRAVEL, (double) (value / 100));
                     case 3 -> GrizzlyEntity.this.stockpile.put(Items.SAND, (double) (value / 100));
-                    case 4 -> GrizzlyEntity.this.stockpile.put(TerrestriaIntegration.BLACK_GRAVEL_ITEM, (double) (value / 100));
-                    case 5 -> GrizzlyEntity.this.stockpile.put(TerrestriaIntegration.BLACK_SAND_ITEM, (double) (value / 100));
+                    case 4 -> GrizzlyEntity.this.stockpile.put(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM, (double) (value / 100));
+                    case 5 -> GrizzlyEntity.this.stockpile.put(TerrestriaIntegration.VOLCANIC_SAND_ITEM, (double) (value / 100));
                     default -> {}
                 }
             } else {
@@ -281,9 +281,9 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
                         this.processingTime = 8;
                         this.markDirty();
                     } else if (TerrestriaIntegration.ENABLED &&
-                            (input.isEmpty() || input.isOf(TerrestriaIntegration.BLACK_GRAVEL_ITEM))
-                            && source.extract(ItemVariant.of(TerrestriaIntegration.BLACK_GRAVEL_ITEM), 1, transaction) > 0) {
-                        input = new ItemStack(TerrestriaIntegration.BLACK_GRAVEL_ITEM, input.getCount() + 1);
+                            (input.isEmpty() || input.isOf(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM))
+                            && source.extract(ItemVariant.of(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM), 1, transaction) > 0) {
+                        input = new ItemStack(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM, input.getCount() + 1);
                         this.inventory.setStack(0, input);
                         transaction.commit();
 
@@ -375,37 +375,37 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
         }
 
         // Second pass for Terrestria integration
-        if (TerrestriaIntegration.ENABLED && (coarse.isEmpty() || (coarse.isOf(TerrestriaIntegration.BLACK_GRAVEL_ITEM) && coarse.getCount() < coarse.getMaxCount()))) {
-            if (input.isOf(TerrestriaIntegration.BLACK_GRAVEL_ITEM) && (fine.isEmpty() || (fine.isOf(TerrestriaIntegration.BLACK_SAND_ITEM) && fine.getCount() < fine.getMaxCount()))) {
+        if (TerrestriaIntegration.ENABLED && (coarse.isEmpty() || (coarse.isOf(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM) && coarse.getCount() < coarse.getMaxCount()))) {
+            if (input.isOf(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM) && (fine.isEmpty() || (fine.isOf(TerrestriaIntegration.VOLCANIC_SAND_ITEM) && fine.getCount() < fine.getMaxCount()))) {
                 // RECIPE: 4 gravel yields 3 gravel and 1 sand
                 input.decrement(1);
                 this.inventory.setStack(0, input);
 
                 // Increment the gravel fraction; maybe move some to the coarse output.
-                double gravel = this.stockpile.get(TerrestriaIntegration.BLACK_GRAVEL_ITEM) + 0.75d;
+                double gravel = this.stockpile.get(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM) + 0.75d;
                 if (gravel >= 1.0d) {
                     gravel -= 1.0d;
                     if (coarse.isEmpty()) {
-                        coarse = new ItemStack(TerrestriaIntegration.BLACK_GRAVEL_ITEM, 1);
+                        coarse = new ItemStack(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM, 1);
                     } else {
                         coarse.increment(1);
                     }
                     this.inventory.setStack(1, coarse);
                 }
-                this.stockpile.put(TerrestriaIntegration.BLACK_GRAVEL_ITEM, gravel);
+                this.stockpile.put(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM, gravel);
 
                 // Increment the sand fraction; maybe move some to the fine output.
-                double sand = this.stockpile.get(TerrestriaIntegration.BLACK_SAND_ITEM) + 0.25d;
+                double sand = this.stockpile.get(TerrestriaIntegration.VOLCANIC_SAND_ITEM) + 0.25d;
                 if (sand >= 1.0d) {
                     sand -= 1.0d;
                     if (fine.isEmpty()) {
-                        fine = new ItemStack(TerrestriaIntegration.BLACK_SAND_ITEM, 1);
+                        fine = new ItemStack(TerrestriaIntegration.VOLCANIC_SAND_ITEM, 1);
                     } else {
                         fine.increment(1);
                     }
                     this.inventory.setStack(2, fine);
                 }
-                this.stockpile.put(TerrestriaIntegration.BLACK_SAND_ITEM, sand);
+                this.stockpile.put(TerrestriaIntegration.VOLCANIC_SAND_ITEM, sand);
 
                 this.processingTime = this.processingTimeTotal;
                 this.markDirty();

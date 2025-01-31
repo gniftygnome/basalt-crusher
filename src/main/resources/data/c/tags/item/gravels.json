@@ -3,7 +3,7 @@
   "values": [
     "minecraft:gravel",
     {
-      "id": "basalt-crusher:black_gravel",
+      "id": "basalt-crusher:volcanic_gravel",
       "required": false
     }
   ]

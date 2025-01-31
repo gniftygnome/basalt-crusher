@@ -2,35 +2,35 @@
   "replace": false,
   "values": [
     {
-      "id": "terrestria:basalt",
+      "id": "terrestria:volcanic_rock",
       "required": false
     },
     {
-      "id": "terrestria:basalt_bricks",
+      "id": "terrestria:volcanic_rock_bricks",
       "required": false
     },
     {
-      "id": "terrestria:basalt_cobblestone",
+      "id": "terrestria:volcanic_cobblestone",
       "required": false
     },
     {
-      "id": "terrestria:chiseled_basalt_bricks",
+      "id": "terrestria:chiseled_volcanic_rock_bricks",
       "required": false
     },
     {
-      "id": "terrestria:cracked_basalt_bricks",
+      "id": "terrestria:cracked_volcanic_rock_bricks",
       "required": false
     },
     {
-      "id": "terrestria:mossy_basalt_bricks",
+      "id": "terrestria:mossy_volcanic_rock_bricks",
       "required": false
     },
     {
-      "id": "terrestria:mossy_basalt_cobblestone",
+      "id": "terrestria:mossy_volcanic_cobblestone",
       "required": false
     },
     {
-      "id": "terrestria:smooth_basalt",
+      "id": "terrestria:smooth_volcanic_rock",
       "required": false
     }
   ]

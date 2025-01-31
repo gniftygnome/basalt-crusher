@@ -24,7 +24,7 @@
                   }
                 }
               ],
-              "name": "basalt-crusher:black_gravel"
+              "name": "basalt-crusher:volcanic_gravel"
             },
             {
               "type": "minecraft:alternatives",
@@ -47,7 +47,7 @@
                 },
                 {
                   "type": "minecraft:item",
-                  "name": "basalt-crusher:black_gravel"
+                  "name": "basalt-crusher:volcanic_gravel"
                 }
               ],
               "conditions": [

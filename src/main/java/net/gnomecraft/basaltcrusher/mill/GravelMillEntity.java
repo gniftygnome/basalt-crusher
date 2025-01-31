@@ -105,7 +105,7 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
                 case 0:
                     // input slot
                     retVal = stack.isOf(Items.GRAVEL) || stack.isOf(Items.SAND) || TerrestriaIntegration.ENABLED &&
-                            (stack.isOf(TerrestriaIntegration.BLACK_GRAVEL_ITEM) || stack.isOf(TerrestriaIntegration.BLACK_SAND_ITEM));
+                            (stack.isOf(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM) || stack.isOf(TerrestriaIntegration.VOLCANIC_SAND_ITEM));
                     break;
                 case 1:
                     // rod charge slot
@@ -266,13 +266,13 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
                 }
             }
             entity.markDirty();
-        } else if (TerrestriaIntegration.ENABLED && input.isOf(TerrestriaIntegration.BLACK_SAND_ITEM)) {
+        } else if (TerrestriaIntegration.ENABLED && input.isOf(TerrestriaIntegration.VOLCANIC_SAND_ITEM)) {
             // Bypass sand input for user convenience.
             // Typically in a real implementation it would be pre-screened to save mill wear.
             // However the mill could be fed a sandy mix (and just have the mill rate adjusted).
             input.decrement(1);
             if (output.isEmpty() || output.getCount() < 1) {
-                entity.inventory.setStack(2, new ItemStack(TerrestriaIntegration.BLACK_SAND_ITEM, 1));
+                entity.inventory.setStack(2, new ItemStack(TerrestriaIntegration.VOLCANIC_SAND_ITEM, 1));
             } else {
                 output.increment(1);
             }
@@ -302,8 +302,8 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
         if (entity.millTime >= entity.millTimeTotal) {
             // Successful milling.
             if (output.isEmpty()) {
-                if (TerrestriaIntegration.ENABLED && input.isOf(TerrestriaIntegration.BLACK_GRAVEL_ITEM)) {
-                    entity.inventory.setStack(2, new ItemStack(TerrestriaIntegration.BLACK_SAND_ITEM, 1));
+                if (TerrestriaIntegration.ENABLED && input.isOf(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM)) {
+                    entity.inventory.setStack(2, new ItemStack(TerrestriaIntegration.VOLCANIC_SAND_ITEM, 1));
                 } else {
                     entity.inventory.setStack(2, new ItemStack(Items.SAND, 1));
                 }

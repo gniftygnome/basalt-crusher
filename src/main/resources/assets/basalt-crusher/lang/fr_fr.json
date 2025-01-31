@@ -3,11 +3,7 @@
   "block.basalt-crusher.gravel_mill": "Broyeur de gravier",
   "block.basalt-crusher.grizzly": "Grizzly",
 
-  "block.basalt-crusher.black_gravel": "Gravier noir",
-
-  "item.basalt-crusher.basalt_crusher": "Concasseur de basalte",
-  "item.basalt-crusher.gravel_mill": "Broyeur de gravier",
-  "item.basalt-crusher.grizzly": "Grizzly",
+  "block.basalt-crusher.volcanic_gravel": "Gravier volcanique",
 
   "item.basalt-crusher.iron_jaw_liner": "Mâchoire en fer",
   "item.basalt-crusher.diamond_jaw_liner": "Mâchoire en diamant",
@@ -15,7 +11,7 @@
 
   "item.basalt-crusher.mill_rod_charge": "Charge de tige de broyeur",
 
-  "item.basalt-crusher.black_gravel": "Gravier noir",
+  "item.basalt-crusher.volcanic_gravel": "Gravier volcanique",
   "item.basalt-crusher.obsidian_pile": "Tas d'obsidienne",
   "item.basalt-crusher.obsidian_shard": "Éclat d'obsidienne",
 

@@ -38,12 +38,12 @@ public class GrizzlyScreen extends HandledScreen<ScreenHandler> {
         boolean black = TerrestriaIntegration.ENABLED && ((GrizzlyScreenHandler) this.handler).stockpileOf(Items.AIR) > 0.0f;
 
         // gravel: 62, 41 -  77, 56
-        Item gravelType = black ? TerrestriaIntegration.BLACK_GRAVEL_ITEM : Items.GRAVEL;
+        Item gravelType = black ? TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM : Items.GRAVEL;
         float gravel = ((GrizzlyScreenHandler) this.handler).stockpileOf(gravelType);
         context.basaltCrusher$drawStockpile(this.textRenderer, gravelType.getDefaultStack(), x + 62, y + 41, gravel);
 
         // sand:   78, 57 -  93, 72
-        Item sandType = black ? TerrestriaIntegration.BLACK_SAND_ITEM : Items.SAND;
+        Item sandType = black ? TerrestriaIntegration.VOLCANIC_SAND_ITEM : Items.SAND;
         float sand = ((GrizzlyScreenHandler) this.handler).stockpileOf(sandType);
         context.basaltCrusher$drawStockpile(this.textRenderer, sandType.getDefaultStack(), x + 78, y + 57, sand);
 

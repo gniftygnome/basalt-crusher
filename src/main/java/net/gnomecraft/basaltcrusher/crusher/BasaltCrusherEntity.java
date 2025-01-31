@@ -335,7 +335,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
             input.decrement(1);
             if (output.isEmpty()) {
                 if (TerrestriaIntegration.ENABLED && input.isIn(TerrestriaIntegration.TERRESTRIA_BASALTS)) {
-                    entity.inventory.setStack(2, new ItemStack(TerrestriaIntegration.BLACK_GRAVEL_ITEM, 1));
+                    entity.inventory.setStack(2, new ItemStack(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM, 1));
                 } else {
                     entity.inventory.setStack(2, new ItemStack(Blocks.GRAVEL, 1));
                 }
