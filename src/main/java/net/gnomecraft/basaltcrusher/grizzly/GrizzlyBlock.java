@@ -9,6 +9,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.ActionResult;
@@ -89,17 +90,15 @@ public class GrizzlyBlock extends BlockWithEntity {
     }
 
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (state.getBlock() != newState.getBlock()) {
-            BlockEntity blockEntity = world.getBlockEntity(pos);
+    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
+        BlockEntity blockEntity = world.getBlockEntity(pos);
 
-            if (blockEntity instanceof GrizzlyEntity) {
-                ((GrizzlyEntity) blockEntity).scatterInventory(world, pos);
-                world.updateComparators(pos,this);
-            }
-
-            super.onStateReplaced(state, world, pos, newState, moved);
+        if (blockEntity instanceof GrizzlyEntity) {
+            ((GrizzlyEntity) blockEntity).scatterInventory(world, pos);
+            world.updateComparators(pos, this);
         }
+
+        super.onStateReplaced(state, world, pos, moved);
     }
 
     @Override

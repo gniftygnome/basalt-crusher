@@ -11,6 +11,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
@@ -93,7 +94,7 @@ public class BasaltCrusherBlock extends BlockWithEntity {
 
             if (random.nextDouble() < 0.015D) {
                 // If the crusher is running, play its sound about once every minute.
-                world.playSound(x, y, z, BasaltCrusher.BASALT_CRUSHER_SOUND_EVENT, SoundCategory.BLOCKS, 1.0F, 1.0F, false);
+                world.playSoundClient(x, y, z, BasaltCrusher.BASALT_CRUSHER_SOUND_EVENT, SoundCategory.BLOCKS, 1.0F, 1.0F, false);
             }
         }
     }
@@ -104,17 +105,15 @@ public class BasaltCrusherBlock extends BlockWithEntity {
     }
 
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (state.getBlock() != newState.getBlock()) {
-            BlockEntity blockEntity = world.getBlockEntity(pos);
+    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
+        BlockEntity blockEntity = world.getBlockEntity(pos);
 
-            if (blockEntity instanceof BasaltCrusherEntity) {
-                ((BasaltCrusherEntity) blockEntity).scatterInventory(world, pos);
-                world.updateComparators(pos,this);
-            }
-
-            super.onStateReplaced(state, world, pos, newState, moved);
+        if (blockEntity instanceof BasaltCrusherEntity) {
+            ((BasaltCrusherEntity) blockEntity).scatterInventory(world, pos);
+            world.updateComparators(pos, this);
         }
+
+        super.onStateReplaced(state, world, pos, moved);
     }
 
     @Override

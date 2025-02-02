@@ -130,12 +130,12 @@ public class BasaltCrusher implements ModInitializer {
         GRAVEL_MILL_SCREEN_HANDLER = Registry.register(Registries.SCREEN_HANDLER, GravelMillBlockId, new ScreenHandlerType<>(GravelMillScreenHandler::new, FeatureSet.empty()));
 
         // Basalt Crusher Jaw Liners
-        IRON_JAW_LINER_ITEM      = Registry.register(Registries.ITEM, IronJawLinerId,      new Item(ToolMaterial.IRON     .applyToolSettings(new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, IronJawLinerId)),      BlockTags.AIR, 0.0f, -3.0f)));
-        DIAMOND_JAW_LINER_ITEM   = Registry.register(Registries.ITEM, DiamondJawLinerId,   new Item(ToolMaterial.DIAMOND  .applyToolSettings(new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, DiamondJawLinerId)),   BlockTags.AIR, 0.0f, -3.0f)));
-        NETHERITE_JAW_LINER_ITEM = Registry.register(Registries.ITEM, NetheriteJawLinerId, new Item(ToolMaterial.NETHERITE.applyToolSettings(new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, NetheriteJawLinerId)), BlockTags.AIR, 0.0f, -3.0f)));
+        IRON_JAW_LINER_ITEM      = Registry.register(Registries.ITEM, IronJawLinerId,      new Item(ToolMaterial.IRON     .applyToolSettings(new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, IronJawLinerId)),      BlockTags.AIR, 0.0f, -3.0f, 0.0f)));
+        DIAMOND_JAW_LINER_ITEM   = Registry.register(Registries.ITEM, DiamondJawLinerId,   new Item(ToolMaterial.DIAMOND  .applyToolSettings(new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, DiamondJawLinerId)),   BlockTags.AIR, 0.0f, -3.0f, 0.0f)));
+        NETHERITE_JAW_LINER_ITEM = Registry.register(Registries.ITEM, NetheriteJawLinerId, new Item(ToolMaterial.NETHERITE.applyToolSettings(new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, NetheriteJawLinerId)), BlockTags.AIR, 0.0f, -3.0f, 0.0f)));
 
         // Gravel Mill Rod Charge
-        MILL_ROD_CHARGE_ITEM = Registry.register(Registries.ITEM, MillRodChargeId, new Item(ToolMaterial.IRON.applyToolSettings(new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, MillRodChargeId)), BlockTags.AIR, 0.0f, -3.0f)));
+        MILL_ROD_CHARGE_ITEM = Registry.register(Registries.ITEM, MillRodChargeId, new Item(ToolMaterial.IRON.applyToolSettings(new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, MillRodChargeId)), BlockTags.AIR, 0.0f, -3.0f, 0.0f)));
 
         // Register standard items for Item Groups
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL)
