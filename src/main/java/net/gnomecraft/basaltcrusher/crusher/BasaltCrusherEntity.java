@@ -19,7 +19,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
@@ -240,12 +239,12 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
     public void readNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(tag, registryLookup);
 
-        inventory.readNbtList(tag.getList("Inventory", NbtList.COMPOUND_TYPE), registryLookup);
+        inventory.readNbtList(tag.getListOrEmpty("Inventory"), registryLookup);
 
-        crushTimeTotal = tag.getShort("CrushTimeTotal");
-        crushTime = tag.getShort("CrushTime");
-        expPerCrush = tag.getFloat("ExpPerCrush");
-        expAccumulated = tag.getFloat("ExpAccumulated");
+        crushTimeTotal = tag.getShort("CrushTimeTotal", (short) 0);
+        crushTime = tag.getShort("CrushTime", (short) 0);
+        expPerCrush = tag.getFloat("ExpPerCrush", 0f);
+        expAccumulated = tag.getFloat("ExpAccumulated", 0f);
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {

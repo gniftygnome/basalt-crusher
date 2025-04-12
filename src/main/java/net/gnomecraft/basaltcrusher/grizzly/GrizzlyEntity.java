@@ -200,12 +200,12 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
         tag.putShort("ProcessingTimeTotal", (short) this.processingTimeTotal);
         tag.putShort("ProcessingTime", (short) this.processingTime);
 
-        tag.put("LastInput", this.lastInput.toNbtAllowEmpty(registryLookup));
+        tag.put("LastInput", this.lastInput.toNbt(registryLookup));
 
         NbtCompound outer = new NbtCompound();
         this.stockpile.forEach((item, amount) -> {
             NbtCompound inner = new NbtCompound();
-            inner.put("item",  item.getDefaultStack().toNbtAllowEmpty(registryLookup));
+            inner.put("item",  item.getDefaultStack().toNbt(registryLookup));
             inner.put("amount", NbtDouble.of(amount));
             outer.put(item.toString(), inner);
         });
@@ -218,27 +218,30 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
     public void readNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(tag, registryLookup);
 
-        this.inventory.readNbtList(tag.getList("Inventory", NbtList.COMPOUND_TYPE), registryLookup);
+        inventory.readNbtList(tag.getListOrEmpty("Inventory"), registryLookup);
 
-        this.processingTimeTotal = tag.getShort("ProcessingTimeTotal");
-        this.processingTime = tag.getShort("ProcessingTime");
+        processingTimeTotal = tag.getShort("ProcessingTimeTotal", (short) 0);
+        processingTime = tag.getShort("ProcessingTime", (short) 0);
 
-        ItemStack stack = ItemStack.fromNbtOrEmpty(registryLookup, tag.getCompound("LastInput"));
+        ItemStack stack = ItemStack.fromNbt(registryLookup, tag.getCompoundOrEmpty("LastInput")).orElse(ItemStack.EMPTY);
         if (stack.isEmpty()) {
-            this.lastInput = Items.COARSE_DIRT.getDefaultStack();
+            lastInput = Items.COARSE_DIRT.getDefaultStack();
         } else {
             stack.setCount(1);
-            this.lastInput = stack;
+            lastInput = stack;
         }
 
-        this.stockpile.clear();
-        NbtCompound outer = tag.getCompound("stockpile");
-        for (String key : outer.getKeys()) {
-            NbtCompound inner = (NbtCompound) (outer.get(key));
-            assert inner != null;
-            this.stockpile.put(ItemStack.fromNbtOrEmpty(registryLookup, inner.getCompound("item")).getItem(), inner.getDouble("amount"));
-        }
-
+        stockpile.clear();
+        tag.getCompound("stockpile").ifPresent(outer -> {
+            for (String key : outer.getKeys()) {
+                outer.getCompound(key).ifPresent(inner ->
+                        stockpile.put(
+                                ItemStack.fromNbt(registryLookup, inner.getCompoundOrEmpty("item")).orElse(ItemStack.EMPTY).getItem(),
+                                inner.getDouble("amount").orElse(0d)
+                        )
+                );
+            }
+        });
     }
 
     @Override

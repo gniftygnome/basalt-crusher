@@ -1,6 +1,5 @@
 package net.gnomecraft.basaltcrusher.mixin;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.gnomecraft.basaltcrusher.utils.InterfaceStockpile;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -39,7 +38,8 @@ public abstract class MixinDrawContext implements InterfaceStockpile {
 
         // layer metadata on top
         this.matrices.push();
-        RenderSystem.disableDepthTest();
+        // TODO: Can we restore this functionality for stack quantities?
+        //RenderSystem.disableDepthTest();
 
         // render stockpile fill level bar
         int k = Math.round(13.0f * (quantity % 1.0f));
@@ -53,7 +53,7 @@ public abstract class MixinDrawContext implements InterfaceStockpile {
             this.drawText(textRenderer, count, x + 17 - textRenderer.getWidth(count), y + 9, 0xFFFFFF, true);
         }
 
-        RenderSystem.enableDepthTest();
+        //RenderSystem.enableDepthTest();
         this.matrices.pop();
     }
 }

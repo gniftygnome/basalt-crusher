@@ -17,7 +17,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
@@ -203,13 +202,13 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
     public void readNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(tag, registryLookup);
 
-        inventory.readNbtList(tag.getList("Inventory", NbtList.COMPOUND_TYPE), registryLookup);
+        inventory.readNbtList(tag.getListOrEmpty("Inventory"), registryLookup);
 
-        millTimeTotal = tag.getShort("MillTimeTotal");
-        millTime = tag.getShort("MillTime");
-        expPerMilling = tag.getFloat("ExpPerMilling");
-        expAccumulated = tag.getFloat("ExpAccumulated");
-        transferCooldown = tag.getShort("TransferCooldown");
+        millTimeTotal = tag.getShort("MillTimeTotal", (short) 0);
+        millTime = tag.getShort("MillTime", (short) 0);
+        expPerMilling = tag.getFloat("ExpPerMilling", 0f);
+        expAccumulated = tag.getFloat("ExpAccumulated", 0f);
+        transferCooldown = tag.getShort("TransferCooldown", (short) 0);
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, GravelMillEntity entity) {
