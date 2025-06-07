@@ -18,14 +18,14 @@ import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
@@ -224,29 +224,30 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
     }
 
     @Override
-    public void writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        tag.put("Inventory", this.inventory.toNbtList(registryLookup));
+    protected void writeData(WriteView view) {
+        inventory.toDataList(view.getListAppender("Inventory", ItemStack.OPTIONAL_CODEC));
 
-        tag.putShort("CrushTimeTotal", (short) this.crushTimeTotal);
-        tag.putShort("CrushTime", (short) this.crushTime);
-        tag.putFloat("ExpPerCrush", expPerCrush);
-        tag.putFloat("ExpAccumulated", expAccumulated);
+        view.putInt("CrushTimeTotal", this.crushTimeTotal);
+        view.putInt("CrushTime", this.crushTime);
+        view.putFloat("ExpPerCrush", expPerCrush);
+        view.putFloat("ExpAccumulated", expAccumulated);
 
-        super.writeNbt(tag, registryLookup);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(tag, registryLookup);
+    protected void readData(ReadView view) {
+        super.readData(view);
 
-        inventory.readNbtList(tag.getListOrEmpty("Inventory"), registryLookup);
+        inventory.readDataList(view.getTypedListView("Inventory", ItemStack.OPTIONAL_CODEC));
 
-        crushTimeTotal = tag.getShort("CrushTimeTotal", (short) 0);
-        crushTime = tag.getShort("CrushTime", (short) 0);
-        expPerCrush = tag.getFloat("ExpPerCrush", 0f);
-        expAccumulated = tag.getFloat("ExpAccumulated", 0f);
+        crushTimeTotal = view.getInt("CrushTimeTotal", 0);
+        crushTime = view.getInt("CrushTime", 0);
+        expPerCrush = view.getFloat("ExpPerCrush", 0f);
+        expAccumulated = view.getFloat("ExpAccumulated", 0f);
     }
 
+    @SuppressWarnings("unused")
     public static void tick(World world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
         if (entity != null && world != null && !world.isClient()) {
             entity.tickJawLiners(world, pos, state, entity);

@@ -1,5 +1,6 @@
 package net.gnomecraft.basaltcrusher.grizzly;
 
+import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -15,11 +16,12 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.*;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
@@ -39,6 +41,9 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
     private ItemStack lastInput;
 
     private final HashMap<Item, Double> stockpile;
+
+    @SuppressWarnings("deprecation")
+    private static final Codec<Map<Item, Double>> STOCKPILE_CODEC = Codec.unboundedMap(Item.ENTRY_CODEC.xmap(RegistryEntry::value, Item::getRegistryEntry).fieldOf("item").codec(), Codec.DOUBLE.fieldOf("amount").codec());
 
     public GrizzlyEntity(BlockPos pos, BlockState state) {
         super(BasaltCrusher.GRIZZLY_ENTITY, pos, state);
@@ -194,36 +199,29 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
     }
 
     @Override
-    public void writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        tag.put("Inventory", this.inventory.toNbtList(registryLookup));
+    protected void writeData(WriteView view) {
+        inventory.toDataList(view.getListAppender("Inventory", ItemStack.OPTIONAL_CODEC));
 
-        tag.putShort("ProcessingTimeTotal", (short) this.processingTimeTotal);
-        tag.putShort("ProcessingTime", (short) this.processingTime);
+        view.putInt("ProcessingTimeTotal", this.processingTimeTotal);
+        view.putInt("ProcessingTime", this.processingTime);
 
-        tag.put("LastInput", this.lastInput.toNbt(registryLookup));
+        view.put("LastInput", ItemStack.OPTIONAL_CODEC, this.lastInput);
 
-        NbtCompound outer = new NbtCompound();
-        this.stockpile.forEach((item, amount) -> {
-            NbtCompound inner = new NbtCompound();
-            inner.put("item",  item.getDefaultStack().toNbt(registryLookup));
-            inner.put("amount", NbtDouble.of(amount));
-            outer.put(item.toString(), inner);
-        });
-        tag.put("stockpile", outer);
+        view.put("stockpile", STOCKPILE_CODEC, this.stockpile);
 
-        super.writeNbt(tag, registryLookup);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(tag, registryLookup);
+    protected void readData(ReadView view) {
+        super.readData(view);
 
-        inventory.readNbtList(tag.getListOrEmpty("Inventory"), registryLookup);
+        inventory.readDataList(view.getTypedListView("Inventory", ItemStack.OPTIONAL_CODEC));
 
-        processingTimeTotal = tag.getShort("ProcessingTimeTotal", (short) 0);
-        processingTime = tag.getShort("ProcessingTime", (short) 0);
+        processingTimeTotal = view.getInt("ProcessingTimeTotal", 0);
+        processingTime = view.getInt("ProcessingTime", 0);
 
-        ItemStack stack = ItemStack.fromNbt(registryLookup, tag.getCompoundOrEmpty("LastInput")).orElse(ItemStack.EMPTY);
+        ItemStack stack = view.read("LastInput", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         if (stack.isEmpty()) {
             lastInput = Items.COARSE_DIRT.getDefaultStack();
         } else {
@@ -231,17 +229,7 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
             lastInput = stack;
         }
 
-        stockpile.clear();
-        tag.getCompound("stockpile").ifPresent(outer -> {
-            for (String key : outer.getKeys()) {
-                outer.getCompound(key).ifPresent(inner ->
-                        stockpile.put(
-                                ItemStack.fromNbt(registryLookup, inner.getCompoundOrEmpty("item")).orElse(ItemStack.EMPTY).getItem(),
-                                inner.getDouble("amount").orElse(0d)
-                        )
-                );
-            }
-        });
+        stockpile.putAll(view.read("stockpile", STOCKPILE_CODEC).orElse(Map.of()));
     }
 
     @Override
@@ -249,6 +237,7 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
         return new GrizzlyScreenHandler(syncId, playerInventory, this.inventory, this.propertyDelegate);
     }
 
+    @SuppressWarnings("unused")
     public static void tick(World world, BlockPos pos, BlockState state, GrizzlyEntity entity) {
         if (entity != null && world != null && !world.isClient()) {
             entity.tickGrizzly(world, pos);

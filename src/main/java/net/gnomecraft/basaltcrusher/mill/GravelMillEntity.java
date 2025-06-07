@@ -16,11 +16,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
@@ -186,29 +186,29 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
     }
 
     @Override
-    public void writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        tag.put("Inventory", this.inventory.toNbtList(registryLookup));
+    protected void writeData(WriteView view) {
+        inventory.toDataList(view.getListAppender("Inventory", ItemStack.OPTIONAL_CODEC));
 
-        tag.putShort("MillTimeTotal", (short) this.millTimeTotal);
-        tag.putShort("MillTime", (short) this.millTime);
-        tag.putFloat("ExpPerMilling", expPerMilling);
-        tag.putFloat("ExpAccumulated", expAccumulated);
-        tag.putShort("TransferCooldown", (short) this.transferCooldown);
+        view.putInt("MillTimeTotal", this.millTimeTotal);
+        view.putInt("MillTime", this.millTime);
+        view.putFloat("ExpPerMilling", expPerMilling);
+        view.putFloat("ExpAccumulated", expAccumulated);
+        view.putInt("TransferCooldown", this.transferCooldown);
 
-        super.writeNbt(tag, registryLookup);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(tag, registryLookup);
+    protected void readData(ReadView view) {
+        super.readData(view);
 
-        inventory.readNbtList(tag.getListOrEmpty("Inventory"), registryLookup);
+        inventory.readDataList(view.getTypedListView("Inventory", ItemStack.OPTIONAL_CODEC));
 
-        millTimeTotal = tag.getShort("MillTimeTotal", (short) 0);
-        millTime = tag.getShort("MillTime", (short) 0);
-        expPerMilling = tag.getFloat("ExpPerMilling", 0f);
-        expAccumulated = tag.getFloat("ExpAccumulated", 0f);
-        transferCooldown = tag.getShort("TransferCooldown", (short) 0);
+        millTimeTotal = view.getInt("MillTimeTotal", 0);
+        millTime = view.getInt("MillTime", 0);
+        expPerMilling = view.getFloat("ExpPerMilling", 0f);
+        expAccumulated = view.getFloat("ExpAccumulated", 0f);
+        transferCooldown = view.getInt("TransferCooldown", 0);
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, GravelMillEntity entity) {
