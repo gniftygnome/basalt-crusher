@@ -94,11 +94,11 @@ public class BasaltCrusher implements ModInitializer {
             LOGGER.debug("Enabling Terrestria integration...");
             extendTerrestria = true;
 
-            BLACK_GRAVEL_BLOCK = Registry.register(Registries.BLOCK, BlackGravelBlockId, new ColoredFallingBlock(new ColorCode(0x202020), AbstractBlock.Settings.copy(Blocks.GRAVEL).mapColor(MapColor.DEEPSLATE_GRAY)));
-            BLACK_GRAVEL_ITEM = Registry.register(Registries.ITEM, BlackGravelBlockId, new BlockItem(BLACK_GRAVEL_BLOCK, new Item.Settings()));
+            BLACK_GRAVEL_BLOCK = Registry.register(Registries.BLOCK, BlackGravelBlockId, new ColoredFallingBlock(new ColorCode(0x202020), AbstractBlock.Settings.copy(Blocks.GRAVEL).registryKey(RegistryKey.of(RegistryKeys.BLOCK, BlackGravelBlockId)).mapColor(MapColor.DEEPSLATE_GRAY)));
+            BLACK_GRAVEL_ITEM = Registry.register(Registries.ITEM, BlackGravelBlockId, new BlockItem(BLACK_GRAVEL_BLOCK, new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, BlackGravelBlockId))));
 
-            OBSIDIAN_PILE_ITEM = Registry.register(Registries.ITEM, ObsidianPileId, new Item(new Item.Settings()));
-            OBSIDIAN_SHARD_ITEM = Registry.register(Registries.ITEM, ObsidianShardId, new Item(new Item.Settings()));
+            OBSIDIAN_PILE_ITEM = Registry.register(Registries.ITEM, ObsidianPileId, new Item(new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, ObsidianPileId))));
+            OBSIDIAN_SHARD_ITEM = Registry.register(Registries.ITEM, ObsidianShardId, new Item(new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, ObsidianShardId))));
 
             // Register Terrestria extension items for Item Groups
             ItemGroupEvents.modifyEntriesEvent(ItemGroups.NATURAL)
