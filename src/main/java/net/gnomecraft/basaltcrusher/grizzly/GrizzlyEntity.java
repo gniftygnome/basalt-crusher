@@ -1,5 +1,6 @@
 package net.gnomecraft.basaltcrusher.grizzly;
 
+import com.google.common.base.Functions;
 import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -16,6 +17,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
@@ -31,6 +33,7 @@ import net.minecraft.world.World;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFactory {
     private final EnumMap<Direction, Storage<ItemVariant>> storageCache;
@@ -42,8 +45,7 @@ public class GrizzlyEntity extends BlockEntity implements NamedScreenHandlerFact
 
     private final HashMap<Item, Double> stockpile;
 
-    @SuppressWarnings("deprecation")
-    private static final Codec<Map<Item, Double>> STOCKPILE_CODEC = Codec.unboundedMap(Item.ENTRY_CODEC.xmap(RegistryEntry::value, Item::getRegistryEntry).fieldOf("item").codec(), Codec.DOUBLE.fieldOf("amount").codec());
+    private static final Codec<Map<Item, Double>> STOCKPILE_CODEC = Codec.unboundedMap(Item.ENTRY_CODEC.xmap(RegistryEntry::value, Functions.compose(Objects::requireNonNull, Registries.ITEM::getEntry)), Codec.DOUBLE);
 
     public GrizzlyEntity(BlockPos pos, BlockState state) {
         super(BasaltCrusher.GRIZZLY_ENTITY, pos, state);
