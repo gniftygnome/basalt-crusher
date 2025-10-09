@@ -57,7 +57,7 @@ public class BasaltCrusherBlock extends BlockWithEntity {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!world.isClient) {
+        if (!world.isClient()) {
             this.openContainer(world, pos, player);
         }
 
@@ -122,7 +122,7 @@ public class BasaltCrusherBlock extends BlockWithEntity {
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
         BlockEntity entity = world.getBlockEntity(pos);
 
         if (entity instanceof BasaltCrusherEntity) {

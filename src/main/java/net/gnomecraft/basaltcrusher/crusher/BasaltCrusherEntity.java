@@ -408,7 +408,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         while (expAccumulated >= 1.0F) {
             expOrb = ExperienceOrbEntity.roundToOrbSize((int) expAccumulated);
             expAccumulated -= expOrb;
-            player.getWorld().spawnEntity(new ExperienceOrbEntity(player.getWorld(), player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, expOrb));
+            player.getEntityWorld().spawnEntity(new ExperienceOrbEntity(player.getEntityWorld(), player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, expOrb));
         }
 
         this.markDirty();
