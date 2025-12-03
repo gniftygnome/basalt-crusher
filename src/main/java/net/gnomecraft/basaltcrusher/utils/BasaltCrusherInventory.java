@@ -1,5 +1,6 @@
 package net.gnomecraft.basaltcrusher.utils;
 
+import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
@@ -25,8 +26,19 @@ public abstract class BasaltCrusherInventory extends SimpleInventory implements 
     public void readDataList(ReadView.TypedListReadView<ItemStack> list) {
         java.util.Iterator<ItemStack> iterator = list.iterator();
 
-        for (int slot = 0; slot < this.size(); ++slot) {
-            this.setStack(slot, iterator.next());
+        if (list.isEmpty()) {
+            // Uninitialized BE (I am not sure why this happens, but it does at placement).
+            this.clear();
+        } else {
+            for (int slot = 0; slot < this.size(); ++slot) {
+                if (iterator.hasNext()) {
+                    this.setStack(slot, iterator.next());
+                } else {
+                    // Should never happen, but this function must not throw.
+                    BasaltCrusher.LOGGER.warn("Deserializing null for slot {}; previous value: {}", slot, this.getStack(slot));
+                    this.setStack(slot, ItemStack.EMPTY);
+                }
+            }
         }
     }
 
