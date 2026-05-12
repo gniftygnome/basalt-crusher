@@ -8,39 +8,42 @@ import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.gnomecraft.basaltcrusher.utils.BasaltCrusherInventory;
 import net.gnomecraft.basaltcrusher.utils.IOTypeMatchers;
 import net.gnomecraft.basaltcrusher.utils.TerrestriaIntegration;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.core.Holder;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.Containers;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.EnumMap;
 import java.util.HashMap;
 
 import static net.gnomecraft.basaltcrusher.crusher.BasaltCrusherBlock.CRUSHING_STATE;
 
-public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandlerFactory {
+@NullMarked
+public class BasaltCrusherEntity extends BlockEntity implements MenuProvider {
     private BasaltCrusherBlock.CrushingState crushingState;
     private final EnumMap<Direction, Storage<ItemVariant>> storageCache;
-    private final HashMap<RegistryKey<Enchantment>, RegistryEntry<Enchantment>> enchantmentEntries = new HashMap<>(8);
+    private final HashMap<ResourceKey<Enchantment>, Holder<Enchantment>> enchantmentEntries = new HashMap<>(8);
 
     private int crushTimeTotal;
     private int crushTime;
@@ -52,7 +55,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         super(BasaltCrusher.BASALT_CRUSHER_ENTITY, pos, state);
 
         // Initialize cached crushing state.
-        this.crushingState = state.get(CRUSHING_STATE);
+        this.crushingState = state.getValue(CRUSHING_STATE);
         this.storageCache = new EnumMap<>(Direction.class);
 
         // Our mod is a simple mod.
@@ -70,7 +73,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         // Crushing slots cannot be targeted: {3,4}
 
         @Override
-        public int[] getAvailableSlots(Direction direction) {
+        public int[] getSlotsForFace(Direction direction) {
             if (direction == Direction.UP) {
                 return TOP_SLOTS;
             } else if (direction == Direction.DOWN) {
@@ -81,31 +84,31 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         }
 
         @Override
-        public boolean canInsert(int slot, ItemStack stack, Direction direction) {
+        public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction direction) {
             // All slots filter insertion.
-            return this.isValid(slot, stack);
+            return this.canPlaceItem(slot, stack);
         }
 
         @Override
-        public boolean canExtract(int slot, ItemStack stack, Direction direction) {
+        public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction direction) {
             // Allow extracting anything from any slot that matches the direction.
             return true;
         }
 
         @Override
-        public boolean isValid(int slot, ItemStack stack) {
+        public boolean canPlaceItem(int slot, ItemStack stack) {
             boolean retVal = false;
 
             switch (slot) {
                 case 0:
                     // input slot
                     // TODO: use recipes
-                    retVal = stack.isIn(BasaltCrusher.BASALTS);
+                    retVal = stack.is(BasaltCrusher.BASALTS);
                     break;
                 case 1:
                     // jaw liner slot
                     // TODO: use recipes
-                    retVal = stack.isIn(BasaltCrusher.JAW_LINERS);
+                    retVal = stack.is(BasaltCrusher.JAW_LINERS);
                     break;
                 case 2:
                     // output slot
@@ -113,12 +116,12 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
                 case 3:
                     // top crushing slot (active jaw liner)
                     // TODO: use recipes
-                    retVal = (stack.isIn(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !ItemStack.areItemsAndComponentsEqual(stack, this.getStack(3)));
+                    retVal = (stack.is(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !ItemStack.isSameItemSameComponents(stack, this.getItem(3)));
                     break;
                 case 4:
                     // bottom crushing slot (active jaw liner)
                     // TODO: use recipes
-                    retVal = (stack.isIn(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !ItemStack.areItemsAndComponentsEqual(stack, this.getStack(4)));
+                    retVal = (stack.is(BasaltCrusher.JAW_LINERS) && stack.getCount() == 1 && !ItemStack.isSameItemSameComponents(stack, this.getItem(4)));
                     break;
             }
 
@@ -126,22 +129,22 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         }
 
         @Override
-        public void markDirty() {
-            BasaltCrusherEntity.this.markDirty();
+        public void setChanged() {
+            BasaltCrusherEntity.this.setChanged();
         }
 
         @Override
-        public void setStack(int slot, ItemStack stack) {
-            ItemStack target = this.getStack(slot);
-            boolean sameItem = !stack.isEmpty() && ItemStack.areItemsAndComponentsEqual(stack, target);
+        public void setItem(int slot, ItemStack stack) {
+            ItemStack target = this.getItem(slot);
+            boolean sameItem = !stack.isEmpty() && ItemStack.isSameItemSameComponents(stack, target);
 
-            super.setStack(slot, stack);
+            super.setItem(slot, stack);
 
             if (slot == 0 && !sameItem) {
                 BasaltCrusherEntity.this.crushTime = 0;
             }
 
-            BasaltCrusherEntity.this.markDirty();
+            BasaltCrusherEntity.this.setChanged();
         }
     };
 
@@ -149,17 +152,17 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
     private final SingleStackStorage jawStorage = new SingleStackStorage() {
         @Override
         protected ItemStack getStack() {
-            return BasaltCrusherEntity.this.inventory.getStack(1);
+            return BasaltCrusherEntity.this.inventory.getItem(1);
         }
 
         @Override
         protected void setStack(ItemStack stack) {
-            BasaltCrusherEntity.this.inventory.setStack(1, stack);
+            BasaltCrusherEntity.this.inventory.setItem(1, stack);
         }
 
         @Override
         protected boolean canInsert(ItemVariant itemVariant) {
-            return itemVariant.toStack().isIn(BasaltCrusher.JAW_LINERS);
+            return itemVariant.toStack().is(BasaltCrusher.JAW_LINERS);
         }
 
         /* TODO: review whether we can restore the 16-stack behavior somehow
@@ -171,10 +174,6 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
     };
 
     public Storage<ItemVariant> getSidedStorage(Direction direction) {
-        if (direction == null) {
-            return null;
-        }
-
         if (storageCache.get(direction) == null) {
             if (direction == Direction.DOWN || direction == Direction.UP) {
                 // slots 0 and 2 via InventoryStorage
@@ -189,7 +188,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
     }
 
     // Provide the crushing progress to the menu.
-    private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
+    private final ContainerData propertyDelegate = new ContainerData() {
         @Override
         public int get(int index) {
             return switch (index) {
@@ -208,57 +207,57 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
         }
 
         @Override
-        public int size() {
+        public int getCount() {
             return 2;
         }
     };
 
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new BasaltCrusherScreenHandler(syncId, playerInventory, this.inventory, this.propertyDelegate);
     }
 
     @Override
-    public Text getDisplayName() {
-        return Text.translatable(getCachedState().getBlock().getTranslationKey());
+    public Component getDisplayName() {
+        return Component.translatable(getBlockState().getBlock().getDescriptionId());
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        inventory.toDataList(view.getListAppender("Inventory", ItemStack.OPTIONAL_CODEC));
+    protected void saveAdditional(ValueOutput view) {
+        inventory.storeAsItemList(view.list("Inventory", ItemStack.OPTIONAL_CODEC));
 
         view.putInt("CrushTimeTotal", this.crushTimeTotal);
         view.putInt("CrushTime", this.crushTime);
         view.putFloat("ExpPerCrush", expPerCrush);
         view.putFloat("ExpAccumulated", expAccumulated);
 
-        super.writeData(view);
+        super.saveAdditional(view);
     }
 
     @Override
-    protected void readData(ReadView view) {
-        super.readData(view);
+    protected void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
 
-        inventory.readDataList(view.getTypedListView("Inventory", ItemStack.OPTIONAL_CODEC));
+        inventory.fromItemList(view.listOrEmpty("Inventory", ItemStack.OPTIONAL_CODEC));
 
-        crushTimeTotal = view.getInt("CrushTimeTotal", 0);
-        crushTime = view.getInt("CrushTime", 0);
-        expPerCrush = view.getFloat("ExpPerCrush", 0f);
-        expAccumulated = view.getFloat("ExpAccumulated", 0f);
+        crushTimeTotal = view.getIntOr("CrushTimeTotal", 0);
+        crushTime = view.getIntOr("CrushTime", 0);
+        expPerCrush = view.getFloatOr("ExpPerCrush", 0f);
+        expAccumulated = view.getFloatOr("ExpAccumulated", 0f);
     }
 
     @SuppressWarnings("unused")
-    public static void tick(World world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
-        if (entity != null && world != null && !world.isClient()) {
+    public static void tick(Level world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
+        if (!world.isClientSide()) {
             entity.tickJawLiners(world, pos, state, entity);
             entity.tickCrusher(world, pos, state, entity);
         }
     }
 
-    private void tickJawLiners(World world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
-        ItemStack liners = entity.inventory.getStack(1);
-        ItemStack upperJaw = entity.inventory.getStack(3);
-        ItemStack lowerJaw = entity.inventory.getStack(4);
+    private void tickJawLiners(Level world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
+        ItemStack liners = entity.inventory.getItem(1);
+        ItemStack upperJaw = entity.inventory.getItem(3);
+        ItemStack lowerJaw = entity.inventory.getItem(4);
 
         // Make sure there is a jaw liner in the top slot if we have one available.
         if (upperJaw.isEmpty()) {
@@ -267,8 +266,8 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
                 entity.setCrushingState(state, BasaltCrusherBlock.CrushingState.EMPTY);
             } else {
                 // Move a jaw liner into the top jaw slot.
-                entity.inventory.setStack(3, entity.inventory.removeStack(1, 1));
-                entity.markDirty();
+                entity.inventory.setItem(3, entity.inventory.removeItem(1, 1));
+                entity.setChanged();
             }
         }
 
@@ -279,20 +278,20 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
                 entity.setCrushingState(state, BasaltCrusherBlock.CrushingState.EMPTY);
             } else {
                 // Move a jaw liner into the bottom jaw slot.
-                entity.inventory.setStack(4, entity.inventory.removeStack(1, 1));
-                entity.markDirty();
+                entity.inventory.setItem(4, entity.inventory.removeItem(1, 1));
+                entity.setChanged();
             }
         }
     }
 
-    private void tickCrusher(World world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
-        ItemStack input = entity.inventory.getStack(0);
-        ItemStack output = entity.inventory.getStack(2);
-        ItemStack upperJaw = entity.inventory.getStack(3);
-        ItemStack lowerJaw = entity.inventory.getStack(4);
+    private void tickCrusher(Level world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
+        ItemStack input = entity.inventory.getItem(0);
+        ItemStack output = entity.inventory.getItem(2);
+        ItemStack upperJaw = entity.inventory.getItem(3);
+        ItemStack lowerJaw = entity.inventory.getItem(4);
 
         // We can't crush if our output is full.  Short circuit.
-        if (output.getCount() == output.getMaxCount()) {
+        if (output.getCount() == output.getMaxStackSize()) {
             entity.setCrushingState(state, BasaltCrusherBlock.CrushingState.IDLE);
 
             return;
@@ -305,7 +304,7 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
                 entity.setCrushingState(state, BasaltCrusherBlock.CrushingState.IDLE);
                 if (entity.crushTime != 0) {
                     entity.crushTime = 0;
-                    entity.markDirty();
+                    entity.setChanged();
                 }
             } else {
                 // Start or continue crushing.
@@ -325,39 +324,39 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
                 // Rate of crushing varies from 2 to 7 depending on use of Efficiency enchants.
                 // Total time can vary from 210 (no Efficiency) to 60 (two Efficiency V) ticks in duration.
                 entity.crushTime += 2 + (getEnchantmentLevel(world, Enchantments.EFFICIENCY, upperJaw) + getEnchantmentLevel(world, Enchantments.EFFICIENCY, lowerJaw)) / 2;
-                entity.markDirty();
+                entity.setChanged();
             }
         }
 
         if (entity.crushTime >= entity.crushTimeTotal) {
             // Successful crushing.
             // TODO: use recipes.
-            input.decrement(1);
+            input.shrink(1);
             if (output.isEmpty()) {
-                if (TerrestriaIntegration.ENABLED && input.isIn(TerrestriaIntegration.TERRESTRIA_BASALTS)) {
-                    entity.inventory.setStack(2, new ItemStack(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM, 1));
+                if (TerrestriaIntegration.ENABLED && input.is(TerrestriaIntegration.TERRESTRIA_BASALTS)) {
+                    entity.inventory.setItem(2, new ItemStack(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM, 1));
                 } else {
-                    entity.inventory.setStack(2, new ItemStack(Blocks.GRAVEL, 1));
+                    entity.inventory.setItem(2, new ItemStack(Blocks.GRAVEL, 1));
                 }
             } else {
-                output.increment(1);
+                output.grow(1);
             }
             // Try to damage the top jaw liner (if possible).
-            if (upperJaw.isDamageable()) {
+            if (upperJaw.isDamageableItem()) {
                 if ((0.5d / (1.0d + (double) getEnchantmentLevel(world, Enchantments.UNBREAKING, upperJaw))) > world.random.nextDouble()) {
-                    upperJaw.setDamage(upperJaw.getDamage() + 1);
+                    upperJaw.setDamageValue(upperJaw.getDamageValue() + 1);
                 }
-                if (upperJaw.getDamage() >= upperJaw.getMaxDamage()) {
-                    upperJaw.decrement(1);
+                if (upperJaw.getDamageValue() >= upperJaw.getMaxDamage()) {
+                    upperJaw.shrink(1);
                 }
             }
             // Try to damage the bottom jaw liner (if possible).
-            if (lowerJaw.isDamageable()) {
+            if (lowerJaw.isDamageableItem()) {
                 if ((0.5d / (1.0d + (double) getEnchantmentLevel(world, Enchantments.UNBREAKING, lowerJaw))) > world.random.nextDouble()) {
-                    lowerJaw.setDamage(lowerJaw.getDamage() + 1);
+                    lowerJaw.setDamageValue(lowerJaw.getDamageValue() + 1);
                 }
-                if (lowerJaw.getDamage() >= lowerJaw.getMaxDamage()) {
-                    lowerJaw.decrement(1);
+                if (lowerJaw.getDamageValue() >= lowerJaw.getMaxDamage()) {
+                    lowerJaw.shrink(1);
                 }
             }
             // Add XP.
@@ -367,12 +366,12 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
             if (entity.expAccumulated >= 1.0f) {
                 if (0.5d > world.random.nextDouble()) {
                     if (getEnchantmentLevel(world, Enchantments.MENDING, upperJaw) > 0 && upperJaw.isDamaged()) {
-                        upperJaw.setDamage(upperJaw.getDamage() - 1);
+                        upperJaw.setDamageValue(upperJaw.getDamageValue() - 1);
                         entity.expAccumulated -= 1.0f;
                     }
                 } else {
                     if (getEnchantmentLevel(world, Enchantments.MENDING, lowerJaw) > 0 && lowerJaw.isDamaged()) {
-                        lowerJaw.setDamage(lowerJaw.getDamage() - 1);
+                        lowerJaw.setDamageValue(lowerJaw.getDamageValue() - 1);
                         entity.expAccumulated -= 1.0f;
                     }
                 }
@@ -380,47 +379,45 @@ public class BasaltCrusherEntity extends BlockEntity implements NamedScreenHandl
 
             // Reset crush timer.
             entity.crushTime = 0;
-            entity.markDirty();
+            entity.setChanged();
         }
     }
 
-    private int getEnchantmentLevel(World world, RegistryKey<Enchantment> enchantment, ItemStack stack) {
-        return EnchantmentHelper.getLevel(
+    private int getEnchantmentLevel(Level world, ResourceKey<Enchantment> enchantment, ItemStack stack) {
+        return EnchantmentHelper.getItemEnchantmentLevel(
                 enchantmentEntries.computeIfAbsent(
                         enchantment,
-                        key -> world.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(key)),
+                        key -> world.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(key)),
                 stack);
     }
 
-    public void scatterInventory(World world, BlockPos pos) {
-        ItemScatterer.spawn(world, pos, this.inventory);
+    public void scatterInventory(Level world, BlockPos pos) {
+        Containers.dropContents(world, pos, this.inventory);
     }
 
     public int calculateComparatorOutput() {
-        return ScreenHandler.calculateComparatorOutput(this.inventory);
+        return AbstractContainerMenu.getRedstoneSignalFromContainer(this.inventory);
     }
 
-    public void dropExperience(PlayerEntity player) {
+    public void dropExperience(Level world, Player player) {
         int expOrb;
 
-        if (player == null) return;
-
         while (expAccumulated >= 1.0F) {
-            expOrb = ExperienceOrbEntity.roundToOrbSize((int) expAccumulated);
+            expOrb = ExperienceOrb.getExperienceValue((int) expAccumulated);
             expAccumulated -= expOrb;
-            player.getEntityWorld().spawnEntity(new ExperienceOrbEntity(player.getEntityWorld(), player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, expOrb));
+            world.addFreshEntity(new ExperienceOrb(world, player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, expOrb));
         }
 
-        this.markDirty();
+        this.setChanged();
     }
 
     // Local cache in the BE so we only update the BS when the state changes.
     // This way I can set the state whenever I feel like it without any penalty.
     private boolean setCrushingState(BlockState state, BasaltCrusherBlock.CrushingState newState) {
-        if (newState == this.crushingState || this.world == null) {
+        if (newState == this.crushingState || this.level == null) {
             return false;
         } else {
-            this.world.setBlockState(pos, state.with(CRUSHING_STATE, newState));
+            this.level.setBlockAndUpdate(worldPosition, state.setValue(CRUSHING_STATE, newState));
             this.crushingState = newState;
             return true;
         }

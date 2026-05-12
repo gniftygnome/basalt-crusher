@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smithing_transform",
+  "template": "minecraft:netherite_upgrade_smithing_template",
+  "base": "basalt_crusher:diamond_jaw_liner",
+  "addition": "minecraft:netherite_ingot",
+  "result": {
+    "id": "basalt_crusher:netherite_jaw_liner"
+  }
+}

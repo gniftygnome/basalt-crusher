@@ -9,29 +9,32 @@ import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.gnomecraft.basaltcrusher.utils.BasaltCrusherInventory;
 import net.gnomecraft.basaltcrusher.utils.IOTypeMatchers;
 import net.gnomecraft.basaltcrusher.utils.TerrestriaIntegration;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.Containers;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.EnumMap;
 
 import static net.gnomecraft.basaltcrusher.mill.GravelMillBlock.MILL_STATE;
 
-public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerFactory {
+@NullMarked
+public class GravelMillEntity extends BlockEntity implements MenuProvider {
     private int millState;
     private final EnumMap<Direction, Storage<ItemVariant>> storageCache;
 
@@ -47,7 +50,7 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
         super(BasaltCrusher.GRAVEL_MILL_ENTITY, pos, state);
 
         // Initialize cached milling state.
-        this.millState = state.get(MILL_STATE);
+        this.millState = state.getValue(MILL_STATE);
         this.storageCache = new EnumMap<>(Direction.class);
 
         // Our mod is a simple mod.
@@ -68,8 +71,8 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
         private static final int[] BOTTOM_SLOTS = new int[]{2}; // output: sand
 
         @Override
-        public int[] getAvailableSlots(Direction direction) {
-            Direction facing = GravelMillEntity.this.getCachedState().get(GravelMillBlock.FACING);
+        public int[] getSlotsForFace(Direction direction) {
+            Direction facing = GravelMillEntity.this.getBlockState().getValue(GravelMillBlock.FACING);
 
             if (direction == Direction.UP) {
                 return TOP_SLOTS;
@@ -85,30 +88,30 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
         }
 
         @Override
-        public boolean canInsert(int slot, ItemStack stack, Direction direction) {
+        public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction direction) {
             // All slots filter insertion.
-            return this.isValid(slot, stack);
+            return this.canPlaceItem(slot, stack);
         }
 
         @Override
-        public boolean canExtract(int slot, ItemStack stack, Direction direction) {
+        public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction direction) {
             // Allow extracting anything from any slot that matches the direction.
             return true;
         }
 
         @Override
-        public boolean isValid(int slot, ItemStack stack) {
+        public boolean canPlaceItem(int slot, ItemStack stack) {
             boolean retVal = false;
 
             switch (slot) {
                 case 0:
                     // input slot
-                    retVal = stack.isOf(Items.GRAVEL) || stack.isOf(Items.SAND) || TerrestriaIntegration.ENABLED &&
-                            (stack.isOf(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM) || stack.isOf(TerrestriaIntegration.VOLCANIC_SAND_ITEM));
+                    retVal = stack.is(Items.GRAVEL) || stack.is(Items.SAND) || TerrestriaIntegration.ENABLED &&
+                            (stack.is(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM) || stack.is(TerrestriaIntegration.VOLCANIC_SAND_ITEM));
                     break;
                 case 1:
                     // rod charge slot
-                    retVal = stack.isOf(BasaltCrusher.MILL_ROD_CHARGE_ITEM);
+                    retVal = stack.is(BasaltCrusher.MILL_ROD_CHARGE_ITEM);
                     break;
                 case 2:
                     // output slot
@@ -119,30 +122,26 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
         }
 
         @Override
-        public void markDirty() {
-            GravelMillEntity.this.markDirty();
+        public void setChanged() {
+            GravelMillEntity.this.setChanged();
         }
 
         @Override
-        public void setStack(int slot, ItemStack stack) {
-            ItemStack target = this.getStack(slot);
-            boolean sameItem = !stack.isEmpty() && ItemStack.areItemsAndComponentsEqual(stack, target);
+        public void setItem(int slot, ItemStack stack) {
+            ItemStack target = this.getItem(slot);
+            boolean sameItem = !stack.isEmpty() && ItemStack.isSameItemSameComponents(stack, target);
 
-            super.setStack(slot, stack);
+            super.setItem(slot, stack);
 
             if (slot == 0 && !sameItem) {
                 GravelMillEntity.this.millTime = 0;
             }
 
-            GravelMillEntity.this.markDirty();
+            GravelMillEntity.this.setChanged();
         }
     };
 
     public Storage<ItemVariant> getSidedStorage(Direction direction) {
-        if (direction == null) {
-            return null;
-        }
-
         if (this.storageCache.get(direction) == null) {
             this.storageCache.put(direction, InventoryStorage.of(this.inventory, direction));
         }
@@ -151,7 +150,7 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
     }
 
     // Provide the milling progress to the menu.
-    private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
+    private final ContainerData propertyDelegate = new ContainerData() {
         @Override
         public int get(int index) {
             return switch (index) {
@@ -170,24 +169,24 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
         }
 
         @Override
-        public int size() {
+        public int getCount() {
             return 2;
         }
     };
 
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new GravelMillScreenHandler(syncId, playerInventory, this.inventory, this.propertyDelegate);
     }
 
     @Override
-    public Text getDisplayName() {
-        return Text.translatable(getCachedState().getBlock().getTranslationKey());
+    public Component getDisplayName() {
+        return Component.translatable(getBlockState().getBlock().getDescriptionId());
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        inventory.toDataList(view.getListAppender("Inventory", ItemStack.OPTIONAL_CODEC));
+    protected void saveAdditional(ValueOutput view) {
+        inventory.storeAsItemList(view.list("Inventory", ItemStack.OPTIONAL_CODEC));
 
         view.putInt("MillTimeTotal", this.millTimeTotal);
         view.putInt("MillTime", this.millTime);
@@ -195,33 +194,33 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
         view.putFloat("ExpAccumulated", expAccumulated);
         view.putInt("TransferCooldown", this.transferCooldown);
 
-        super.writeData(view);
+        super.saveAdditional(view);
     }
 
     @Override
-    protected void readData(ReadView view) {
-        super.readData(view);
+    protected void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
 
-        inventory.readDataList(view.getTypedListView("Inventory", ItemStack.OPTIONAL_CODEC));
+        inventory.fromItemList(view.listOrEmpty("Inventory", ItemStack.OPTIONAL_CODEC));
 
-        millTimeTotal = view.getInt("MillTimeTotal", 0);
-        millTime = view.getInt("MillTime", 0);
-        expPerMilling = view.getFloat("ExpPerMilling", 0f);
-        expAccumulated = view.getFloat("ExpAccumulated", 0f);
-        transferCooldown = view.getInt("TransferCooldown", 0);
+        millTimeTotal = view.getIntOr("MillTimeTotal", 0);
+        millTime = view.getIntOr("MillTime", 0);
+        expPerMilling = view.getFloatOr("ExpPerMilling", 0f);
+        expAccumulated = view.getFloatOr("ExpAccumulated", 0f);
+        transferCooldown = view.getIntOr("TransferCooldown", 0);
     }
 
-    public static void tick(World world, BlockPos pos, BlockState state, GravelMillEntity entity) {
-        if (entity != null && world != null && !world.isClient()) {
+    public static void tick(Level world, BlockPos pos, BlockState state, GravelMillEntity entity) {
+        if (!world.isClientSide()) {
             entity.tickMill(world, pos, state, entity);
             entity.tickTransfer(world, pos, state, entity);
         }
     }
 
-    private void tickMill(World world, BlockPos pos, BlockState state, GravelMillEntity entity) {
-        ItemStack input = entity.inventory.getStack(0);
-        ItemStack output = entity.inventory.getStack(2);
-        ItemStack rodCharge = entity.inventory.getStack(1);
+    private void tickMill(Level world, BlockPos pos, BlockState state, GravelMillEntity entity) {
+        ItemStack input = entity.inventory.getItem(0);
+        ItemStack output = entity.inventory.getItem(2);
+        ItemStack rodCharge = entity.inventory.getItem(1);
 
         // The mill is shut down without a rod charge.  Short circuit.
         if (rodCharge.isEmpty()) {
@@ -231,7 +230,7 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
         }
 
         // We can't mill if our output is full.  Short circuit.
-        if (output.getCount() == output.getMaxCount()) {
+        if (output.getCount() == output.getMaxStackSize()) {
             entity.setMillState(state, 20);
 
             return;
@@ -243,48 +242,48 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
             entity.setMillState(state, 20);
             if (entity.millTime != 0) {
                 entity.millTime = 0;
-                entity.markDirty();
+                entity.setChanged();
             }
-        } else if (input.isOf(Items.SAND)) {
+        } else if (input.is(Items.SAND)) {
             // Bypass sand input for user convenience.
             // Typically in a real implementation it would be pre-screened to save mill wear.
             // However the mill could be fed a sandy mix (and just have the mill rate adjusted).
-            input.decrement(1);
+            input.shrink(1);
             if (output.isEmpty() || output.getCount() < 1) {
-                entity.inventory.setStack(2, new ItemStack(Items.SAND, 1));
+                entity.inventory.setItem(2, new ItemStack(Items.SAND, 1));
             } else {
-                output.increment(1);
+                output.grow(1);
             }
             // Try to damage the rod charge (if possible), but less than with gravel.
-            if (rodCharge.isDamageable()) {
+            if (rodCharge.isDamageableItem()) {
                 if (0.25d > world.random.nextDouble()) {
-                    rodCharge.setDamage(rodCharge.getDamage() + 1);
+                    rodCharge.setDamageValue(rodCharge.getDamageValue() + 1);
                 }
-                if (rodCharge.getDamage() >= rodCharge.getMaxDamage()) {
-                    rodCharge.decrement(1);
+                if (rodCharge.getDamageValue() >= rodCharge.getMaxDamage()) {
+                    rodCharge.shrink(1);
                 }
             }
-            entity.markDirty();
-        } else if (TerrestriaIntegration.ENABLED && input.isOf(TerrestriaIntegration.VOLCANIC_SAND_ITEM)) {
+            entity.setChanged();
+        } else if (TerrestriaIntegration.ENABLED && input.is(TerrestriaIntegration.VOLCANIC_SAND_ITEM)) {
             // Bypass sand input for user convenience.
             // Typically in a real implementation it would be pre-screened to save mill wear.
             // However the mill could be fed a sandy mix (and just have the mill rate adjusted).
-            input.decrement(1);
+            input.shrink(1);
             if (output.isEmpty() || output.getCount() < 1) {
-                entity.inventory.setStack(2, new ItemStack(TerrestriaIntegration.VOLCANIC_SAND_ITEM, 1));
+                entity.inventory.setItem(2, new ItemStack(TerrestriaIntegration.VOLCANIC_SAND_ITEM, 1));
             } else {
-                output.increment(1);
+                output.grow(1);
             }
             // Try to damage the rod charge (if possible), but less than with gravel.
-            if (rodCharge.isDamageable()) {
+            if (rodCharge.isDamageableItem()) {
                 if (0.25d > world.random.nextDouble()) {
-                    rodCharge.setDamage(rodCharge.getDamage() + 1);
+                    rodCharge.setDamageValue(rodCharge.getDamageValue() + 1);
                 }
-                if (rodCharge.getDamage() >= rodCharge.getMaxDamage()) {
-                    rodCharge.decrement(1);
+                if (rodCharge.getDamageValue() >= rodCharge.getMaxDamage()) {
+                    rodCharge.shrink(1);
                 }
             }
-            entity.markDirty();
+            entity.setChanged();
         } else {
             // Start or continue milling.
             // Rod mills should travel about 280 to 480 ft/min inside the cylinder.
@@ -295,80 +294,78 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
             // Rate of milling in the rod mill is constant.
             // (In real rod mills it depends on things like input mix, rotation speed, and rod size.)
             ++entity.millTime;
-            entity.markDirty();
+            entity.setChanged();
         }
 
         if (entity.millTime >= entity.millTimeTotal) {
             // Successful milling.
             if (output.isEmpty()) {
-                if (TerrestriaIntegration.ENABLED && input.isOf(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM)) {
-                    entity.inventory.setStack(2, new ItemStack(TerrestriaIntegration.VOLCANIC_SAND_ITEM, 1));
+                if (TerrestriaIntegration.ENABLED && input.is(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM)) {
+                    entity.inventory.setItem(2, new ItemStack(TerrestriaIntegration.VOLCANIC_SAND_ITEM, 1));
                 } else {
-                    entity.inventory.setStack(2, new ItemStack(Items.SAND, 1));
+                    entity.inventory.setItem(2, new ItemStack(Items.SAND, 1));
                 }
             } else {
-                output.increment(1);
+                output.grow(1);
             }
-            input.decrement(1);
+            input.shrink(1);
             // Try to damage the rod charge (if possible).
-            if (rodCharge.isDamageable()) {
-                rodCharge.setDamage(rodCharge.getDamage() + 1);
-                if (rodCharge.getDamage() >= rodCharge.getMaxDamage()) {
-                    rodCharge.decrement(1);
+            if (rodCharge.isDamageableItem()) {
+                rodCharge.setDamageValue(rodCharge.getDamageValue() + 1);
+                if (rodCharge.getDamageValue() >= rodCharge.getMaxDamage()) {
+                    rodCharge.shrink(1);
                 }
             }
             // Add XP.
             entity.expAccumulated += entity.expPerMilling;
             // Reset milling timer.
             entity.millTime = 0;
-            entity.markDirty();
+            entity.setChanged();
         }
     }
 
-    private void tickTransfer(World world, BlockPos pos, BlockState state, GravelMillEntity entity) {
-        ItemStack output = entity.inventory.getStack(2);
+    private void tickTransfer(Level world, BlockPos pos, BlockState state, GravelMillEntity entity) {
+        ItemStack output = entity.inventory.getItem(2);
 
         // Implement transfer cooldown.
         if (entity.transferCooldown > 0) {
             --transferCooldown;
-            entity.markDirty();
+            entity.setChanged();
         }
 
         if (entity.transferCooldown <= 0 && !output.isEmpty()) {
             // Try to push an item into adjacent storage.
-            Direction vent = state.get(GravelMillBlock.FACING).getOpposite();
+            Direction vent = state.getValue(GravelMillBlock.FACING).getOpposite();
             Storage<ItemVariant> sourceStorage = entity.getSidedStorage(vent);
-            Storage<ItemVariant> targetStorage = ItemStorage.SIDED.find(world, pos.offset(vent), vent.getOpposite());
+            Storage<ItemVariant> targetStorage = ItemStorage.SIDED.find(world, pos.relative(vent), vent.getOpposite());
 
-            if (sourceStorage != null && targetStorage != null) {
+            if (targetStorage != null) {
                 if (StorageUtil.move(sourceStorage, targetStorage, variant -> true, 1, null) > 0) {
                     entity.transferCooldown = 8;
-                    entity.markDirty();
+                    entity.setChanged();
                 }
             }
         }
     }
 
-    public void scatterInventory(World world, BlockPos pos) {
-        ItemScatterer.spawn(world, pos, this.inventory);
+    public void scatterInventory(Level world, BlockPos pos) {
+        Containers.dropContents(world, pos, this.inventory);
     }
 
     public int calculateComparatorOutput() {
-        return ScreenHandler.calculateComparatorOutput(this.inventory);
+        return AbstractContainerMenu.getRedstoneSignalFromContainer(this.inventory);
     }
 
-    public void dropExperience(PlayerEntity player) {
+    public void dropExperience(Level world, Player player) {
         int expOrb;
 
-        if (player == null) return;
-
         while (expAccumulated >= 1.0F) {
-            expOrb = ExperienceOrbEntity.roundToOrbSize((int) expAccumulated);
+            expOrb = ExperienceOrb.getExperienceValue((int) expAccumulated);
             expAccumulated -= expOrb;
-            player.getEntityWorld().spawnEntity(new ExperienceOrbEntity(player.getEntityWorld(), player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, expOrb));
+            world.addFreshEntity(new ExperienceOrb(world, player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, expOrb));
         }
 
-        this.markDirty();
+        this.setChanged();
     }
 
     // Local cache in the BE so we only update the BS when the state changes.
@@ -376,10 +373,10 @@ public class GravelMillEntity extends BlockEntity implements NamedScreenHandlerF
     private boolean setMillState(BlockState state, int newState) {
         assert (newState >= 0 && newState <= 21);
 
-        if (newState == this.millState || this.world == null) {
+        if (newState == this.millState || this.level == null) {
             return false;
         } else {
-            this.world.setBlockState(pos, state.with(MILL_STATE, newState));
+            this.level.setBlockAndUpdate(worldPosition, state.setValue(MILL_STATE, newState));
             this.millState = newState;
             return true;
         }

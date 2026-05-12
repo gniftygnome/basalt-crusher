@@ -2,38 +2,40 @@ package net.gnomecraft.basaltcrusher.grizzly;
 
 import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.gnomecraft.basaltcrusher.utils.TerrestriaIntegration;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.ArrayPropertyDelegate;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.ClickType;
+import org.jspecify.annotations.NullMarked;
 
-public class GrizzlyScreenHandler extends ScreenHandler {
-    private final Inventory inventory;
-    PropertyDelegate propertyDelegate;
+@NullMarked
+public class GrizzlyScreenHandler extends AbstractContainerMenu {
+    private final Container inventory;
+    ContainerData propertyDelegate;
 
-    public GrizzlyScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, new SimpleInventory(3), new ArrayPropertyDelegate(6));
+    public GrizzlyScreenHandler(int syncId, Inventory playerInventory) {
+        this(syncId, playerInventory, new SimpleContainer(3), new SimpleContainerData(6));
     }
 
-    public GrizzlyScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
+    public GrizzlyScreenHandler(int syncId, Inventory playerInventory, Container inventory, ContainerData propertyDelegate) {
         super(BasaltCrusher.GRIZZLY_SCREEN_HANDLER, syncId);
 
-        checkSize(inventory, 3);
+        checkContainerSize(inventory, 3);
         this.inventory = inventory;
 
-        checkDataCount(propertyDelegate, 6);
+        checkContainerDataCount(propertyDelegate, 6);
         this.propertyDelegate = propertyDelegate;
 
-        this.inventory.onOpen(playerInventory.player);
-        this.addProperties(propertyDelegate);
+        this.inventory.startOpen(playerInventory.player);
+        this.addDataSlots(propertyDelegate);
 
         // Grizzly inventory slots
         this.addSlot(new Slot(inventory, 0, 80,  10));  // input
@@ -54,21 +56,21 @@ public class GrizzlyScreenHandler extends ScreenHandler {
     }
 
     @Override
-    public boolean canUse(PlayerEntity player) {
-        return this.inventory.canPlayerUse(player);
+    public boolean stillValid(Player player) {
+        return this.inventory.stillValid(player);
     }
 
     @Override
-    public void onSlotClick(int slotNumber, int button, SlotActionType action, PlayerEntity player) {
-        ItemStack newStack = this.getCursorStack();
+    public void clicked(int slotNumber, int button, ClickType action, Player player) {
+        ItemStack newStack = this.getCarried();
 
         // Filter swaps on the Grizzly inventory for acceptable items in.
-        if ((action == SlotActionType.PICKUP || action == SlotActionType.PICKUP_ALL || action == SlotActionType.QUICK_CRAFT) && !newStack.isEmpty() && slotNumber >= 0 && slotNumber < this.slots.size()) {
+        if ((action == ClickType.PICKUP || action == ClickType.PICKUP_ALL || action == ClickType.QUICK_CRAFT) && !newStack.isEmpty() && slotNumber >= 0 && slotNumber < this.slots.size()) {
             switch (slotNumber) {
                 case 0:
                     // input slot
-                    if (newStack.isOf(Items.COARSE_DIRT)) {
-                        super.onSlotClick(slotNumber, button, action, player);
+                    if (newStack.is(Items.COARSE_DIRT)) {
+                        super.clicked(slotNumber, button, action, player);
                     }
                     break;
                 case 1:
@@ -80,34 +82,34 @@ public class GrizzlyScreenHandler extends ScreenHandler {
                     // (nothing is acceptable)
                     break;
                 default:
-                    super.onSlotClick(slotNumber, button, action, player);
+                    super.clicked(slotNumber, button, action, player);
                     break;
             }
         } else {
-            super.onSlotClick(slotNumber, button, action, player);
+            super.clicked(slotNumber, button, action, player);
         }
     }
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int invSlot) {
+    public ItemStack quickMoveStack(Player player, int invSlot) {
         ItemStack newStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(invSlot);
 
         // Reimplement to filter transfers to the Grizzly inventory for acceptable items in.
-        if (slot.hasStack()) {
-            ItemStack originalStack = slot.getStack();
+        if (slot.hasItem()) {
+            ItemStack originalStack = slot.getItem();
             newStack = originalStack.copy();
 
-            if (invSlot < this.inventory.size()) {
+            if (invSlot < this.inventory.getContainerSize()) {
                 // From the Grizzly inventory to the Player.
-                if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
+                if (!this.moveItemStackTo(originalStack, this.inventory.getContainerSize(), this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
             } else {
                 // From the Player inventory to the Grizzly.
-                if (originalStack.isOf(Items.COARSE_DIRT)) {
+                if (originalStack.is(Items.COARSE_DIRT)) {
                     // Try to place up to a stack of any acceptable item into the input slot.
-                    if (!this.insertItem(originalStack, 0, 1, false)) {
+                    if (!this.moveItemStackTo(originalStack, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }
                 } else {
@@ -117,9 +119,9 @@ public class GrizzlyScreenHandler extends ScreenHandler {
             }
 
             if (originalStack.isEmpty()) {
-                slot.setStackNoCallbacks(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY);
             } else {
-                slot.markDirty();
+                slot.setChanged();
             }
         }
 

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top": "basalt_crusher:block/gravel_mill/gravel_mill_side",
+    "north": "basalt_crusher:block/gravel_mill/gravel_mill_front_active_15",
+    "east": "basalt_crusher:block/gravel_mill/gravel_mill_side",
+    "south": "basalt_crusher:block/gravel_mill/gravel_mill_back_active_15",
+    "west": "basalt_crusher:block/gravel_mill/gravel_mill_side",
+    "bottom": "basalt_crusher:block/gravel_mill/gravel_mill_side",
+    "particle": "basalt_crusher:block/gravel_mill/gravel_mill_side"
+  }
+}

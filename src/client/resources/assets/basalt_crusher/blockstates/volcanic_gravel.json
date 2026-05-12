@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "basalt_crusher:block/volcanic_gravel"
+      },
+      {
+        "model": "basalt_crusher:block/volcanic_gravel",
+        "y": 90
+      },
+      {
+        "model": "basalt_crusher:block/volcanic_gravel",
+        "y": 180
+      },
+      {
+        "model": "basalt_crusher:block/volcanic_gravel",
+        "y": 270
+      }
+    ]
+  }
+}

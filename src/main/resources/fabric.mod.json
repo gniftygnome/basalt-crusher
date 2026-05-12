@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "basalt-crusher",
+  "id": "basalt_crusher",
   "version": "${version}",
   "name": "Basalt Crusher",
   "description": "Making basalt useful since 2022!",
@@ -12,7 +12,7 @@
     "repo": "https://github.com/gniftygnome/basalt-crusher"
   },
   "license": "MIT",
-  "icon": "assets/basalt-crusher/icon.png",
+  "icon": "assets/basalt_crusher/icon.png",
   "environment": "*",
   "entrypoints": {
     "client": [
@@ -23,7 +23,11 @@
     ]
   },
   "mixins": [
-    "basalt-crusher.mixins.json"
+    "basalt_crusher.mixins.json",
+    {
+      "config": "basalt_crusher.client.mixins.json",
+      "environment": "client"
+    }
   ],
   "custom": {
     "loom:injected_interfaces": {

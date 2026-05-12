@@ -1,8 +1,8 @@
 {
   "replace": false,
   "values": [
-    "basalt-crusher:basalt_crusher",
-    "basalt-crusher:grizzly",
-    "basalt-crusher:gravel_mill"
+    "basalt_crusher:basalt_crusher",
+    "basalt_crusher:grizzly",
+    "basalt_crusher:gravel_mill"
   ]
 }

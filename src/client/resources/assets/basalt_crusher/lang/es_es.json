@@ -1,0 +1,11 @@
+{
+  "block.basalt_crusher.basalt_crusher":      "Trituradora de basalto",
+  "block.basalt_crusher.gravel_mill":         "Molino de grava",
+  "block.basalt_crusher.grizzly":             "Canoso",
+
+  "item.basalt_crusher.iron_jaw_liner":       "Mandíbula de hierro",
+  "item.basalt_crusher.diamond_jaw_liner":    "Mandíbula de diamante",
+  "item.basalt_crusher.netherite_jaw_liner":  "Mandíbula de netherita",
+
+  "item.basalt_crusher.mill_rod_charge":      "Carga de molino de barras"
+}

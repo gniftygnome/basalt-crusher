@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "nnn",
+    "III",
+    " i "
+  ],
+  "key": {
+    "n": "minecraft:netherite_ingot",
+    "I": "minecraft:iron_block",
+    "i": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "basalt_crusher:netherite_jaw_liner"
+  }
+}

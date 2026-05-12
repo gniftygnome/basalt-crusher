@@ -1,0 +1,14 @@
+{
+  "basalt_crusher_sound": {
+    "subtitle": "subtitles.basalt_crusher.basalt_crusher_sound",
+    "sounds": [
+      "basalt_crusher:basalt_crusher_sound"
+    ]
+  },
+  "gravel_mill_sound": {
+    "subtitle": "subtitles.basalt_crusher.gravel_mill_sound",
+    "sounds": [
+      "basalt_crusher:gravel_mill_sound"
+    ]
+  }
+}

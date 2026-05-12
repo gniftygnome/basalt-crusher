@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iri",
+    "ipi",
+    "ipi"
+  ],
+  "key": {
+    "i": "minecraft:iron_ingot",
+    "p": "minecraft:piston",
+    "r": "minecraft:redstone"
+  },
+  "result": {
+    "id": "basalt_crusher:basalt_crusher"
+  }
+}

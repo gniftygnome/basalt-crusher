@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iii",
+    "III",
+    " i "
+  ],
+  "key": {
+    "i": "minecraft:iron_ingot",
+    "I": "minecraft:iron_block"
+  },
+  "result": {
+    "id": "basalt_crusher:iron_jaw_liner"
+  }
+}

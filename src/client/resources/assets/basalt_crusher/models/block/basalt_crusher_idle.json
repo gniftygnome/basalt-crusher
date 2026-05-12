@@ -1,0 +1,10 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top": "basalt_crusher:block/basalt_crusher/basalt_crusher_side",
+    "front": "basalt_crusher:block/basalt_crusher/basalt_crusher_front_jaws_idle",
+    "side": "basalt_crusher:block/basalt_crusher/basalt_crusher_side",
+    "bottom": "basalt_crusher:block/basalt_crusher/basalt_crusher_bottom",
+    "particle": "basalt_crusher:block/basalt_crusher/basalt_crusher_side"
+  }
+}

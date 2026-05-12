@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "basalt_crusher:iron_jaw_liner",
+    "basalt_crusher:diamond_jaw_liner",
+    "basalt_crusher:netherite_jaw_liner"
+  ]
+}

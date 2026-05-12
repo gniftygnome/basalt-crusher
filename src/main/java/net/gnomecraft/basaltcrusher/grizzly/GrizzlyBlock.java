@@ -2,162 +2,172 @@ package net.gnomecraft.basaltcrusher.grizzly;
 
 import com.mojang.serialization.MapCodec;
 import net.gnomecraft.basaltcrusher.BasaltCrusher;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
-public class GrizzlyBlock extends BlockWithEntity {
-    static final EnumProperty<Direction> FACING = HorizontalFacingBlock.FACING;
+@NullMarked
+public class GrizzlyBlock extends BaseEntityBlock {
+    static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
 
-    private static final VoxelShape GRIZZLY_SHAPE_NORTH = VoxelShapes.union(
+    private static final VoxelShape GRIZZLY_SHAPE_NORTH = Shapes.or(
             // base, front, left, right, back
-            Block.createCuboidShape(0, 0, 0, 16, 4, 16),
-            Block.createCuboidShape(0, 4, 0, 16, 8, 1),
-            Block.createCuboidShape(0, 4, 1, 1, 16, 15),
-            Block.createCuboidShape(15, 4, 1, 16, 16, 15),
-            Block.createCuboidShape(0, 4, 15, 16, 16, 16),
+            Block.box(0, 0, 0, 16, 4, 16),
+            Block.box(0, 4, 0, 16, 8, 1),
+            Block.box(0, 4, 1, 1, 16, 15),
+            Block.box(15, 4, 1, 16, 16, 15),
+            Block.box(0, 4, 15, 16, 16, 16),
             // Sloped component (slats) ... can't believe this is The Way but look at the Lectern...
-            Block.createCuboidShape(1, 4,  4, 15, 6, 6),
-            Block.createCuboidShape(1, 4,  6, 15, 8, 8),
-            Block.createCuboidShape(1, 4,  8, 15, 10, 10),
-            Block.createCuboidShape(1, 4, 10, 15, 12, 12),
-            Block.createCuboidShape(1, 4, 12, 15, 14, 14),
-            Block.createCuboidShape(1, 4, 14, 15, 16, 16)
-    ).simplify();
+            Block.box(1, 4,  4, 15, 6, 6),
+            Block.box(1, 4,  6, 15, 8, 8),
+            Block.box(1, 4,  8, 15, 10, 10),
+            Block.box(1, 4, 10, 15, 12, 12),
+            Block.box(1, 4, 12, 15, 14, 14),
+            Block.box(1, 4, 14, 15, 16, 16)
+    ).optimize();
     private static final VoxelShape GRIZZLY_SHAPE_EAST  = rotateShape(Direction.NORTH, Direction.EAST,  GRIZZLY_SHAPE_NORTH);
     private static final VoxelShape GRIZZLY_SHAPE_SOUTH = rotateShape(Direction.NORTH, Direction.SOUTH, GRIZZLY_SHAPE_NORTH);
     private static final VoxelShape GRIZZLY_SHAPE_WEST  = rotateShape(Direction.NORTH, Direction.WEST,  GRIZZLY_SHAPE_NORTH);
 
-    public GrizzlyBlock(AbstractBlock.Settings settings) {
+    public GrizzlyBlock(BlockBehaviour.Properties settings) {
         super(settings);
 
-        setDefaultState(getStateManager().getDefaultState().with(FACING, Direction.NORTH));
+        registerDefaultState(getStateDefinition().any().setValue(FACING, Direction.NORTH));
     }
 
     @Override
-    protected MapCodec<? extends BlockWithEntity> getCodec() {
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        //noinspection ConstantConditions
         return null;
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new GrizzlyEntity(pos, state);
     }
 
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return validateTicker(type, BasaltCrusher.GRIZZLY_ENTITY, GrizzlyEntity::tick);
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+        return createTickerHelper(type, BasaltCrusher.GRIZZLY_ENTITY, GrizzlyEntity::tick);
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!world.isClient()) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!world.isClientSide()) {
             this.openContainer(world, pos, player);
         }
 
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    private void openContainer(World world, BlockPos blockPos, PlayerEntity playerEntity) {
+    private void openContainer(Level world, BlockPos blockPos, Player playerEntity) {
         BlockEntity blockEntity = world.getBlockEntity(blockPos);
 
         if (blockEntity instanceof GrizzlyEntity) {
-            playerEntity.openHandledScreen((NamedScreenHandlerFactory) blockEntity);
+            playerEntity.openMenu((MenuProvider) blockEntity);
             // TODO: playerEntity.increaseStat(Stats.INTERACT_WITH_GRIZZLY, 1);
         }
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
-        return this.getDefaultState().with(FACING, context.getHorizontalPlayerFacing().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Override
-    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
+    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean moved) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
 
-        if (blockEntity instanceof GrizzlyEntity) {
-            ((GrizzlyEntity) blockEntity).scatterInventory(world, pos);
-            world.updateComparators(pos, this);
+        if (blockEntity instanceof GrizzlyEntity grizzlyEntity) {
+            grizzlyEntity.scatterInventory(world, pos);
+            world.updateNeighbourForOutputSignal(pos, this);
         }
 
-        super.onStateReplaced(state, world, pos, moved);
+        super.affectNeighborsAfterRemoval(state, world, pos, moved);
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState state) {
+    public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
+    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
         BlockEntity entity = world.getBlockEntity(pos);
 
-        if (entity instanceof GrizzlyEntity) {
-            return ((GrizzlyEntity) entity).calculateComparatorOutput();
+        if (entity instanceof GrizzlyEntity grizzlyEntity) {
+            return grizzlyEntity.calculateComparatorOutput();
         }
 
         return 0;
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
-        return state.with(FACING, rotation.rotate(state.get(FACING)));
+    public BlockState rotate(BlockState state, Rotation rotation) {
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState state, BlockMirror mirror) {
-        return state.rotate(mirror.getRotation(state.get(FACING)));
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return switch (state.get(FACING)) {
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+        return switch (state.getValue(FACING)) {
             case NORTH -> GRIZZLY_SHAPE_NORTH;
             case EAST  -> GRIZZLY_SHAPE_EAST;
             case SOUTH -> GRIZZLY_SHAPE_SOUTH;
             case WEST  -> GRIZZLY_SHAPE_WEST;
-            default    -> VoxelShapes.fullCube();
+            default    -> Shapes.block();
         };
     }
 
     public static VoxelShape rotateShape(Direction from, Direction to, VoxelShape shape) {
-        VoxelShape[] buffer = new VoxelShape[]{shape, VoxelShapes.empty()};
+        VoxelShape[] buffer = new VoxelShape[]{shape, Shapes.empty()};
 
-        int times = (to.getHorizontalQuarterTurns() - from.getHorizontalQuarterTurns() + 4) % 4;
+        int times = (to.get2DDataValue() - from.get2DDataValue() + 4) % 4;
         for (int i = 0; i < times; i++) {
-            buffer[0].forEachBox((minX, minY, minZ, maxX, maxY, maxZ) -> buffer[1] = VoxelShapes.union(buffer[1], VoxelShapes.cuboid(1 - maxZ, minY, minX, 1 - minZ, maxY, maxX)));
+            buffer[0].forAllBoxes((minX, minY, minZ, maxX, maxY, maxZ) -> buffer[1] = Shapes.or(buffer[1], Shapes.box(1 - maxZ, minY, minX, 1 - minZ, maxY, maxX)));
             buffer[0] = buffer[1];
-            buffer[1] = VoxelShapes.empty();
+            buffer[1] = Shapes.empty();
         }
 
-        return buffer[0].simplify();
+        return buffer[0].optimize();
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
 }

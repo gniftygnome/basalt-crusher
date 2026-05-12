@@ -2,7 +2,7 @@
   "replace": false,
   "values": [
     {
-      "id": "basalt-crusher:volcanic_gravel",
+      "id": "basalt_crusher:volcanic_gravel",
       "required": false
     }
   ]

@@ -1,37 +1,39 @@
 package net.gnomecraft.basaltcrusher.mill;
 
 import net.gnomecraft.basaltcrusher.BasaltCrusher;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.ArrayPropertyDelegate;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.ClickType;
+import org.jspecify.annotations.NullMarked;
 
-public class GravelMillScreenHandler extends ScreenHandler {
-    private final Inventory inventory;
-    PropertyDelegate propertyDelegate;
+@NullMarked
+public class GravelMillScreenHandler extends AbstractContainerMenu {
+    private final Container inventory;
+    ContainerData propertyDelegate;
 
-    public GravelMillScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, new SimpleInventory(3), new ArrayPropertyDelegate(2));
+    public GravelMillScreenHandler(int syncId, Inventory playerInventory) {
+        this(syncId, playerInventory, new SimpleContainer(3), new SimpleContainerData(2));
     }
 
-    public GravelMillScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
+    public GravelMillScreenHandler(int syncId, Inventory playerInventory, Container inventory, ContainerData propertyDelegate) {
         super(BasaltCrusher.GRAVEL_MILL_SCREEN_HANDLER, syncId);
 
-        checkSize(inventory, 3);
+        checkContainerSize(inventory, 3);
         this.inventory = inventory;
 
-        checkDataCount(propertyDelegate, 2);
+        checkContainerDataCount(propertyDelegate, 2);
         this.propertyDelegate = propertyDelegate;
 
-        this.inventory.onOpen(playerInventory.player);
-        this.addProperties(propertyDelegate);
+        this.inventory.startOpen(playerInventory.player);
+        this.addDataSlots(propertyDelegate);
 
         // GravelMill inventory slots
         this.addSlot(new Slot(inventory, 0, 17,  35));  // input
@@ -52,27 +54,27 @@ public class GravelMillScreenHandler extends ScreenHandler {
     }
 
     @Override
-    public boolean canUse(PlayerEntity player) {
-        return this.inventory.canPlayerUse(player);
+    public boolean stillValid(Player player) {
+        return this.inventory.stillValid(player);
     }
 
     @Override
-    public void onSlotClick(int slotNumber, int button, SlotActionType action, PlayerEntity player) {
-        ItemStack newStack = this.getCursorStack();
+    public void clicked(int slotNumber, int button, ClickType action, Player player) {
+        ItemStack newStack = this.getCarried();
 
         // Filter swaps on the Mill inventory for acceptable items in.
-        if ((action == SlotActionType.PICKUP || action == SlotActionType.PICKUP_ALL || action == SlotActionType.QUICK_CRAFT) && !newStack.isEmpty() && slotNumber >= 0 && slotNumber < this.slots.size()) {
+        if ((action == ClickType.PICKUP || action == ClickType.PICKUP_ALL || action == ClickType.QUICK_CRAFT) && !newStack.isEmpty() && slotNumber >= 0 && slotNumber < this.slots.size()) {
             switch (slotNumber) {
                 case 0:
                     // input slot
-                    if (newStack.isOf(Items.GRAVEL) || newStack.isOf(Items.SAND)) {
-                        super.onSlotClick(slotNumber, button, action, player);
+                    if (newStack.is(Items.GRAVEL) || newStack.is(Items.SAND)) {
+                        super.clicked(slotNumber, button, action, player);
                     }
                     break;
                 case 1:
                     // rod charge slot
-                    if (newStack.isOf(BasaltCrusher.MILL_ROD_CHARGE_ITEM)) {
-                        super.onSlotClick(slotNumber, button, action, player);
+                    if (newStack.is(BasaltCrusher.MILL_ROD_CHARGE_ITEM)) {
+                        super.clicked(slotNumber, button, action, player);
                     }
                     break;
                 case 2:
@@ -80,46 +82,46 @@ public class GravelMillScreenHandler extends ScreenHandler {
                     // (nothing is acceptable)
                     break;
                 default:
-                    super.onSlotClick(slotNumber, button, action, player);
+                    super.clicked(slotNumber, button, action, player);
                     break;
             }
         } else {
-            super.onSlotClick(slotNumber, button, action, player);
+            super.clicked(slotNumber, button, action, player);
         }
     }
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int invSlot) {
+    public ItemStack quickMoveStack(Player player, int invSlot) {
         ItemStack newStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(invSlot);
 
         // Reimplement to filter transfers to the Mill inventory for acceptable items & counts in.
-        if (slot.hasStack()) {
-            ItemStack originalStack = slot.getStack();
+        if (slot.hasItem()) {
+            ItemStack originalStack = slot.getItem();
             newStack = originalStack.copy();
 
-            if (invSlot < this.inventory.size()) {
+            if (invSlot < this.inventory.getContainerSize()) {
                 // From the Mill inventory to the Player.
-                if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
+                if (!this.moveItemStackTo(originalStack, this.inventory.getContainerSize(), this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
             } else {
                 // From the Player inventory to the Mill.
-                if (originalStack.isOf(BasaltCrusher.MILL_ROD_CHARGE_ITEM)) {
+                if (originalStack.is(BasaltCrusher.MILL_ROD_CHARGE_ITEM)) {
                     // Try to place a rod charge into the rod charge slot.
-                    ItemStack targetStack = this.inventory.getStack(1).copy();
+                    ItemStack targetStack = this.inventory.getItem(1).copy();
                     if (targetStack.isEmpty()) {
-                        this.inventory.setStack(1, originalStack.split(1));
-                        this.slots.get(1).markDirty();
+                        this.inventory.setItem(1, originalStack.split(1));
+                        this.slots.get(1).setChanged();
                     }
 
                     // If the process above did not move any items.
-                    if (ItemStack.areEqual(originalStack, newStack)) {
+                    if (ItemStack.matches(originalStack, newStack)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (originalStack.isOf(Items.GRAVEL) || originalStack.isOf(Items.SAND)) {
+                } else if (originalStack.is(Items.GRAVEL) || originalStack.is(Items.SAND)) {
                     // Then try to place acceptable inputs into the input slot.
-                    if (!this.insertItem(originalStack, 0, 1, false)) {
+                    if (!this.moveItemStackTo(originalStack, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }
                 } else {
@@ -129,9 +131,9 @@ public class GravelMillScreenHandler extends ScreenHandler {
             }
 
             if (originalStack.isEmpty()) {
-                slot.setStackNoCallbacks(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY);
             } else {
-                slot.markDirty();
+                slot.setChanged();
             }
         }
 
