@@ -5,12 +5,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.inventory.SimpleContainerData;
-import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.inventory.ClickType;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
@@ -65,22 +61,22 @@ public class BasaltCrusherScreenHandler extends AbstractContainerMenu {
     }
 
     @Override
-    public void clicked(int slotNumber, int button, ClickType action, Player player) {
+    public void clicked(int slotNumber, int button, ContainerInput input, Player player) {
         ItemStack newStack = this.getCarried();
 
         // Filter swaps on the Crusher inventory for acceptable items in.
-        if ((action == ClickType.PICKUP || action == ClickType.PICKUP_ALL || action == ClickType.QUICK_CRAFT) && !newStack.isEmpty() && slotNumber >= 0 && slotNumber < this.slots.size()) {
+        if ((input == ContainerInput.PICKUP || input == ContainerInput.PICKUP_ALL || input == ContainerInput.QUICK_CRAFT) && !newStack.isEmpty() && slotNumber >= 0 && slotNumber < this.slots.size()) {
             switch (slotNumber) {
                 case 0:
                     // input slot
                     if (newStack.is(BasaltCrusher.BASALTS)) {
-                        super.clicked(slotNumber, button, action, player);
+                        super.clicked(slotNumber, button, input, player);
                     }
                     break;
                 case 1:
                     // jaw liner slot
                     if (newStack.is(BasaltCrusher.JAW_LINERS)) {
-                        super.clicked(slotNumber, button, action, player);
+                        super.clicked(slotNumber, button, input, player);
                     }
                     break;
                 case 2:
@@ -90,21 +86,21 @@ public class BasaltCrusherScreenHandler extends AbstractContainerMenu {
                 case 3:
                     // top crushing slot
                     if (newStack.is(BasaltCrusher.JAW_LINERS) && newStack.getCount() == 1 && !ItemStack.isSameItemSameComponents(newStack, this.inventory.getItem(3))) {
-                        super.clicked(slotNumber, button, action, player);
+                        super.clicked(slotNumber, button, input, player);
                     }
                     break;
                 case 4:
                     // bottom crushing slot
                     if (newStack.is(BasaltCrusher.JAW_LINERS) && newStack.getCount() == 1 && !ItemStack.isSameItemSameComponents(newStack, this.inventory.getItem(4))) {
-                        super.clicked(slotNumber, button, action, player);
+                        super.clicked(slotNumber, button, input, player);
                     }
                     break;
                 default:
-                    super.clicked(slotNumber, button, action, player);
+                    super.clicked(slotNumber, button, input, player);
                     break;
             }
         } else {
-            super.clicked(slotNumber, button, action, player);
+            super.clicked(slotNumber, button, input, player);
         }
     }
 

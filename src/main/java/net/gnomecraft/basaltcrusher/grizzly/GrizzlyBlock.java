@@ -72,21 +72,21 @@ public class GrizzlyBlock extends BaseEntityBlock {
     }
 
     @Override
-    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return createTickerHelper(type, BasaltCrusher.GRIZZLY_ENTITY, GrizzlyEntity::tick);
     }
 
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!world.isClientSide()) {
-            this.openContainer(world, pos, player);
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!level.isClientSide()) {
+            this.openContainer(level, pos, player);
         }
 
         return InteractionResult.SUCCESS;
     }
 
-    private void openContainer(Level world, BlockPos blockPos, Player playerEntity) {
-        BlockEntity blockEntity = world.getBlockEntity(blockPos);
+    private void openContainer(Level level, BlockPos blockPos, Player playerEntity) {
+        BlockEntity blockEntity = level.getBlockEntity(blockPos);
 
         if (blockEntity instanceof GrizzlyEntity) {
             playerEntity.openMenu((MenuProvider) blockEntity);
@@ -100,15 +100,15 @@ public class GrizzlyBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean moved) {
-        BlockEntity blockEntity = world.getBlockEntity(pos);
+    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean moved) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
 
         if (blockEntity instanceof GrizzlyEntity grizzlyEntity) {
-            grizzlyEntity.scatterInventory(world, pos);
-            world.updateNeighbourForOutputSignal(pos, this);
+            grizzlyEntity.scatterInventory(level, pos);
+            level.updateNeighbourForOutputSignal(pos, this);
         }
 
-        super.affectNeighborsAfterRemoval(state, world, pos, moved);
+        super.affectNeighborsAfterRemoval(state, level, pos, moved);
     }
 
     @Override
@@ -117,8 +117,8 @@ public class GrizzlyBlock extends BaseEntityBlock {
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
-        BlockEntity entity = world.getBlockEntity(pos);
+    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
+        BlockEntity entity = level.getBlockEntity(pos);
 
         if (entity instanceof GrizzlyEntity grizzlyEntity) {
             return grizzlyEntity.calculateComparatorOutput();
@@ -143,7 +143,7 @@ public class GrizzlyBlock extends BaseEntityBlock {
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return switch (state.getValue(FACING)) {
             case NORTH -> GRIZZLY_SHAPE_NORTH;
             case EAST  -> GRIZZLY_SHAPE_EAST;

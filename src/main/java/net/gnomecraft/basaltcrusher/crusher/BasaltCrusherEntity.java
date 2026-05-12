@@ -1,6 +1,6 @@
 package net.gnomecraft.basaltcrusher.crusher;
 
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.base.SingleStackStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -8,6 +8,7 @@ import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.gnomecraft.basaltcrusher.utils.BasaltCrusherInventory;
 import net.gnomecraft.basaltcrusher.utils.IOTypeMatchers;
 import net.gnomecraft.basaltcrusher.utils.TerrestriaIntegration;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -177,7 +178,7 @@ public class BasaltCrusherEntity extends BlockEntity implements MenuProvider {
         if (storageCache.get(direction) == null) {
             if (direction == Direction.DOWN || direction == Direction.UP) {
                 // slots 0 and 2 via InventoryStorage
-                storageCache.put(direction, InventoryStorage.of(inventory, direction));
+                storageCache.put(direction, ContainerStorage.of(inventory, direction));
             } else {
                 // slot 1 via SingleStackStorage
                 storageCache.put(direction, jawStorage);
@@ -247,14 +248,14 @@ public class BasaltCrusherEntity extends BlockEntity implements MenuProvider {
     }
 
     @SuppressWarnings("unused")
-    public static void tick(Level world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
-        if (!world.isClientSide()) {
-            entity.tickJawLiners(world, pos, state, entity);
-            entity.tickCrusher(world, pos, state, entity);
+    public static void tick(Level level, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
+        if (!level.isClientSide()) {
+            entity.tickJawLiners(level, pos, state, entity);
+            entity.tickCrusher(level, pos, state, entity);
         }
     }
 
-    private void tickJawLiners(Level world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
+    private void tickJawLiners(Level level, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
         ItemStack liners = entity.inventory.getItem(1);
         ItemStack upperJaw = entity.inventory.getItem(3);
         ItemStack lowerJaw = entity.inventory.getItem(4);
@@ -284,7 +285,7 @@ public class BasaltCrusherEntity extends BlockEntity implements MenuProvider {
         }
     }
 
-    private void tickCrusher(Level world, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
+    private void tickCrusher(Level level, BlockPos pos, BlockState state, BasaltCrusherEntity entity) {
         ItemStack input = entity.inventory.getItem(0);
         ItemStack output = entity.inventory.getItem(2);
         ItemStack upperJaw = entity.inventory.getItem(3);
@@ -323,13 +324,15 @@ public class BasaltCrusherEntity extends BlockEntity implements MenuProvider {
 
                 // Rate of crushing varies from 2 to 7 depending on use of Efficiency enchants.
                 // Total time can vary from 210 (no Efficiency) to 60 (two Efficiency V) ticks in duration.
-                entity.crushTime += 2 + (getEnchantmentLevel(world, Enchantments.EFFICIENCY, upperJaw) + getEnchantmentLevel(world, Enchantments.EFFICIENCY, lowerJaw)) / 2;
+                entity.crushTime += 2 + (getEnchantmentLevel(level, Enchantments.EFFICIENCY, upperJaw) + getEnchantmentLevel(level, Enchantments.EFFICIENCY, lowerJaw)) / 2;
                 entity.setChanged();
             }
         }
 
         if (entity.crushTime >= entity.crushTimeTotal) {
             // Successful crushing.
+            RandomSource random = level.getRandom();
+
             // TODO: use recipes.
             input.shrink(1);
             if (output.isEmpty()) {
@@ -343,7 +346,7 @@ public class BasaltCrusherEntity extends BlockEntity implements MenuProvider {
             }
             // Try to damage the top jaw liner (if possible).
             if (upperJaw.isDamageableItem()) {
-                if ((0.5d / (1.0d + (double) getEnchantmentLevel(world, Enchantments.UNBREAKING, upperJaw))) > world.random.nextDouble()) {
+                if ((0.5d / (1.0d + (double) getEnchantmentLevel(level, Enchantments.UNBREAKING, upperJaw))) > random.nextDouble()) {
                     upperJaw.setDamageValue(upperJaw.getDamageValue() + 1);
                 }
                 if (upperJaw.getDamageValue() >= upperJaw.getMaxDamage()) {
@@ -352,7 +355,7 @@ public class BasaltCrusherEntity extends BlockEntity implements MenuProvider {
             }
             // Try to damage the bottom jaw liner (if possible).
             if (lowerJaw.isDamageableItem()) {
-                if ((0.5d / (1.0d + (double) getEnchantmentLevel(world, Enchantments.UNBREAKING, lowerJaw))) > world.random.nextDouble()) {
+                if ((0.5d / (1.0d + (double) getEnchantmentLevel(level, Enchantments.UNBREAKING, lowerJaw))) > random.nextDouble()) {
                     lowerJaw.setDamageValue(lowerJaw.getDamageValue() + 1);
                 }
                 if (lowerJaw.getDamageValue() >= lowerJaw.getMaxDamage()) {
@@ -364,13 +367,13 @@ public class BasaltCrusherEntity extends BlockEntity implements MenuProvider {
 
             // Draw down stored XP to mend jaw liners.
             if (entity.expAccumulated >= 1.0f) {
-                if (0.5d > world.random.nextDouble()) {
-                    if (getEnchantmentLevel(world, Enchantments.MENDING, upperJaw) > 0 && upperJaw.isDamaged()) {
+                if (0.5d > random.nextDouble()) {
+                    if (getEnchantmentLevel(level, Enchantments.MENDING, upperJaw) > 0 && upperJaw.isDamaged()) {
                         upperJaw.setDamageValue(upperJaw.getDamageValue() - 1);
                         entity.expAccumulated -= 1.0f;
                     }
                 } else {
-                    if (getEnchantmentLevel(world, Enchantments.MENDING, lowerJaw) > 0 && lowerJaw.isDamaged()) {
+                    if (getEnchantmentLevel(level, Enchantments.MENDING, lowerJaw) > 0 && lowerJaw.isDamaged()) {
                         lowerJaw.setDamageValue(lowerJaw.getDamageValue() - 1);
                         entity.expAccumulated -= 1.0f;
                     }
@@ -383,29 +386,29 @@ public class BasaltCrusherEntity extends BlockEntity implements MenuProvider {
         }
     }
 
-    private int getEnchantmentLevel(Level world, ResourceKey<Enchantment> enchantment, ItemStack stack) {
+    private int getEnchantmentLevel(Level level, ResourceKey<Enchantment> enchantment, ItemStack stack) {
         return EnchantmentHelper.getItemEnchantmentLevel(
                 enchantmentEntries.computeIfAbsent(
                         enchantment,
-                        key -> world.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(key)),
+                        key -> level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(key)),
                 stack);
     }
 
-    public void scatterInventory(Level world, BlockPos pos) {
-        Containers.dropContents(world, pos, this.inventory);
+    public void scatterInventory(Level level, BlockPos pos) {
+        Containers.dropContents(level, pos, this.inventory);
     }
 
     public int calculateComparatorOutput() {
         return AbstractContainerMenu.getRedstoneSignalFromContainer(this.inventory);
     }
 
-    public void dropExperience(Level world, Player player) {
+    public void dropExperience(Level level, Player player) {
         int expOrb;
 
         while (expAccumulated >= 1.0F) {
             expOrb = ExperienceOrb.getExperienceValue((int) expAccumulated);
             expAccumulated -= expOrb;
-            world.addFreshEntity(new ExperienceOrb(world, player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, expOrb));
+            level.addFreshEntity(new ExperienceOrb(level, player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, expOrb));
         }
 
         this.setChanged();

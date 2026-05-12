@@ -52,32 +52,32 @@ public class GravelMillBlock extends BaseEntityBlock {
     }
 
     @Override
-    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return createTickerHelper(type, BasaltCrusher.GRAVEL_MILL_ENTITY, GravelMillEntity::tick);
     }
 
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!world.isClientSide()) {
-            this.openContainer(world, pos, player);
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!level.isClientSide()) {
+            this.openContainer(level, pos, player);
         }
 
         return InteractionResult.SUCCESS;
     }
 
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        BlockEntity blockEntity = world.getBlockEntity(pos);
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
 
         if (blockEntity instanceof GravelMillEntity gravelMillEntity) {
-            gravelMillEntity.dropExperience(world, player);
+            gravelMillEntity.dropExperience(level, player);
         }
 
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
 
-    private void openContainer(Level world, BlockPos blockPos, Player playerEntity) {
-        BlockEntity blockEntity = world.getBlockEntity(blockPos);
+    private void openContainer(Level level, BlockPos blockPos, Player playerEntity) {
+        BlockEntity blockEntity = level.getBlockEntity(blockPos);
 
         if (blockEntity instanceof GravelMillEntity) {
             playerEntity.openMenu((MenuProvider) blockEntity);
@@ -87,7 +87,7 @@ public class GravelMillBlock extends BaseEntityBlock {
 
     @Environment(EnvType.CLIENT)
     @Override
-    public void animateTick(BlockState state, Level world, BlockPos pos, RandomSource random) {
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (state.getValue(MILL_STATE) < 20) {
             double x = (double) pos.getX() + 0.5D;
             double y = (double) pos.getY();
@@ -95,7 +95,7 @@ public class GravelMillBlock extends BaseEntityBlock {
 
             if (random.nextDouble() < 0.015D) {
                 // If the mill is running, play its sound about once every minute.
-                world.playLocalSound(x, y, z, BasaltCrusher.GRAVEL_MILL_SOUND_EVENT, SoundSource.BLOCKS, 1.0F, 1.0F, false);
+                level.playLocalSound(x, y, z, BasaltCrusher.GRAVEL_MILL_SOUND_EVENT, SoundSource.BLOCKS, 1.0F, 1.0F, false);
             }
         }
     }
@@ -106,15 +106,15 @@ public class GravelMillBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean moved) {
-        BlockEntity blockEntity = world.getBlockEntity(pos);
+    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean moved) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
 
         if (blockEntity instanceof GravelMillEntity gravelMillEntity) {
-            gravelMillEntity.scatterInventory(world, pos);
-            world.updateNeighbourForOutputSignal(pos, this);
+            gravelMillEntity.scatterInventory(level, pos);
+            level.updateNeighbourForOutputSignal(pos, this);
         }
 
-        super.affectNeighborsAfterRemoval(state, world, pos, moved);
+        super.affectNeighborsAfterRemoval(state, level, pos, moved);
     }
 
     @Override
@@ -123,8 +123,8 @@ public class GravelMillBlock extends BaseEntityBlock {
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
-        BlockEntity entity = world.getBlockEntity(pos);
+    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
+        BlockEntity entity = level.getBlockEntity(pos);
 
         if (entity instanceof GravelMillEntity gravelMillEntity) {
             return gravelMillEntity.calculateComparatorOutput();

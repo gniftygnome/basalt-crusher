@@ -3,8 +3,8 @@ package net.gnomecraft.basaltcrusher.mixin.client;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.gnomecraft.basaltcrusher.utils.InterfaceStockpile;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix3x2fStack;
 import org.jspecify.annotations.NullMarked;
@@ -14,30 +14,31 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @NullMarked
-@Mixin(GuiGraphics.class)
-public abstract class MixinGuiGraphics implements InterfaceStockpile {
+@Mixin(GuiGraphicsExtractor.class)
+public abstract class MixinGuiGraphicsExtractor implements InterfaceStockpile {
     @Shadow
     @Final
     private Matrix3x2fStack pose;
 
     @Shadow
-    public abstract void renderItem(ItemStack item, int x, int y);
+    public abstract void item(ItemStack item, int x, int y);
 
     @Shadow
-    public abstract void drawString(Font textRenderer, @Nullable String text, int x, int y, int color, boolean shadow);
+    public abstract void text(Font textRenderer, @Nullable String text, int x, int y, int color, boolean shadow);
 
     @Shadow
     public abstract void fill(RenderPipeline pipeline, int x1, int y1, int x2, int y2, int color);
 
     // This is based on the new merged item renderer in 23w16a's "new" DrawContext class.
     // Drawing the ItemStack and drawing the damage are no longer two separate methods, so...
+    @Override
     public void basaltCrusher$drawStockpile(Font textRenderer, ItemStack stack, int x, int y, float quantity) {
         if (stack.isEmpty()) {
             return;
         }
 
         // render item
-        this.renderItem(stack, x, y);
+        this.item(stack, x, y);
 
         // layer metadata on top
         this.pose.pushMatrix();
@@ -50,7 +51,7 @@ public abstract class MixinGuiGraphics implements InterfaceStockpile {
         // render item stack count
         if (quantity > 1.0f) {
             String count = String.valueOf((int) quantity);
-            this.drawString(textRenderer, count, x + 17 - textRenderer.width(count), y + 9, 0xFFFFFFFF, true);
+            this.text(textRenderer, count, x + 17 - textRenderer.width(count), y + 9, 0xFFFFFFFF, true);
         }
 
         this.pose.popMatrix();

@@ -1,7 +1,7 @@
 package net.gnomecraft.basaltcrusher;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.loader.api.FabricLoader;
@@ -124,17 +124,17 @@ public class BasaltCrusher implements ModInitializer {
             BuiltInRegistries.ITEM.addAlias(Identifier.fromNamespaceAndPath(MOD_ID, "black_gravel"), Identifier.fromNamespaceAndPath(MOD_ID, "volcanic_gravel"));
 
             // Register Terrestria extension items for Item Groups
-            ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.NATURAL_BLOCKS)
-                    .register(content -> content.addAfter(Items.GRAVEL, VOLCANIC_GRAVEL_ITEM));
-            ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.INGREDIENTS)
-                    .register(content -> content.addAfter(Items.FLINT, OBSIDIAN_SHARD_ITEM, OBSIDIAN_PILE_ITEM));
+            CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.NATURAL_BLOCKS)
+                    .register(content -> content.insertAfter(Items.GRAVEL, VOLCANIC_GRAVEL_ITEM));
+            CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.INGREDIENTS)
+                    .register(content -> content.insertAfter(Items.FLINT, OBSIDIAN_SHARD_ITEM, OBSIDIAN_PILE_ITEM));
         }
 
         // Register standard items for Item Groups
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS)
-                .register(content -> content.addAfter(Items.BLAST_FURNACE, BASALT_CRUSHER_ITEM, GRAVEL_MILL_ITEM, GRIZZLY_ITEM));
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.INGREDIENTS)
-                .register(content -> content.addBefore(Items.WHITE_DYE, IRON_JAW_LINER_ITEM, DIAMOND_JAW_LINER_ITEM, NETHERITE_JAW_LINER_ITEM, MILL_ROD_CHARGE_ITEM));
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS)
+                .register(content -> content.insertAfter(Items.BLAST_FURNACE, BASALT_CRUSHER_ITEM, GRAVEL_MILL_ITEM, GRIZZLY_ITEM));
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.INGREDIENTS)
+                .register(content -> content.insertBefore(Items.WHITE_DYE, IRON_JAW_LINER_ITEM, DIAMOND_JAW_LINER_ITEM, NETHERITE_JAW_LINER_ITEM, MILL_ROD_CHARGE_ITEM));
 
         // Basalt Crusher Storage
         ItemStorage.SIDED.registerForBlocks((world, pos, state, blockEntity, direction) -> direction != null && blockEntity instanceof BasaltCrusherEntity ? ((BasaltCrusherEntity) blockEntity).getSidedStorage(direction) : null, BASALT_CRUSHER_BLOCK);

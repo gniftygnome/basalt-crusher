@@ -6,14 +6,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.inventory.SimpleContainerData;
-import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.inventory.ClickType;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
@@ -61,16 +57,16 @@ public class GrizzlyScreenHandler extends AbstractContainerMenu {
     }
 
     @Override
-    public void clicked(int slotNumber, int button, ClickType action, Player player) {
+    public void clicked(int slotNumber, int button, ContainerInput input, Player player) {
         ItemStack newStack = this.getCarried();
 
         // Filter swaps on the Grizzly inventory for acceptable items in.
-        if ((action == ClickType.PICKUP || action == ClickType.PICKUP_ALL || action == ClickType.QUICK_CRAFT) && !newStack.isEmpty() && slotNumber >= 0 && slotNumber < this.slots.size()) {
+        if ((input == ContainerInput.PICKUP || input == ContainerInput.PICKUP_ALL || input == ContainerInput.QUICK_CRAFT) && !newStack.isEmpty() && slotNumber >= 0 && slotNumber < this.slots.size()) {
             switch (slotNumber) {
                 case 0:
                     // input slot
                     if (newStack.is(Items.COARSE_DIRT)) {
-                        super.clicked(slotNumber, button, action, player);
+                        super.clicked(slotNumber, button, input, player);
                     }
                     break;
                 case 1:
@@ -82,11 +78,11 @@ public class GrizzlyScreenHandler extends AbstractContainerMenu {
                     // (nothing is acceptable)
                     break;
                 default:
-                    super.clicked(slotNumber, button, action, player);
+                    super.clicked(slotNumber, button, input, player);
                     break;
             }
         } else {
-            super.clicked(slotNumber, button, action, player);
+            super.clicked(slotNumber, button, input, player);
         }
     }
 

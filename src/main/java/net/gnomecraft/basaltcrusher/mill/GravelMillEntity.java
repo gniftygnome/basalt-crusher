@@ -1,6 +1,6 @@
 package net.gnomecraft.basaltcrusher.mill;
 
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -143,7 +143,7 @@ public class GravelMillEntity extends BlockEntity implements MenuProvider {
 
     public Storage<ItemVariant> getSidedStorage(Direction direction) {
         if (this.storageCache.get(direction) == null) {
-            this.storageCache.put(direction, InventoryStorage.of(this.inventory, direction));
+            this.storageCache.put(direction, ContainerStorage.of(this.inventory, direction));
         }
 
         return this.storageCache.get(direction);
@@ -210,14 +210,14 @@ public class GravelMillEntity extends BlockEntity implements MenuProvider {
         transferCooldown = view.getIntOr("TransferCooldown", 0);
     }
 
-    public static void tick(Level world, BlockPos pos, BlockState state, GravelMillEntity entity) {
-        if (!world.isClientSide()) {
-            entity.tickMill(world, pos, state, entity);
-            entity.tickTransfer(world, pos, state, entity);
+    public static void tick(Level level, BlockPos pos, BlockState state, GravelMillEntity entity) {
+        if (!level.isClientSide()) {
+            entity.tickMill(level, pos, state, entity);
+            entity.tickTransfer(level, pos, state, entity);
         }
     }
 
-    private void tickMill(Level world, BlockPos pos, BlockState state, GravelMillEntity entity) {
+    private void tickMill(Level level, BlockPos pos, BlockState state, GravelMillEntity entity) {
         ItemStack input = entity.inventory.getItem(0);
         ItemStack output = entity.inventory.getItem(2);
         ItemStack rodCharge = entity.inventory.getItem(1);
@@ -256,7 +256,7 @@ public class GravelMillEntity extends BlockEntity implements MenuProvider {
             }
             // Try to damage the rod charge (if possible), but less than with gravel.
             if (rodCharge.isDamageableItem()) {
-                if (0.25d > world.random.nextDouble()) {
+                if (0.25d > level.getRandom().nextDouble()) {
                     rodCharge.setDamageValue(rodCharge.getDamageValue() + 1);
                 }
                 if (rodCharge.getDamageValue() >= rodCharge.getMaxDamage()) {
@@ -276,7 +276,7 @@ public class GravelMillEntity extends BlockEntity implements MenuProvider {
             }
             // Try to damage the rod charge (if possible), but less than with gravel.
             if (rodCharge.isDamageableItem()) {
-                if (0.25d > world.random.nextDouble()) {
+                if (0.25d > level.getRandom().nextDouble()) {
                     rodCharge.setDamageValue(rodCharge.getDamageValue() + 1);
                 }
                 if (rodCharge.getDamageValue() >= rodCharge.getMaxDamage()) {
@@ -324,7 +324,7 @@ public class GravelMillEntity extends BlockEntity implements MenuProvider {
         }
     }
 
-    private void tickTransfer(Level world, BlockPos pos, BlockState state, GravelMillEntity entity) {
+    private void tickTransfer(Level level, BlockPos pos, BlockState state, GravelMillEntity entity) {
         ItemStack output = entity.inventory.getItem(2);
 
         // Implement transfer cooldown.
@@ -337,7 +337,7 @@ public class GravelMillEntity extends BlockEntity implements MenuProvider {
             // Try to push an item into adjacent storage.
             Direction vent = state.getValue(GravelMillBlock.FACING).getOpposite();
             Storage<ItemVariant> sourceStorage = entity.getSidedStorage(vent);
-            Storage<ItemVariant> targetStorage = ItemStorage.SIDED.find(world, pos.relative(vent), vent.getOpposite());
+            Storage<ItemVariant> targetStorage = ItemStorage.SIDED.find(level, pos.relative(vent), vent.getOpposite());
 
             if (targetStorage != null) {
                 if (StorageUtil.move(sourceStorage, targetStorage, variant -> true, 1, null) > 0) {
@@ -348,21 +348,21 @@ public class GravelMillEntity extends BlockEntity implements MenuProvider {
         }
     }
 
-    public void scatterInventory(Level world, BlockPos pos) {
-        Containers.dropContents(world, pos, this.inventory);
+    public void scatterInventory(Level level, BlockPos pos) {
+        Containers.dropContents(level, pos, this.inventory);
     }
 
     public int calculateComparatorOutput() {
         return AbstractContainerMenu.getRedstoneSignalFromContainer(this.inventory);
     }
 
-    public void dropExperience(Level world, Player player) {
+    public void dropExperience(Level level, Player player) {
         int expOrb;
 
         while (expAccumulated >= 1.0F) {
             expOrb = ExperienceOrb.getExperienceValue((int) expAccumulated);
             expAccumulated -= expOrb;
-            world.addFreshEntity(new ExperienceOrb(world, player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, expOrb));
+            level.addFreshEntity(new ExperienceOrb(level, player.getX(), player.getY() + 0.5D, player.getZ() + 0.5D, expOrb));
         }
 
         this.setChanged();

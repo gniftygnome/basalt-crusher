@@ -2,7 +2,7 @@ package net.gnomecraft.basaltcrusher.grizzly;
 
 import com.google.common.base.Functions;
 import com.mojang.serialization.Codec;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
@@ -137,7 +137,7 @@ public class GrizzlyEntity extends BlockEntity implements MenuProvider {
 
     public Storage<ItemVariant> getSidedStorage(Direction direction) {
         if (this.storageCache.get(direction) == null) {
-            this.storageCache.put(direction, InventoryStorage.of(this.inventory, direction));
+            this.storageCache.put(direction, ContainerStorage.of(this.inventory, direction));
         }
 
         return this.storageCache.get(direction);
@@ -239,13 +239,13 @@ public class GrizzlyEntity extends BlockEntity implements MenuProvider {
     }
 
     @SuppressWarnings("unused")
-    public static void tick(Level world, BlockPos pos, BlockState state, GrizzlyEntity entity) {
-        if (!world.isClientSide()) {
-            entity.tickGrizzly(world, pos);
+    public static void tick(Level level, BlockPos pos, BlockState state, GrizzlyEntity entity) {
+        if (!level.isClientSide()) {
+            entity.tickGrizzly(level, pos);
         }
     }
 
-    private void tickGrizzly(Level world, BlockPos pos) {
+    private void tickGrizzly(Level level, BlockPos pos) {
         if (this.processingTime > 0) {
             --this.processingTime;
             this.setChanged();
@@ -258,7 +258,7 @@ public class GrizzlyEntity extends BlockEntity implements MenuProvider {
 
         // If we can insert gravel to our input slot we will try to get some from a crusher above.
         if (input.getCount() < input.getMaxStackSize()) {
-            if (world.getBlockEntity(pos.relative(Direction.UP)) instanceof BasaltCrusherEntity companion) {
+            if (level.getBlockEntity(pos.relative(Direction.UP)) instanceof BasaltCrusherEntity companion) {
                 Storage<ItemVariant> source = companion.getSidedStorage(Direction.DOWN);
 
                 try (Transaction transaction = Transaction.openOuter()) {
@@ -403,8 +403,8 @@ public class GrizzlyEntity extends BlockEntity implements MenuProvider {
         }
     }
 
-    public void scatterInventory(Level world, BlockPos pos) {
-        Containers.dropContents(world, pos, this.inventory);
+    public void scatterInventory(Level level, BlockPos pos) {
+        Containers.dropContents(level, pos, this.inventory);
     }
 
     public int calculateComparatorOutput() {

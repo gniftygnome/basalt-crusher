@@ -31,12 +31,12 @@
   ],
   "custom": {
     "loom:injected_interfaces": {
-      "net/minecraft/class_332": ["net/gnomecraft/basaltcrusher/utils/InterfaceStockpile"]
+      "net/minecraft/client/gui/GuiGraphicsExtractor": ["net/gnomecraft/basaltcrusher/utils/InterfaceStockpile"]
     }
   },
   "depends": {
     "fabricloader": ">=0.15.7",
     "fabric-api": "*",
-    "minecraft": ">=1.21.9 <1.22"
+    "minecraft": ">=26.1-"
   }
 }
