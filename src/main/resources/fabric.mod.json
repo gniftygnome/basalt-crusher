@@ -20,6 +20,9 @@
     ],
     "main": [
       "net.gnomecraft.basaltcrusher.BasaltCrusher"
+    ],
+    "fabric-datagen": [
+      "net.gnomecraft.basaltcrusher.data.BasaltCrusherDatagen"
     ]
   },
   "mixins": [
