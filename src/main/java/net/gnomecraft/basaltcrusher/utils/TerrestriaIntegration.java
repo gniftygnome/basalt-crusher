@@ -5,12 +5,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NullMarked;
 
@@ -31,12 +27,10 @@ public final class TerrestriaIntegration {
 
     public static final boolean ENABLED;
 
-    public static final TagKey<Item> TERRESTRIA_BASALTS;
-
     static {
         VOLCANIC_SAND_ITEM = BuiltInRegistries.ITEM.getOptional(Identifier.fromNamespaceAndPath("terrestria", "volcanic_sand")).orElse(Items.SAND);
 
-        if (BasaltCrusher.extendTerrestria && new ItemStack(Items.SAND).is(VOLCANIC_SAND_ITEM)) {
+        if (BasaltCrusher.extendTerrestria && Items.SAND == VOLCANIC_SAND_ITEM) {
             // Safety mechanism in case the registry fails to cough up the Terrestria block.
             BasaltCrusher.LOGGER.warn("Disabling Terrestria integration: 'terrestria:volcanic_sand' is not present in the Item registry.");
             ENABLED = false;
@@ -49,14 +43,12 @@ public final class TerrestriaIntegration {
             VOLCANIC_GRAVEL_ITEM = Objects.requireNonNull(BasaltCrusher.VOLCANIC_GRAVEL_ITEM);
             OBSIDIAN_PILE_ITEM = Objects.requireNonNull(BasaltCrusher.OBSIDIAN_PILE_ITEM);
             OBSIDIAN_SHARD_ITEM = Objects.requireNonNull(BasaltCrusher.OBSIDIAN_SHARD_ITEM);
-            TERRESTRIA_BASALTS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(BasaltCrusher.MOD_ID, "terrestria_basalts"));
         } else {
             // Have some coal in your stocking.  (Hey at least it's not null!)
             VOLCANIC_GRAVEL_BLOCK = Blocks.COAL_BLOCK;
             VOLCANIC_GRAVEL_ITEM = (BlockItem) Items.COAL_BLOCK;
             OBSIDIAN_PILE_ITEM = Items.COAL;
             OBSIDIAN_SHARD_ITEM = Items.COAL;
-            TERRESTRIA_BASALTS = ItemTags.COALS;
         }
     }
 }

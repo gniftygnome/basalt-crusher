@@ -63,6 +63,7 @@ public class BasaltCrusher implements ModInitializer {
 
     public static final TagKey<Item> BASALTS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "basalts"));
     public static final TagKey<Item> JAW_LINERS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MOD_ID, "jaw_liners"));
+    public static final TagKey<Item> TERRESTRIA_BASALTS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MOD_ID, "terrestria_basalts"));
 
     public static final Identifier BASALT_CRUSHER_SOUND_ID = Identifier.fromNamespaceAndPath(MOD_ID, "basalt_crusher_sound");
     public static final Identifier GRAVEL_MILL_SOUND_ID = Identifier.fromNamespaceAndPath(MOD_ID,"gravel_mill_sound");
@@ -109,10 +110,14 @@ public class BasaltCrusher implements ModInitializer {
     public void onInitialize() {
         LOGGER.info("Basalt Crusher block is hungry...");
 
+        // Extend Terrestria if it's present
         if (FabricLoader.getInstance().isModLoaded("terrestria")) {
             LOGGER.debug("Enabling Terrestria integration...");
             extendTerrestria = true;
+        }
 
+        // Register Terrestria integrations if we're extending Terrestria OR running datagen
+        if (extendTerrestria || System.getProperty("fabric-api.datagen") != null) {
             VOLCANIC_GRAVEL_BLOCK = Registry.register(BuiltInRegistries.BLOCK, VolcanicGravelBlockId, new ColoredFallingBlock(new ColorRGBA(0x202020), BlockBehaviour.Properties.ofFullCopy(Blocks.GRAVEL).setId(ResourceKey.create(Registries.BLOCK, VolcanicGravelBlockId)).mapColor(MapColor.DEEPSLATE)));
             VOLCANIC_GRAVEL_ITEM = Registry.register(BuiltInRegistries.ITEM, VolcanicGravelBlockId, new BlockItem(VOLCANIC_GRAVEL_BLOCK, new net.minecraft.world.item.Item.Properties().setId(ResourceKey.create(Registries.ITEM, VolcanicGravelBlockId)).useBlockDescriptionPrefix()));
 

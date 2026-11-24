@@ -336,7 +336,7 @@ public class BasaltCrusherEntity extends BlockEntity implements MenuProvider {
             // TODO: use recipes.
             input.shrink(1);
             if (output.isEmpty()) {
-                if (TerrestriaIntegration.ENABLED && input.is(TerrestriaIntegration.TERRESTRIA_BASALTS)) {
+                if (TerrestriaIntegration.ENABLED && input.is(BasaltCrusher.TERRESTRIA_BASALTS)) {
                     entity.inventory.setItem(2, new ItemStack(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM, 1));
                 } else {
                     entity.inventory.setItem(2, new ItemStack(Blocks.GRAVEL, 1));

@@ -1,5 +1,6 @@
 package net.gnomecraft.basaltcrusher.utils;
 
+import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.jspecify.annotations.NullMarked;
@@ -8,8 +9,8 @@ import org.jspecify.annotations.NullMarked;
 public class IOTypeMatchers {
     public static boolean matchStoneGravel(ItemStack stone, ItemStack gravel) {
         return (!TerrestriaIntegration.ENABLED || gravel.isEmpty() || gravel.is(stone.getItem()) ||
-                (gravel.is(Items.GRAVEL) && !stone.is(TerrestriaIntegration.TERRESTRIA_BASALTS)) ||
-                (gravel.is(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM) && stone.is(TerrestriaIntegration.TERRESTRIA_BASALTS))
+                (gravel.is(Items.GRAVEL) && !stone.is(BasaltCrusher.TERRESTRIA_BASALTS)) ||
+                (gravel.is(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM) && stone.is(BasaltCrusher.TERRESTRIA_BASALTS))
         );
     }
 
