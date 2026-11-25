@@ -106,7 +106,7 @@ public class GravelMillEntity extends BlockEntity implements MenuProvider {
             switch (slot) {
                 case 0:
                     // input slot
-                    retVal = stack.is(Items.GRAVEL) || stack.is(Items.SAND) || TerrestriaIntegration.ENABLED &&
+                    retVal = stack.is(Items.GRAVEL) || stack.is(Items.SAND) || BasaltCrusher.extendTerrestria &&
                             (stack.is(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM) || stack.is(TerrestriaIntegration.VOLCANIC_SAND_ITEM));
                     break;
                 case 1:
@@ -264,7 +264,7 @@ public class GravelMillEntity extends BlockEntity implements MenuProvider {
                 }
             }
             entity.setChanged();
-        } else if (TerrestriaIntegration.ENABLED && input.is(TerrestriaIntegration.VOLCANIC_SAND_ITEM)) {
+        } else if (BasaltCrusher.extendTerrestria && input.is(TerrestriaIntegration.VOLCANIC_SAND_ITEM)) {
             // Bypass sand input for user convenience.
             // Typically in a real implementation it would be pre-screened to save mill wear.
             // However the mill could be fed a sandy mix (and just have the mill rate adjusted).
@@ -300,7 +300,7 @@ public class GravelMillEntity extends BlockEntity implements MenuProvider {
         if (entity.millTime >= entity.millTimeTotal) {
             // Successful milling.
             if (output.isEmpty()) {
-                if (TerrestriaIntegration.ENABLED && input.is(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM)) {
+                if (BasaltCrusher.extendTerrestria && input.is(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM)) {
                     entity.inventory.setItem(2, new ItemStack(TerrestriaIntegration.VOLCANIC_SAND_ITEM, 1));
                 } else {
                     entity.inventory.setItem(2, new ItemStack(Items.SAND, 1));

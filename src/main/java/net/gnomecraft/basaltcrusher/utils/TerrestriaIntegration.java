@@ -1,54 +1,30 @@
 package net.gnomecraft.basaltcrusher.utils;
 
+import com.terraformersmc.terrestria.init.TerrestriaBlocks;
+import com.terraformersmc.terrestria.init.TerrestriaItems;
 import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
 
 /**
- * Lazy loaded Terrestria integration.  Terrestria blocks are not available (via the registry)
- * at mod initialization time so we need to wait until we actually need these values to set them.
+ * This class provides a local interface to Terrestria-dependent blocks, so:
+ * - Our other code does not directly reference Terrestria classes
+ * - Our code has null-safe access to these blocks
  */
 @NullMarked
+@SuppressWarnings("unused")
 public final class TerrestriaIntegration {
-    public static final Block VOLCANIC_GRAVEL_BLOCK;
-    public static final BlockItem VOLCANIC_GRAVEL_ITEM;
-    public static final Item VOLCANIC_SAND_ITEM;
+    // from Basalt Crusher
+    public static final Item OBSIDIAN_PILE_ITEM = Objects.requireNonNull(BasaltCrusher.OBSIDIAN_PILE_ITEM);
+    public static final Item OBSIDIAN_SHARD_ITEM = Objects.requireNonNull(BasaltCrusher.OBSIDIAN_SHARD_ITEM);
 
-    public static final Item OBSIDIAN_PILE_ITEM;
-    public static final Item OBSIDIAN_SHARD_ITEM;
+    public static final Block VOLCANIC_GRAVEL_BLOCK = Objects.requireNonNull(BasaltCrusher.VOLCANIC_GRAVEL_BLOCK);
+    public static final Item VOLCANIC_GRAVEL_ITEM = Objects.requireNonNull(BasaltCrusher.VOLCANIC_GRAVEL_ITEM);
 
-    public static final boolean ENABLED;
-
-    static {
-        VOLCANIC_SAND_ITEM = BuiltInRegistries.ITEM.getOptional(Identifier.fromNamespaceAndPath("terrestria", "volcanic_sand")).orElse(Items.SAND);
-
-        if (BasaltCrusher.extendTerrestria && Items.SAND == VOLCANIC_SAND_ITEM) {
-            // Safety mechanism in case the registry fails to cough up the Terrestria block.
-            BasaltCrusher.LOGGER.warn("Disabling Terrestria integration: 'terrestria:volcanic_sand' is not present in the Item registry.");
-            ENABLED = false;
-        } else {
-            ENABLED = BasaltCrusher.extendTerrestria;
-        }
-
-        if (ENABLED) {
-            VOLCANIC_GRAVEL_BLOCK = Objects.requireNonNull(BasaltCrusher.VOLCANIC_GRAVEL_BLOCK);
-            VOLCANIC_GRAVEL_ITEM = Objects.requireNonNull(BasaltCrusher.VOLCANIC_GRAVEL_ITEM);
-            OBSIDIAN_PILE_ITEM = Objects.requireNonNull(BasaltCrusher.OBSIDIAN_PILE_ITEM);
-            OBSIDIAN_SHARD_ITEM = Objects.requireNonNull(BasaltCrusher.OBSIDIAN_SHARD_ITEM);
-        } else {
-            // Have some coal in your stocking.  (Hey at least it's not null!)
-            VOLCANIC_GRAVEL_BLOCK = Blocks.COAL_BLOCK;
-            VOLCANIC_GRAVEL_ITEM = (BlockItem) Items.COAL_BLOCK;
-            OBSIDIAN_PILE_ITEM = Items.COAL;
-            OBSIDIAN_SHARD_ITEM = Items.COAL;
-        }
-    }
+    // from Terrestria
+    public static final Block VOLCANIC_SAND_BLOCK = TerrestriaBlocks.VOLCANIC_SAND;
+    public static final Item VOLCANIC_SAND_ITEM = TerrestriaItems.VOLCANIC_SAND;
 }

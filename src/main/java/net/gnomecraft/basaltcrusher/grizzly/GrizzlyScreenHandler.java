@@ -135,9 +135,9 @@ public class GrizzlyScreenHandler extends AbstractContainerMenu {
             return propertyDelegate.get(2) / 100.0f;
         } else if (item == Items.SAND) {
             return propertyDelegate.get(3) / 100.0f;
-        } else if (TerrestriaIntegration.ENABLED && item == TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM) {
+        } else if (BasaltCrusher.extendTerrestria && item == TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM) {
             return propertyDelegate.get(4) / 100.0f;
-        } else if (TerrestriaIntegration.ENABLED && item == TerrestriaIntegration.VOLCANIC_SAND_ITEM) {
+        } else if (BasaltCrusher.extendTerrestria && item == TerrestriaIntegration.VOLCANIC_SAND_ITEM) {
             return propertyDelegate.get(5) / 100.0f;
         } else {
             return 0.0f;

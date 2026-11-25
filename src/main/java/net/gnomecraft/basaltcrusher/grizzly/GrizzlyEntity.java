@@ -60,7 +60,7 @@ public class GrizzlyEntity extends BlockEntity implements MenuProvider {
 
         lastInput = Items.COARSE_DIRT.getDefaultInstance();
 
-        if (TerrestriaIntegration.ENABLED) {
+        if (BasaltCrusher.extendTerrestria) {
             this.stockpile = new HashMap<>(Map.of(Items.DIRT, 0.0d,
                     Items.GRAVEL, 0.0d, TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM, 0.0d,
                     Items.SAND, 0.0d, TerrestriaIntegration.VOLCANIC_SAND_ITEM, 0.0d));
@@ -147,7 +147,7 @@ public class GrizzlyEntity extends BlockEntity implements MenuProvider {
     private final ContainerData propertyDelegate = new ContainerData() {
         @Override
         public int get(int index) {
-            if (TerrestriaIntegration.ENABLED) {
+            if (BasaltCrusher.extendTerrestria) {
                 return switch (index) {
                     case 0 -> GrizzlyEntity.this.lastInput.is(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM) ? 1 : 0;
                     case 1 -> (int) (100 * GrizzlyEntity.this.stockpile.get(Items.DIRT));
@@ -169,7 +169,7 @@ public class GrizzlyEntity extends BlockEntity implements MenuProvider {
 
         @Override
         public void set(int index, int value) {
-            if (TerrestriaIntegration.ENABLED) {
+            if (BasaltCrusher.extendTerrestria) {
                 switch (index) {
                     case 1 -> GrizzlyEntity.this.stockpile.put(Items.DIRT, (double) (value / 100));
                     case 2 -> GrizzlyEntity.this.stockpile.put(Items.GRAVEL, (double) (value / 100));
@@ -270,7 +270,7 @@ public class GrizzlyEntity extends BlockEntity implements MenuProvider {
                         // Input at Item Hopper speed.
                         this.processingTime = 8;
                         this.setChanged();
-                    } else if (TerrestriaIntegration.ENABLED &&
+                    } else if (BasaltCrusher.extendTerrestria &&
                             (input.isEmpty() || input.is(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM))
                             && source.extract(ItemVariant.of(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM), 1, transaction) > 0) {
                         input = new ItemStack(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM, input.getCount() + 1);
@@ -365,7 +365,7 @@ public class GrizzlyEntity extends BlockEntity implements MenuProvider {
         }
 
         // Second pass for Terrestria integration
-        if (TerrestriaIntegration.ENABLED && (coarse.isEmpty() || (coarse.is(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM) && coarse.getCount() < coarse.getMaxStackSize()))) {
+        if (BasaltCrusher.extendTerrestria && (coarse.isEmpty() || (coarse.is(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM) && coarse.getCount() < coarse.getMaxStackSize()))) {
             if (input.is(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM) && (fine.isEmpty() || (fine.is(TerrestriaIntegration.VOLCANIC_SAND_ITEM) && fine.getCount() < fine.getMaxStackSize()))) {
                 // RECIPE: 4 gravel yields 3 gravel and 1 sand
                 input.shrink(1);

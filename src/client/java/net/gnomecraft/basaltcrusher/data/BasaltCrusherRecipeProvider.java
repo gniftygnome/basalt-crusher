@@ -30,7 +30,7 @@ public class BasaltCrusherRecipeProvider extends FabricRecipeProvider {
 		return new RecipeProvider(registryLookup, exporter) {
 			@Override
 			public void buildRecipes() {
-				// Terrestria integration is always registered when running datagen
+				// Terrestria integration blocks/items are always registered when running datagen
 				assert BasaltCrusher.OBSIDIAN_SHARD_ITEM != null;
 				assert BasaltCrusher.OBSIDIAN_PILE_ITEM != null;
 

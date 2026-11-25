@@ -37,13 +37,20 @@ public class BasaltCrusherRegistryAliases {
         ITEMS.forEach(BuiltInRegistries.ITEM::addAlias);
 
         // Only when Terrestria is present
-        if (TerrestriaIntegration.ENABLED) {
+        if (BasaltCrusher.extendTerrestria) {
             Map<Identifier, Identifier> TERRESTRIA_ITEMS = Map.ofEntries(
                     entry("obsidian_pile"),
                     entry("obsidian_shard"),
                     entry("volcanic_gravel")
             );
             TERRESTRIA_ITEMS.forEach(BuiltInRegistries.ITEM::addAlias);
+
+            // Register aliases for Volcanic Gravel (renamed from Black Gravel)
+            Map<Identifier, Identifier> RENAMED_BLOCKITEMS = Map.ofEntries(
+                    entry("black_gravel", "volcanic_gravel")
+            );
+            RENAMED_BLOCKITEMS.forEach(BuiltInRegistries.BLOCK::addAlias);
+            RENAMED_BLOCKITEMS.forEach(BuiltInRegistries.ITEM::addAlias);
         }
     }
 
