@@ -15,6 +15,7 @@ import net.gnomecraft.basaltcrusher.mill.GravelMillBlock;
 import net.gnomecraft.basaltcrusher.mill.GravelMillEntity;
 import net.gnomecraft.basaltcrusher.mill.GravelMillScreenHandler;
 import net.gnomecraft.basaltcrusher.utils.BasaltCrusherRegistryAliases;
+import net.minecraft.references.BlockItemId;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
@@ -49,17 +50,17 @@ public class BasaltCrusher implements ModInitializer {
     public static final String MOD_ID = "basalt_crusher";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public static final Identifier OBSIDIAN_PILE_ID = Identifier.fromNamespaceAndPath(MOD_ID, "obsidian_pile");
-    public static final Identifier OBSIDIAN_SHARD_ID = Identifier.fromNamespaceAndPath(MOD_ID, "obsidian_shard");
-    public static final Identifier VOLCANIC_GRAVEL_BLOCK_ID = Identifier.fromNamespaceAndPath(MOD_ID, "volcanic_gravel");
+    public static final ResourceKey<Item> OBSIDIAN_PILE_ID = itemId("obsidian_pile");
+    public static final ResourceKey<Item> OBSIDIAN_SHARD_ID = itemId("obsidian_shard");
+    public static final BlockItemId VOLCANIC_GRAVEL_BLOCK_ID = blockItemId("volcanic_gravel");
 
-    public static final Identifier BASALT_CRUSHER_BLOCK_ID = Identifier.fromNamespaceAndPath(MOD_ID, "basalt_crusher");
-    public static final Identifier GRIZZLY_BLOCK_ID = Identifier.fromNamespaceAndPath(MOD_ID, "grizzly");
-    public static final Identifier GRAVEL_MILL_BLOCK_ID = Identifier.fromNamespaceAndPath(MOD_ID, "gravel_mill");
-    public static final Identifier IRON_JAW_LINER_ID = Identifier.fromNamespaceAndPath(MOD_ID, "iron_jaw_liner");
-    public static final Identifier DIAMOND_JAW_LINER_ID = Identifier.fromNamespaceAndPath(MOD_ID, "diamond_jaw_liner");
-    public static final Identifier NETHERITE_JAW_LINER_ID = Identifier.fromNamespaceAndPath(MOD_ID, "netherite_jaw_liner");
-    public static final Identifier MILL_ROD_CHARGE_ID = Identifier.fromNamespaceAndPath(MOD_ID, "mill_rod_charge");
+    public static final BlockItemId BASALT_CRUSHER_BLOCK_ID = blockItemId("basalt_crusher");
+    public static final BlockItemId GRIZZLY_BLOCK_ID = blockItemId("grizzly");
+    public static final BlockItemId GRAVEL_MILL_BLOCK_ID = blockItemId("gravel_mill");
+    public static final ResourceKey<Item> IRON_JAW_LINER_ID = itemId("iron_jaw_liner");
+    public static final ResourceKey<Item> DIAMOND_JAW_LINER_ID = itemId("diamond_jaw_liner");
+    public static final ResourceKey<Item> NETHERITE_JAW_LINER_ID = itemId("netherite_jaw_liner");
+    public static final ResourceKey<Item> MILL_ROD_CHARGE_ID = itemId("mill_rod_charge");
 
     public static final TagKey<Item> BASALTS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "basalts"));
     public static final TagKey<Item> JAW_LINERS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MOD_ID, "jaw_liners"));
@@ -71,30 +72,30 @@ public class BasaltCrusher implements ModInitializer {
     public static final SoundEvent GRAVEL_MILL_SOUND_EVENT = SoundEvent.createVariableRangeEvent(GRAVEL_MILL_SOUND_ID);
 
     // Basalt Crusher block
-    public static final Block BASALT_CRUSHER_BLOCK = Registry.register(BuiltInRegistries.BLOCK, BASALT_CRUSHER_BLOCK_ID, new BasaltCrusherBlock(BlockBehaviour.Properties.of().setId(ResourceKey.create(Registries.BLOCK, BASALT_CRUSHER_BLOCK_ID)).mapColor(MapColor.METAL).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.f, 4.8f).sound(SoundType.METAL)));
-    public static final BlockItem BASALT_CRUSHER_ITEM = Registry.register(BuiltInRegistries.ITEM, BASALT_CRUSHER_BLOCK_ID, new BlockItem(BASALT_CRUSHER_BLOCK, new net.minecraft.world.item.Item.Properties().setId(ResourceKey.create(Registries.ITEM, BASALT_CRUSHER_BLOCK_ID)).useBlockDescriptionPrefix()));
-    public static final BlockEntityType<BasaltCrusherEntity> BASALT_CRUSHER_ENTITY = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, BASALT_CRUSHER_BLOCK_ID, FabricBlockEntityTypeBuilder.create(BasaltCrusherEntity::new, BASALT_CRUSHER_BLOCK).build());
-    public static final MenuType<BasaltCrusherScreenHandler> BASALT_CRUSHER_SCREEN_HANDLER = Registry.register(BuiltInRegistries.MENU, BASALT_CRUSHER_BLOCK_ID, new MenuType<>(BasaltCrusherScreenHandler::new, FeatureFlagSet.of()));
+    public static final Block BASALT_CRUSHER_BLOCK = Registry.register(BuiltInRegistries.BLOCK, BASALT_CRUSHER_BLOCK_ID.block(), new BasaltCrusherBlock(BlockBehaviour.Properties.of().setId(BASALT_CRUSHER_BLOCK_ID.block()).mapColor(MapColor.METAL).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.f, 4.8f).sound(SoundType.METAL)));
+    public static final BlockItem BASALT_CRUSHER_ITEM = Registry.register(BuiltInRegistries.ITEM, BASALT_CRUSHER_BLOCK_ID.item(), new BlockItem(BASALT_CRUSHER_BLOCK, new net.minecraft.world.item.Item.Properties().setId(BASALT_CRUSHER_BLOCK_ID.item()).useBlockDescriptionPrefix()));
+    public static final BlockEntityType<BasaltCrusherEntity> BASALT_CRUSHER_ENTITY = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, BASALT_CRUSHER_BLOCK_ID.block().identifier(), FabricBlockEntityTypeBuilder.create(BasaltCrusherEntity::new, BASALT_CRUSHER_BLOCK).build());
+    public static final MenuType<BasaltCrusherScreenHandler> BASALT_CRUSHER_SCREEN_HANDLER = Registry.register(BuiltInRegistries.MENU, BASALT_CRUSHER_BLOCK_ID.block().identifier(), new MenuType<>(BasaltCrusherScreenHandler::new, FeatureFlagSet.of()));
 
     // Grizzly block
-    public static final Block GRIZZLY_BLOCK = Registry.register(BuiltInRegistries.BLOCK, GRIZZLY_BLOCK_ID, new GrizzlyBlock(BlockBehaviour.Properties.of().setId(ResourceKey.create(Registries.BLOCK, GRIZZLY_BLOCK_ID)).mapColor(MapColor.METAL).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.0f, 4.8f).sound(SoundType.METAL).noOcclusion()));
-    public static final BlockItem GRIZZLY_ITEM = Registry.register(BuiltInRegistries.ITEM, GRIZZLY_BLOCK_ID, new BlockItem(GRIZZLY_BLOCK, new net.minecraft.world.item.Item.Properties().setId(ResourceKey.create(Registries.ITEM, GRIZZLY_BLOCK_ID)).useBlockDescriptionPrefix()));
-    public static final BlockEntityType<GrizzlyEntity> GRIZZLY_ENTITY = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, GRIZZLY_BLOCK_ID, FabricBlockEntityTypeBuilder.create(GrizzlyEntity::new, GRIZZLY_BLOCK).build());
-    public static final MenuType<GrizzlyScreenHandler> GRIZZLY_SCREEN_HANDLER = Registry.register(BuiltInRegistries.MENU, GRIZZLY_BLOCK_ID, new MenuType<>(GrizzlyScreenHandler::new, FeatureFlagSet.of()));
+    public static final Block GRIZZLY_BLOCK = Registry.register(BuiltInRegistries.BLOCK, GRIZZLY_BLOCK_ID.block(), new GrizzlyBlock(BlockBehaviour.Properties.of().setId(GRIZZLY_BLOCK_ID.block()).mapColor(MapColor.METAL).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.0f, 4.8f).sound(SoundType.METAL).noOcclusion()));
+    public static final BlockItem GRIZZLY_ITEM = Registry.register(BuiltInRegistries.ITEM, GRIZZLY_BLOCK_ID.item(), new BlockItem(GRIZZLY_BLOCK, new net.minecraft.world.item.Item.Properties().setId(GRIZZLY_BLOCK_ID.item()).useBlockDescriptionPrefix()));
+    public static final BlockEntityType<GrizzlyEntity> GRIZZLY_ENTITY = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, GRIZZLY_BLOCK_ID.block().identifier(), FabricBlockEntityTypeBuilder.create(GrizzlyEntity::new, GRIZZLY_BLOCK).build());
+    public static final MenuType<GrizzlyScreenHandler> GRIZZLY_SCREEN_HANDLER = Registry.register(BuiltInRegistries.MENU, GRIZZLY_BLOCK_ID.block().identifier(), new MenuType<>(GrizzlyScreenHandler::new, FeatureFlagSet.of()));
 
     // Gravel Mill block
-    public static final Block GRAVEL_MILL_BLOCK = Registry.register(BuiltInRegistries.BLOCK, GRAVEL_MILL_BLOCK_ID, new GravelMillBlock(BlockBehaviour.Properties.of().setId(ResourceKey.create(Registries.BLOCK, GRAVEL_MILL_BLOCK_ID)).mapColor(MapColor.METAL).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.0f, 4.8f).sound(SoundType.METAL)));
-    public static final BlockItem GRAVEL_MILL_ITEM = Registry.register(BuiltInRegistries.ITEM, GRAVEL_MILL_BLOCK_ID, new BlockItem(GRAVEL_MILL_BLOCK, new net.minecraft.world.item.Item.Properties().setId(ResourceKey.create(Registries.ITEM, GRAVEL_MILL_BLOCK_ID)).useBlockDescriptionPrefix()));
-    public static final BlockEntityType<GravelMillEntity> GRAVEL_MILL_ENTITY = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, GRAVEL_MILL_BLOCK_ID, FabricBlockEntityTypeBuilder.create(GravelMillEntity::new, GRAVEL_MILL_BLOCK).build());
-    public static final MenuType<GravelMillScreenHandler> GRAVEL_MILL_SCREEN_HANDLER = Registry.register(BuiltInRegistries.MENU, GRAVEL_MILL_BLOCK_ID, new MenuType<>(GravelMillScreenHandler::new, FeatureFlagSet.of()));
+    public static final Block GRAVEL_MILL_BLOCK = Registry.register(BuiltInRegistries.BLOCK, GRAVEL_MILL_BLOCK_ID.block(), new GravelMillBlock(BlockBehaviour.Properties.of().setId(GRAVEL_MILL_BLOCK_ID.block()).mapColor(MapColor.METAL).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(3.0f, 4.8f).sound(SoundType.METAL)));
+    public static final BlockItem GRAVEL_MILL_ITEM = Registry.register(BuiltInRegistries.ITEM, GRAVEL_MILL_BLOCK_ID.item(), new BlockItem(GRAVEL_MILL_BLOCK, new net.minecraft.world.item.Item.Properties().setId(GRAVEL_MILL_BLOCK_ID.item()).useBlockDescriptionPrefix()));
+    public static final BlockEntityType<GravelMillEntity> GRAVEL_MILL_ENTITY = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, GRAVEL_MILL_BLOCK_ID.block().identifier(), FabricBlockEntityTypeBuilder.create(GravelMillEntity::new, GRAVEL_MILL_BLOCK).build());
+    public static final MenuType<GravelMillScreenHandler> GRAVEL_MILL_SCREEN_HANDLER = Registry.register(BuiltInRegistries.MENU, GRAVEL_MILL_BLOCK_ID.block().identifier(), new MenuType<>(GravelMillScreenHandler::new, FeatureFlagSet.of()));
 
     // Basalt Crusher Jaw Liners
-    public static final Item IRON_JAW_LINER_ITEM      = Registry.register(BuiltInRegistries.ITEM, IRON_JAW_LINER_ID,      new Item(ToolMaterial.IRON     .applyToolProperties(new net.minecraft.world.item.Item.Properties().setId(ResourceKey.create(Registries.ITEM, IRON_JAW_LINER_ID)),      BlockTags.AIR, 0.0f, -3.0f, 0.0f)));
-    public static final Item DIAMOND_JAW_LINER_ITEM   = Registry.register(BuiltInRegistries.ITEM, DIAMOND_JAW_LINER_ID,   new Item(ToolMaterial.DIAMOND  .applyToolProperties(new net.minecraft.world.item.Item.Properties().setId(ResourceKey.create(Registries.ITEM, DIAMOND_JAW_LINER_ID)),   BlockTags.AIR, 0.0f, -3.0f, 0.0f)));
-    public static final Item NETHERITE_JAW_LINER_ITEM = Registry.register(BuiltInRegistries.ITEM, NETHERITE_JAW_LINER_ID, new Item(ToolMaterial.NETHERITE.applyToolProperties(new net.minecraft.world.item.Item.Properties().setId(ResourceKey.create(Registries.ITEM, NETHERITE_JAW_LINER_ID)), BlockTags.AIR, 0.0f, -3.0f, 0.0f)));
+    public static final Item IRON_JAW_LINER_ITEM      = Registry.register(BuiltInRegistries.ITEM, IRON_JAW_LINER_ID,      new Item(ToolMaterial.IRON     .applyToolProperties(new net.minecraft.world.item.Item.Properties().setId(IRON_JAW_LINER_ID),      BlockTags.AIR, 0.0f, -3.0f, 0.0f)));
+    public static final Item DIAMOND_JAW_LINER_ITEM   = Registry.register(BuiltInRegistries.ITEM, DIAMOND_JAW_LINER_ID,   new Item(ToolMaterial.DIAMOND  .applyToolProperties(new net.minecraft.world.item.Item.Properties().setId(DIAMOND_JAW_LINER_ID),   BlockTags.AIR, 0.0f, -3.0f, 0.0f)));
+    public static final Item NETHERITE_JAW_LINER_ITEM = Registry.register(BuiltInRegistries.ITEM, NETHERITE_JAW_LINER_ID, new Item(ToolMaterial.NETHERITE.applyToolProperties(new net.minecraft.world.item.Item.Properties().setId(NETHERITE_JAW_LINER_ID), BlockTags.AIR, 0.0f, -3.0f, 0.0f)));
 
     // Gravel Mill Rod Charge
-    public static final Item MILL_ROD_CHARGE_ITEM = Registry.register(BuiltInRegistries.ITEM, MILL_ROD_CHARGE_ID, new Item(ToolMaterial.IRON.applyToolProperties(new net.minecraft.world.item.Item.Properties().setId(ResourceKey.create(Registries.ITEM, MILL_ROD_CHARGE_ID)), BlockTags.AIR, 0.0f, -3.0f, 0.0f)));
+    public static final Item MILL_ROD_CHARGE_ITEM = Registry.register(BuiltInRegistries.ITEM, MILL_ROD_CHARGE_ID, new Item(ToolMaterial.IRON.applyToolProperties(new net.minecraft.world.item.Item.Properties().setId(MILL_ROD_CHARGE_ID), BlockTags.AIR, 0.0f, -3.0f, 0.0f)));
 
     /*
      * These variables are initialized when Terrestria is present (extendTerrestria == true).
@@ -118,11 +119,11 @@ public class BasaltCrusher implements ModInitializer {
 
         // Register Terrestria integrations if we're extending Terrestria OR running datagen
         if (extendTerrestria || System.getProperty("fabric-api.datagen") != null) {
-            VOLCANIC_GRAVEL_BLOCK = Registry.register(BuiltInRegistries.BLOCK, VOLCANIC_GRAVEL_BLOCK_ID, new ColoredFallingBlock(new ColorRGBA(0x202020), BlockBehaviour.Properties.ofFullCopy(Blocks.GRAVEL).setId(ResourceKey.create(Registries.BLOCK, VOLCANIC_GRAVEL_BLOCK_ID)).mapColor(MapColor.DEEPSLATE)));
-            VOLCANIC_GRAVEL_ITEM = Registry.register(BuiltInRegistries.ITEM, VOLCANIC_GRAVEL_BLOCK_ID, new BlockItem(VOLCANIC_GRAVEL_BLOCK, new net.minecraft.world.item.Item.Properties().setId(ResourceKey.create(Registries.ITEM, VOLCANIC_GRAVEL_BLOCK_ID)).useBlockDescriptionPrefix()));
+            VOLCANIC_GRAVEL_BLOCK = Registry.register(BuiltInRegistries.BLOCK, VOLCANIC_GRAVEL_BLOCK_ID.block(), new ColoredFallingBlock(new ColorRGBA(0x202020), BlockBehaviour.Properties.ofFullCopy(Blocks.GRAVEL).setId(VOLCANIC_GRAVEL_BLOCK_ID.block()).mapColor(MapColor.DEEPSLATE)));
+            VOLCANIC_GRAVEL_ITEM = Registry.register(BuiltInRegistries.ITEM, VOLCANIC_GRAVEL_BLOCK_ID.item(), new BlockItem(VOLCANIC_GRAVEL_BLOCK, new net.minecraft.world.item.Item.Properties().setId(VOLCANIC_GRAVEL_BLOCK_ID.item()).useBlockDescriptionPrefix()));
 
-            OBSIDIAN_PILE_ITEM = Registry.register(BuiltInRegistries.ITEM, OBSIDIAN_PILE_ID, new Item(new net.minecraft.world.item.Item.Properties().setId(ResourceKey.create(Registries.ITEM, OBSIDIAN_PILE_ID))));
-            OBSIDIAN_SHARD_ITEM = Registry.register(BuiltInRegistries.ITEM, OBSIDIAN_SHARD_ID, new Item(new net.minecraft.world.item.Item.Properties().setId(ResourceKey.create(Registries.ITEM, OBSIDIAN_SHARD_ID))));
+            OBSIDIAN_PILE_ITEM = Registry.register(BuiltInRegistries.ITEM, OBSIDIAN_PILE_ID, new Item(new net.minecraft.world.item.Item.Properties().setId(OBSIDIAN_PILE_ID)));
+            OBSIDIAN_SHARD_ITEM = Registry.register(BuiltInRegistries.ITEM, OBSIDIAN_SHARD_ID, new Item(new net.minecraft.world.item.Item.Properties().setId(OBSIDIAN_SHARD_ID)));
 
             // Register Terrestria extension items for Item Groups
             CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.NATURAL_BLOCKS)
@@ -147,5 +148,14 @@ public class BasaltCrusher implements ModInitializer {
 
         // Take care of blocks and items needing s/basalt-crusher/basalt_crusher/ or a change of name
         BasaltCrusherRegistryAliases.init();
+    }
+
+    private static BlockItemId blockItemId(String path) {
+        Identifier id = Identifier.fromNamespaceAndPath(MOD_ID, path);
+        return BlockItemId.create(id, id);
+    }
+
+    private static ResourceKey<Item> itemId(String path) {
+        return ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MOD_ID, path));
     }
 }

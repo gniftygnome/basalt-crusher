@@ -7,11 +7,11 @@ import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.gnomecraft.basaltcrusher.BasaltCrusher;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.references.BlockItemIds;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.concurrent.CompletableFuture;
@@ -27,20 +27,20 @@ public class BasaltCrusherItemTagsProvider extends FabricTagsProvider.ItemTagsPr
 		/*
 		 * Vanilla item tags
 		 */
-		valueLookupBuilder(ItemTags.DURABILITY_ENCHANTABLE)
+		tag(ItemTags.DURABILITY_ENCHANTABLE)
 				.addTag(BasaltCrusher.JAW_LINERS);
 
-		valueLookupBuilder(ItemTags.MINING_ENCHANTABLE)
+		tag(ItemTags.MINING_ENCHANTABLE)
 				.addTag(BasaltCrusher.JAW_LINERS);
 
 
 		/*
 		 * Conventional item tags
 		 */
-		valueLookupBuilder(BasaltCrusher.BASALTS)
-				.add(Items.BASALT)
-				.add(Items.POLISHED_BASALT)
-				.add(Items.SMOOTH_BASALT);
+		tag(BasaltCrusher.BASALTS)
+				.add(BlockItemIds.BASALT.item())
+				.add(BlockItemIds.POLISHED_BASALT.item())
+				.add(BlockItemIds.SMOOTH_BASALT.item());
 
 		copy(ConventionalBlockTags.GRAVELS, ConventionalItemTags.GRAVELS);
 
@@ -48,10 +48,10 @@ public class BasaltCrusherItemTagsProvider extends FabricTagsProvider.ItemTagsPr
 		/*
 		 * Local item tags
 		 */
-		valueLookupBuilder(BasaltCrusher.JAW_LINERS)
-				.add(BasaltCrusher.IRON_JAW_LINER_ITEM)
-				.add(BasaltCrusher.DIAMOND_JAW_LINER_ITEM)
-				.add(BasaltCrusher.NETHERITE_JAW_LINER_ITEM);
+		tag(BasaltCrusher.JAW_LINERS)
+				.add(BasaltCrusher.IRON_JAW_LINER_ID)
+				.add(BasaltCrusher.DIAMOND_JAW_LINER_ID)
+				.add(BasaltCrusher.NETHERITE_JAW_LINER_ID);
 
 		// this works around not wanting to wait for Terrestria to be available when updating
 		builder(BasaltCrusher.TERRESTRIA_BASALTS)
