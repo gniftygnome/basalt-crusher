@@ -38,7 +38,7 @@ public class GrizzlyScreen extends AbstractContainerScreen<AbstractContainerMenu
          */
 
         // If we are processing Terrestria volcanic materials at the moment, show those stockpiles instead.
-        boolean black = TerrestriaIntegration.ENABLED && ((GrizzlyScreenHandler) this.menu).stockpileOf(Items.AIR) > 0.0f;
+        boolean black = BasaltCrusher.extendTerrestria && ((GrizzlyScreenHandler) this.menu).stockpileOf(Items.AIR) > 0.0f;
 
         // gravel: 62, 41 -  77, 56
         Item gravelType = black ? TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM : Items.GRAVEL;

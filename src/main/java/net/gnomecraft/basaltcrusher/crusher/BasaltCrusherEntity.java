@@ -334,9 +334,8 @@ public class BasaltCrusherEntity extends BlockEntity implements MenuProvider {
             RandomSource random = level.getRandom();
 
             // TODO: use recipes.
-            input.shrink(1);
             if (output.isEmpty()) {
-                if (TerrestriaIntegration.ENABLED && input.is(BasaltCrusher.TERRESTRIA_BASALTS)) {
+                if (BasaltCrusher.extendTerrestria && input.is(BasaltCrusher.TERRESTRIA_BASALTS)) {
                     entity.inventory.setItem(2, new ItemStack(TerrestriaIntegration.VOLCANIC_GRAVEL_ITEM, 1));
                 } else {
                     entity.inventory.setItem(2, new ItemStack(Blocks.GRAVEL, 1));
@@ -344,6 +343,7 @@ public class BasaltCrusherEntity extends BlockEntity implements MenuProvider {
             } else {
                 output.grow(1);
             }
+            input.shrink(1);
             // Try to damage the top jaw liner (if possible).
             if (upperJaw.isDamageableItem()) {
                 if ((0.5d / (1.0d + (double) getEnchantmentLevel(level, Enchantments.UNBREAKING, upperJaw))) > random.nextDouble()) {
